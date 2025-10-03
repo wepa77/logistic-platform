@@ -1,0 +1,23 @@
+# Python / Django
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.db
+.env
+.venv/
+media/
+staticfiles/
+
+# Django settings
+local_settings.py
+
+# Node / Vue
+node_modules/
+dist/
+*.log
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
