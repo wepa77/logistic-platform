@@ -33,15 +33,20 @@ export const useAuthStore = defineStore('auth', {
       // 🔥 redirect to dashboard
       router.push('/')
     },
-    async fetchMe() {
-      try {
-        const { data } = await http.get<IUser>('/auth/me/')
-        this.user = data
-      } catch {
-        // token expired or invalid
-        this.logout()
+      async fetchMe() {
+          try {
+              const { data } = await http.get<IUser>('/auth/me/')
+              this.user = data
+
+              // 👇 user_type ýok bolsa onboarding sahypasyna git
+              if (!this.user?.user_type) {
+                  router.push('/onboarding')
+              }
+          } catch {
+              this.logout()
+          }
       }
-    },
+      ,
     logout() {
       this.user = null
       this.access = ''
@@ -49,6 +54,17 @@ export const useAuthStore = defineStore('auth', {
       localStorage.removeItem('access')
       localStorage.removeItem('refresh')
       router.push('/login')
+    },
+    
+    async updateUserType(userType: 'carrier' | 'shipper') {
+      try {
+        await http.patch('/auth/set-type/', { user_type: userType })
+        await this.fetchMe()
+        return true
+      } catch (error) {
+        console.error('Failed to update user type:', error)
+        throw error
+      }
     }
   }
 })

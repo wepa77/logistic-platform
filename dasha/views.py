@@ -22,6 +22,17 @@ from .permissions import IsOwnerOrReadOnly
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
+# dasha/views.py
+from rest_framework import permissions, generics
+from .serializers import UserTypeSerializer
+
+class SetUserTypeView(generics.UpdateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserTypeSerializer
+
+    def get_object(self):
+        return self.request.user
+
 
 # --- Stripe webhook ---
 @csrf_exempt
@@ -195,3 +206,4 @@ class ReviewViewSet(viewsets.ModelViewSet):
     search_fields = ["comment", "shipment__cargo__title", "reviewer__username"]
     ordering_fields = ["rating", "created_at"]
     ordering = ["-created_at"]
+

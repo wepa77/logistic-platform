@@ -34,7 +34,7 @@
         </div>
         <div class="balance-info">
           <div class="balance-label">Current Balance</div>
-          <div class="balance-value">{{ user?.balance?.toFixed(2) || '0.00' }} TMT</div>
+          <div class="balance-value">{{ formatBalance(user?.balance) }} TMT</div>
         </div>
       </div>
 
@@ -49,7 +49,7 @@
         </div>
         <div class="balance-info">
           <div class="balance-label">Deposit Balance</div>
-          <div class="balance-value">{{ user?.deposit_balance?.toFixed(2) || '0.00' }} TMT</div>
+          <div class="balance-value">{{ formatBalance(user?.deposit_balance) }} TMT</div>
         </div>
       </div>
     </div>
@@ -247,7 +247,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/store/auth'
 import { useRouter } from 'vue-router'
@@ -259,17 +259,21 @@ import {
 } from '@/api/api'
 
 const auth = useAuthStore()
-const { user } = storeToRefs(auth)
-const router = useRouter()
+const { user } = storeToRefs(useAuthStore())
 
-const chartPeriod = ref('7d')
-
+// Stats state
 const stats = ref({
   totalCargos: 0,
   totalVehicles: 0,
   totalShipments: 0,
   totalOffers: 0,
 })
+
+// Safely format balance values
+const formatBalance = (value: number | null | undefined): string => {
+  if (value === null || value === undefined) return '0.00'
+  return Number(value).toFixed(2)
+}
 
 const recentActivities = ref([
   {

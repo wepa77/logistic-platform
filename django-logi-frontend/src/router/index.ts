@@ -13,6 +13,7 @@ const ReviewsPage = defineAsyncComponent(() => import('@/pages/Reviews/index.vue
 const WalletPage = defineAsyncComponent(() => import('@/pages/Wallet/index.vue'))
 const AppLayout = defineAsyncComponent(() => import('@/layout/AppLayout/index.vue'))
 const LoginPage = defineAsyncComponent(() => import('@/pages/auth/Login/index.vue'))
+const OnboardingPage = defineAsyncComponent(() => import('@/pages/Onboarding/index.vue'))
 
 const routes = [
     {
@@ -29,6 +30,7 @@ const routes = [
         ]
     },
     { path: '/login', name: 'login', component: LoginPage, meta: { title: 'Login' } },
+    { path: '/onboarding', name: 'onboarding', component: OnboardingPage },
     { path: '/:pathMatch(.*)*', redirect: '/' }
 ]
 

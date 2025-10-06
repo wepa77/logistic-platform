@@ -1,6 +1,6 @@
 <template>
   <el-container class="app-layout">
-    <!-- Sidebar -->
+    <!-- SIDEBAR -->
     <el-aside width="260px" class="sidebar">
       <div class="logo">
         <div class="logo-icon">
@@ -9,58 +9,68 @@
         <span class="brand">Logistic</span>
       </div>
 
+      <!-- MENU -->
       <el-menu
           router
           :default-active="$route.path"
           background-color="transparent"
           text-color="#94a3b8"
-          active-text-color="#ffffff"
+          active-text-color="#fff"
           class="menu"
       >
-        <el-menu-item index="/" class="menu-item">
+        <el-menu-item index="/">
           <i class="mdi mdi-view-dashboard-outline menu-icon"></i>
           <span>{{ $t('nav.dashboard') }}</span>
         </el-menu-item>
-        <el-menu-item index="/vehicles" class="menu-item">
-          <i class="mdi mdi-truck menu-icon"></i>
-          <span>{{ $t('nav.vehicles') }}</span>
-        </el-menu-item>
-        <el-menu-item index="/cargos" class="menu-item">
-          <i class="mdi mdi-package-variant-closed menu-icon"></i>
-          <span>{{ $t('nav.cargos') }}</span>
-        </el-menu-item>
-        <el-menu-item index="/offers" class="menu-item">
-          <i class="mdi mdi-handshake-outline menu-icon"></i>
-          <span>{{ $t('nav.offers') }}</span>
-        </el-menu-item>
-        <el-menu-item index="/shipments" class="menu-item">
-          <i class="mdi mdi-transit-connection-variant menu-icon"></i>
-          <span>{{ $t('nav.shipments') }}</span>
-        </el-menu-item>
-        <el-menu-item index="/reviews" class="menu-item">
+
+        <!-- Carrier menus -->
+        <template v-if="user?.user_type === 'carrier'">
+          <el-menu-item index="/vehicles">
+            <i class="mdi mdi-truck menu-icon"></i>
+            <span>{{ $t('nav.vehicles') }}</span>
+          </el-menu-item>
+          <el-menu-item index="/shipments">
+            <i class="mdi mdi-transit-connection-variant menu-icon"></i>
+            <span>{{ $t('nav.shipments') }}</span>
+          </el-menu-item>
+        </template>
+
+        <!-- Shipper menus -->
+        <template v-if="user?.user_type === 'shipper'">
+          <el-menu-item index="/cargos">
+            <i class="mdi mdi-package-variant-closed menu-icon"></i>
+            <span>{{ $t('nav.cargos') }}</span>
+          </el-menu-item>
+          <el-menu-item index="/offers">
+            <i class="mdi mdi-handshake-outline menu-icon"></i>
+            <span>{{ $t('nav.offers') }}</span>
+          </el-menu-item>
+        </template>
+
+        <!-- Common -->
+        <el-menu-item index="/reviews">
           <i class="mdi mdi-star-outline menu-icon"></i>
           <span>{{ $t('nav.reviews') }}</span>
         </el-menu-item>
-        <el-menu-item index="/wallet" class="menu-item">
+        <el-menu-item index="/wallet">
           <i class="mdi mdi-wallet-outline menu-icon"></i>
           <span>{{ $t('nav.wallet') }}</span>
         </el-menu-item>
       </el-menu>
 
+      <!-- USER FOOTER -->
       <div class="sidebar-footer">
-        <div class="user-info">
-          <el-avatar :size="40" :src="user?.avatar" class="user-avatar">
-            <i class="mdi mdi-account"></i>
-          </el-avatar>
-          <div class="user-details">
-            <div class="user-name">{{ user?.username || 'User' }}</div>
-            <div class="user-role">Administrator</div>
-          </div>
+        <el-avatar :size="40" :src="user?.avatar" class="user-avatar">
+          <i class="mdi mdi-account"></i>
+        </el-avatar>
+        <div class="user-details">
+          <div class="user-name">{{ user?.username || 'User' }}</div>
+          <div class="user-role">{{ userRole }}</div>
         </div>
       </div>
     </el-aside>
 
-    <!-- Main -->
+    <!-- MAIN -->
     <el-container>
       <el-header class="header">
         <div class="header-left">
@@ -73,10 +83,7 @@
           <LanguageSwitcher />
           <el-button text class="header-action">
             <i class="mdi mdi-bell-outline"></i>
-            <span class="notification-badge">3</span>
-          </el-button>
-          <el-button text class="header-action">
-            <i class="mdi mdi-cog-outline"></i>
+            <span v-if="notifications>0" class="notification-badge">{{ notifications }}</span>
           </el-button>
           <el-dropdown trigger="click" class="user-dropdown">
             <div class="user-trigger">
@@ -103,30 +110,62 @@
       </el-header>
 
       <el-main class="main">
-        <router-view />
+        <!-- 👉 If user_type not set, show onboarding -->
+        <Onboarding v-if="!user?.user_type" @selected="setUserType"/>
+        <router-view v-else />
       </el-main>
     </el-container>
   </el-container>
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useAuthStore } from '@/store/auth'
 import { useRoute, useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import LanguageSwitcher from '@/components/LanguageSwitcher.vue'
+import Onboarding from '@/pages/Onboarding/index.vue'
 
 const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
 
 const user = computed(() => auth.user)
-const pageTitle = computed(() => route.meta.title || 'Dashboard')
+const userRole = computed(() => {
+  if (auth.isCarrier) return 'Carrier'
+  if (auth.isShipper) return 'Shipper'
+  return 'Visitor'
+})
 
-function logout() {
+const pageTitle = computed(() => route.meta.title || 'Dashboard')
+const notifications = ref(0)
+
+// Fetch notifications when component mounts
+onMounted(async () => {
+  try {
+    const { data } = await http.get('/notifications/unread-count/')
+    notifications.value = data.count
+  } catch (error) {
+    console.error('Failed to fetch notifications:', error)
+  }
+})
+
+async function logout() {
   auth.logout()
   router.push('/login')
 }
+
+async function setUserType(type: 'carrier' | 'shipper') {
+  try {
+    await auth.updateUserType(type)
+    ElMessage.success('Rol üstünlikli saýlandy')
+    router.push('/')
+  } catch (error) {
+    ElMessage.error('Rol üýtgedilýärkä ýalňyşlyk ýüze çykdy')
+  }
+}
 </script>
+
 
 <style scoped>
 .app-layout {

@@ -190,3 +190,8 @@ class MeSerializer(serializers.ModelSerializer):
             "address", "user_type", "verified", "balance", "deposit_balance"
         ]
         read_only_fields = ["username", "verified", "balance", "deposit_balance"]
+
+class UserTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['user_type']

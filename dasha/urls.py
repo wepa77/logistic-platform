@@ -11,7 +11,7 @@ from .views import (
     ShipmentViewSet, ReviewViewSet,
     RegisterView, MeView,
     WalletTransactionViewSet, TopUpRequestViewSet,
-    stripe_webhook
+    stripe_webhook, SetUserTypeView
 )
 
 # DRF Router
@@ -42,6 +42,8 @@ urlpatterns = [
 
     # --- Stripe webhook ---
     path('stripe/webhook/', stripe_webhook, name='stripe-webhook'),
+    path("auth/set-type/", SetUserTypeView.as_view(), name="auth-set-type"),
+
 ]
 
 # Media URL

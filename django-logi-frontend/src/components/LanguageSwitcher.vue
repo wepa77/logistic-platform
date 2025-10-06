@@ -1,33 +1,36 @@
 <template>
-  <el-dropdown trigger="click" @command="changeLanguage">
-    <el-button text class="language-btn">
-      <i class="mdi mdi-translate"></i>
-      <span class="language-text">{{ currentLanguageLabel }}</span>
-      <i class="mdi mdi-chevron-down"></i>
+  <div class="language-switcher">
+    <el-button 
+      text 
+      :class="['language-btn', { active: locale === 'en' }]"
+      @click="changeLanguage('en')"
+    >
+      <span class="flag">🇬🇧</span>
+      <span class="language-text">EN</span>
     </el-button>
-    <template #dropdown>
-      <el-dropdown-menu>
-        <el-dropdown-item command="en" :class="{ active: locale === 'en' }">
-          <div class="language-option">
-            <span class="flag">🇬🇧</span>
-            <span>English</span>
-          </div>
-        </el-dropdown-item>
-        <el-dropdown-item command="ru" :class="{ active: locale === 'ru' }">
-          <div class="language-option">
-            <span class="flag">🇷🇺</span>
-            <span>Русский</span>
-          </div>
-        </el-dropdown-item>
-        <el-dropdown-item command="tk" :class="{ active: locale === 'tk' }">
-          <div class="language-option">
-            <span class="flag">🇹🇲</span>
-            <span>Türkmençe</span>
-          </div>
-        </el-dropdown-item>
-      </el-dropdown-menu>
-    </template>
-  </el-dropdown>
+    
+    <el-divider direction="vertical" border-style="dashed" />
+    
+    <el-button 
+      text 
+      :class="['language-btn', { active: locale === 'ru' }]"
+      @click="changeLanguage('ru')"
+    >
+      <span class="flag">🇷🇺</span>
+      <span class="language-text">RU</span>
+    </el-button>
+    
+    <el-divider direction="vertical" border-style="dashed" />
+    
+    <el-button 
+      text 
+      :class="['language-btn', { active: locale === 'tk' }]"
+      @click="changeLanguage('tk')"
+    >
+      <span class="flag">🇹🇲</span>
+      <span class="language-text">TM</span>
+    </el-button>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -36,14 +39,7 @@ import { useI18n } from 'vue-i18n'
 
 const { locale } = useI18n()
 
-const currentLanguageLabel = computed(() => {
-  const labels: Record<string, string> = {
-    en: 'EN',
-    ru: 'RU',
-    tk: 'TM'
-  }
-  return labels[locale.value] || 'EN'
-})
+// Current language label is now directly in the template
 
 function changeLanguage(lang: string) {
   locale.value = lang
@@ -52,40 +48,52 @@ function changeLanguage(lang: string) {
 </script>
 
 <style scoped>
+.language-switcher {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  margin: 0 8px;
+}
+
 .language-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  color: #94a3b8;
+  justify-content: center;
+  padding: 0 10px;
+  height: 32px;
+  min-width: 40px;
+  color: var(--el-text-color-secondary);
+  font-size: 14px;
   font-weight: 500;
-  transition: all 0.3s ease;
+  transition: all 0.3s;
+  border-radius: 4px;
+  margin: 0 2px;
 }
 
 .language-btn:hover {
-  color: #3b82f6;
-  background: rgba(59, 130, 246, 0.1);
+  color: var(--el-color-primary);
+  background-color: var(--el-color-primary-light-9);
+}
+
+.language-btn.active {
+  color: var(--el-color-primary);
+  background-color: var(--el-color-primary-light-8);
+  font-weight: 600;
 }
 
 .language-text {
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.language-option {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 4px 0;
+  margin-left: 4px;
+  font-size: 13px;
 }
 
 .flag {
-  font-size: 18px;
+  font-size: 16px;
+  line-height: 1;
 }
 
-.el-dropdown-menu__item.active {
-  background: #eff6ff;
-  color: #3b82f6;
-  font-weight: 600;
+:deep(.el-divider) {
+  margin: 0 2px;
+  height: 1em;
+  background-color: var(--el-border-color);
 }
 </style>
