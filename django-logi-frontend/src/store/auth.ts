@@ -37,11 +37,6 @@ export const useAuthStore = defineStore('auth', {
           try {
               const { data } = await http.get<IUser>('/auth/me/')
               this.user = data
-
-              // 👇 user_type ýok bolsa onboarding sahypasyna git
-              if (!this.user?.user_type) {
-                  router.push('/onboarding')
-              }
           } catch {
               this.logout()
           }

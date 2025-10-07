@@ -286,7 +286,25 @@ export default {
     alreadyHaveAccount: 'Eýýäm hasabyňyz barmy?',
     signIn: 'Gir',
     signUp: 'Hasaba al',
-    signOut: 'Çyk'
+    signOut: 'Çyk',
+    registrationTitle: 'APL.SU-da hasaba alyş',
+    selectProfile: 'Işiňiziň profilini görkeziň',
+    profileDescription: 'Biz ony beýleki gatnaşyjylara görkezeris, şonuň üçin hyzmatdaşlary tapmak aňsat bolar. Hasaba alynandan soň islän wagtyňyz saýlawyňyzy üýtgedip bilersiňiz.',
+    carrier: 'Daşaýjy',
+    carrierDescription: 'Daşamak üçin ýük gözleýärin, meniň ulagym bar',
+    forwarder: 'Ekspeditor',
+    forwarderDescription: 'Zerurlyga görä ýük ýa-da ulag gözleýärin',
+    cargoOwner: 'Ýük eýesi',
+    cargoOwnerDescription: 'Meniň ýüküm bar, daşaýjy gözleýärin',
+    showMore: 'Has köp görkez',
+    selectProfileWarning: 'Işiňiziň profilini saýlaň',
+    login: 'Login',
+    phone: 'Ykjam telefon',
+    agreeToTerms: 'Okuw we mahabat bilen habarlaşmalary almaga razy',
+    continue: 'Dowam et',
+    termsNotice: '«Dowam et» düwmesine basmak bilen, siz şertleri kabul edýärsiňiz',
+    userAgreement: 'Ulanyjy ylalaşygy',
+    backToRoles: 'Rol saýlamaga dolan'
   },
   
   userTypes: {

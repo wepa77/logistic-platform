@@ -43,6 +43,7 @@ urlpatterns = [
     # --- Stripe webhook ---
     path('stripe/webhook/', stripe_webhook, name='stripe-webhook'),
     path("auth/set-type/", SetUserTypeView.as_view(), name="auth-set-type"),
+    path('auth/register/', RegisterView.as_view(), name='register'),
 
 ]
 

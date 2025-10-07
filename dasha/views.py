@@ -1,5 +1,6 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, permissions, generics, filters
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.conf import settings
@@ -25,6 +26,7 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 # dasha/views.py
 from rest_framework import permissions, generics
 from .serializers import UserTypeSerializer
+
 
 class SetUserTypeView(generics.UpdateAPIView):
     permission_classes = [permissions.IsAuthenticated]

@@ -110,9 +110,7 @@
       </el-header>
 
       <el-main class="main">
-        <!-- 👉 If user_type not set, show onboarding -->
-        <Onboarding v-if="!user?.user_type" @selected="setUserType"/>
-        <router-view v-else />
+        <router-view />
       </el-main>
     </el-container>
   </el-container>
@@ -123,8 +121,8 @@ import { computed, ref, onMounted } from 'vue'
 import { useAuthStore } from '@/store/auth'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { http } from '@/api/http'
 import LanguageSwitcher from '@/components/LanguageSwitcher.vue'
-import Onboarding from '@/pages/Onboarding/index.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -153,16 +151,6 @@ onMounted(async () => {
 async function logout() {
   auth.logout()
   router.push('/login')
-}
-
-async function setUserType(type: 'carrier' | 'shipper') {
-  try {
-    await auth.updateUserType(type)
-    ElMessage.success('Rol üstünlikli saýlandy')
-    router.push('/')
-  } catch (error) {
-    ElMessage.error('Rol üýtgedilýärkä ýalňyşlyk ýüze çykdy')
-  }
 }
 </script>
 

@@ -286,7 +286,25 @@ export default {
     alreadyHaveAccount: 'Already have an account?',
     signIn: 'Sign In',
     signUp: 'Sign Up',
-    signOut: 'Sign Out'
+    signOut: 'Sign Out',
+    registrationTitle: 'Registration on APL.SU',
+    selectProfile: 'Specify your activity profile',
+    profileDescription: 'We will show it to other participants so that you can easily find partners. You can change your choice at any time after registration.',
+    carrier: 'Carrier',
+    carrierDescription: 'Looking for cargo to transport, I have transport',
+    forwarder: 'Forwarder',
+    forwarderDescription: 'Looking for cargo or transport, depending on needs',
+    cargoOwner: 'Cargo Owner',
+    cargoOwnerDescription: 'I have cargo, looking for carriers',
+    showMore: 'Show more',
+    selectProfileWarning: 'Please select an activity profile',
+    login: 'Login',
+    phone: 'Mobile phone',
+    agreeToTerms: 'I agree to receive newsletters with training and advertising',
+    continue: 'Continue',
+    termsNotice: 'By clicking "Continue", you accept the terms of',
+    userAgreement: 'User Agreement',
+    backToRoles: 'Back to role selection'
   },
   
   userTypes: {

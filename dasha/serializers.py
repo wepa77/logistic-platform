@@ -2,6 +2,20 @@ from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
 from .models import User, Vehicle, Cargo, Offer, Shipment, Review, WalletTransaction, TopUpRequest
 
+class RegisterSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+    phone = serializers.CharField(max_length=20)
+
+    class Meta:
+        model = User
+        fields = ["username", "email", "password", "user_type", "phone"]
+
+    def create(self, validated_data):
+        password = validated_data.pop("password")
+        user = User(**validated_data)
+        user.set_password(password)
+        user.save()
+        return user
 
 # --- WalletTransaction ---
 class WalletTransactionSerializer(serializers.ModelSerializer):
@@ -156,29 +170,6 @@ class ReviewSerializer(serializers.ModelSerializer):
         model = Review
         fields = ['id', 'shipment', 'reviewer', 'reviewer_id', 'rating', 'comment', 'created_at']
         read_only_fields = ['created_at']
-
-
-# --- Register ---
-class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=True)
-
-    class Meta:
-        model = User
-        fields = [
-            "id", "username", "email", "phone", "company_name",
-            "address", "user_type", "password"
-        ]
-
-    def validate_password(self, value):
-        validate_password(value)
-        return value
-
-    def create(self, validated_data):
-        password = validated_data.pop("password")
-        user = User(**validated_data)
-        user.set_password(password)
-        user.save()
-        return user
 
 
 # --- Me (profile) ---

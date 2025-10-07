@@ -13,7 +13,7 @@ const ReviewsPage = defineAsyncComponent(() => import('@/pages/Reviews/index.vue
 const WalletPage = defineAsyncComponent(() => import('@/pages/Wallet/index.vue'))
 const AppLayout = defineAsyncComponent(() => import('@/layout/AppLayout/index.vue'))
 const LoginPage = defineAsyncComponent(() => import('@/pages/auth/Login/index.vue'))
-const OnboardingPage = defineAsyncComponent(() => import('@/pages/Onboarding/index.vue'))
+const RegisterPage = defineAsyncComponent(() => import('@/pages/auth/Register/index.vue'))
 
 const routes = [
     {
@@ -30,7 +30,7 @@ const routes = [
         ]
     },
     { path: '/login', name: 'login', component: LoginPage, meta: { title: 'Login' } },
-    { path: '/onboarding', name: 'onboarding', component: OnboardingPage },
+    { path: '/register', name: 'register', component: RegisterPage, meta: { title: 'Register' } },
     { path: '/:pathMatch(.*)*', redirect: '/' }
 ]
 
@@ -42,7 +42,7 @@ export const router = createRouter({
 // ✅ Auth guard
 router.beforeEach((to, _from, next) => {
     const auth = useAuthStore()
-    if (!auth.isAuthed && to.path !== '/login') return next('/login')
-    if (auth.isAuthed && to.path === '/login') return next('/')
+    if (!auth.isAuthed && to.path !== '/login' && to.path !== '/register') return next('/login')
+    if (auth.isAuthed && (to.path === '/login' || to.path === '/register')) return next('/')
     next()
 })

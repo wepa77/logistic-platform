@@ -1,46 +1,23 @@
-<script lang="ts" setup>
-import { ref } from 'vue'
-import { useAuthStore } from '@/store/auth'
-import { ElMessage } from 'element-plus'
-
-const username = ref('')
-const password = ref('')
-const loading = ref(false)
-const auth = useAuthStore()   // ✅ Store goşduk
-
-async function handleLogin() {
-  loading.value = true
-  try {
-    await auth.login(username.value, password.value)  // ✅ Store-dan login ulan
-    ElMessage.success('Login successful')
-    // router.push('/') gerek däl, çünki store.login()-iň içinde bar
-  } catch (err) {
-    console.error(err)
-    ElMessage.error('Login failed. Please check your credentials.')
-  } finally {
-    loading.value = false
-  }
-}
-</script>
-
-
 <template>
-  <div class="login-container">
-    <el-card class="login-card" shadow="always">
-      <div class="login-header">
-<!--        <img src="/logo.png" alt="Logo" class="logo" />-->
-        <h2>Logistic Platform</h2>
-        <p class="subtitle">Please sign in to continue</p>
-      </div>
-
+  <div class="auth-container">
+    <div class="language-switcher-wrapper">
+      <LanguageSwitcher />
+    </div>
+    <el-card class="auth-card" shadow="always">
+      <h2 class="auth-title">{{ $t('auth.login') }}</h2>
       <el-form @submit.prevent="handleLogin" label-position="top">
-        <el-form-item label="Username">
-          <el-input v-model="username" placeholder="Enter username" clearable />
+        <el-form-item :label="$t('auth.username')">
+          <el-input v-model="username" :placeholder="$t('auth.username')" clearable />
         </el-form-item>
 
-        <el-form-item label="Password">
-          <el-input v-model="password" type="password" placeholder="Enter password" clearable show-password />
+        <el-form-item :label="$t('auth.password')">
+          <el-input v-model="password" type="password" :placeholder="$t('auth.password')" clearable show-password />
         </el-form-item>
+
+        <div class="auth-actions">
+          <el-checkbox v-model="remember">{{ $t('auth.rememberMe') }}</el-checkbox>
+          <router-link to="/forgot" class="forgot">{{ $t('auth.forgotPassword') }}</router-link>
+        </div>
 
         <el-button
             type="primary"
@@ -49,42 +26,91 @@ async function handleLogin() {
             @click="handleLogin"
             style="width: 100%; margin-top: 10px"
         >
-          Login
+          {{ $t('auth.signIn') }}
         </el-button>
       </el-form>
+
+      <div class="register">
+        {{ $t('auth.dontHaveAccount') }}
+        <router-link to="/register">{{ $t('auth.signUp') }}</router-link>
+      </div>
     </el-card>
   </div>
 </template>
 
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useAuthStore } from '@/store/auth'
+import { ElMessage } from 'element-plus'
+import { useRouter } from 'vue-router'
+import LanguageSwitcher from '@/components/LanguageSwitcher.vue'
+
+const { t } = useI18n()
+const username = ref('')
+const password = ref('')
+const remember = ref(false)
+const loading = ref(false)
+const auth = useAuthStore()
+const router = useRouter()
+
+async function handleLogin() {
+  loading.value = true
+  try {
+    await auth.login(username.value, password.value)
+    ElMessage.success(t('dashboard.welcomeBack') + '!')
+    router.push('/')
+  } catch (err) {
+    console.error(err)
+    ElMessage.error(t('messages.operationFailed'))
+  } finally {
+    loading.value = false
+  }
+}
+</script>
+
 <style scoped>
-.login-container {
+.auth-container {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
   background: linear-gradient(135deg, #3b82f6, #2563eb);
+  position: relative;
 }
 
-.login-card {
+.language-switcher-wrapper {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 10;
+  background: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.auth-card {
   width: 380px;
-  padding: 30px 30px 20px;
+  padding: 30px;
   border-radius: 16px;
 }
-
-.login-header {
+.auth-title {
   text-align: center;
   margin-bottom: 20px;
 }
-
-.logo {
-  width: 80px;
-  height: 80px;
-  margin-bottom: 8px;
+.auth-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
-
-.subtitle {
-  color: #6b7280;
+.forgot {
+  font-size: 13px;
+  color: #2563eb;
+  text-decoration: underline;
+}
+.register {
+  text-align: center;
+  margin-top: 16px;
   font-size: 14px;
-  margin-top: 4px;
 }
 </style>
