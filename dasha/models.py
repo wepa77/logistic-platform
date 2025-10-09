@@ -2,29 +2,83 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 
+from django.contrib.auth.models import AbstractUser
+from django.db import models
+
 
 class User(AbstractUser):
     USER_TYPES = [
-        ('shipper', 'Ýük ugradýan'),
-        ('carrier', 'Ýük gatnadýan'),
+        ('shipper', 'Ýük ugradýan'),              # Shipper / Sender
+        ('carrier', 'Ýük gatnadýan'),             # Carrier / Driver
+        ('both', 'Ýük ugradýan-gatnadýan'),       # Both (dual role)
+        ('expeditor', 'Ekspeditor'),              # Dispatcher / Forwarder
+        ('guest', 'Myhman'),                      # Guest user
+        ('admin', 'Administrator'),               # System administrator
+        ('operator', 'Operator'),                 # Operator / Support
+        ('merchant', 'Söwdagar'),                 # Business / Seller
     ]
-    user_type = models.CharField(max_length=20, choices=USER_TYPES)
-    phone = models.CharField(max_length=20, blank=True, null=True)
-    company_name = models.CharField(max_length=255, blank=True, null=True)
-    address = models.CharField(max_length=255, blank=True, null=True)
-    verified = models.BooleanField(default=False)
-    balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    deposit_balance = models.DecimalField(  # ✅ täze meýdan
+
+    user_type = models.CharField(
+        max_length=20,
+        choices=USER_TYPES,
+        default='guest',
+        verbose_name="Ulanyjy görnüşi"
+    )
+
+    phone = models.CharField(
+        max_length=20,
+        blank=True,
+        null=True,
+        verbose_name="Telefon belgisi"
+    )
+
+    company_name = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name="Kompaniýanyň ady"
+    )
+
+    address = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name="Salgysy"
+    )
+
+    verified = models.BooleanField(
+        default=False,
+        verbose_name="Tassyklananmy"
+    )
+
+    balance = models.DecimalField(
         max_digits=10,
         decimal_places=2,
         default=0,
-        help_text="Carrier tarapyndan goýlan öňki depozit"
+        verbose_name="Balans"
     )
-    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
+
+    deposit_balance = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0,
+        help_text="Carrier tarapyndan goýlan öňki depozit",
+        verbose_name="Depozit balansy"
+    )
+
+    avatar = models.ImageField(
+        upload_to='avatars/',
+        blank=True,
+        null=True,
+        verbose_name="Profil suraty"
+    )
 
     def __str__(self):
         return f"{self.username} ({self.get_user_type_display()})"
 
+    class Meta:
+        verbose_name = "Ulanyjy"
+        verbose_name_plural = "Ulanyjylar"
 
 class Shipment(models.Model):
     PAYMENT_TYPES = [
