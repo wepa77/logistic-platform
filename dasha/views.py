@@ -20,6 +20,11 @@ from .serializers import (
     WalletTransactionSerializer, TopUpRequestSerializer
 )
 from .permissions import IsOwnerOrReadOnly
+from .filters import (
+    UserFilter, VehicleFilter, CargoFilter,
+    ShipmentFilter, OfferFilter, ReviewFilter,
+    WalletTransactionFilter, TopUpRequestFilter,
+)
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -70,6 +75,11 @@ def stripe_webhook(request):
 class WalletTransactionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = WalletTransactionSerializer
     permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_class = WalletTransactionFilter
+    search_fields = ["description", "tx_type"]
+    ordering_fields = ["created_at", "amount", "id"]
+    ordering = ["-created_at"]
 
     def get_queryset(self):
         return WalletTransaction.objects.filter(user=self.request.user).order_by("-created_at")
@@ -80,6 +90,11 @@ class WalletTransactionViewSet(viewsets.ReadOnlyModelViewSet):
 class TopUpRequestViewSet(viewsets.ModelViewSet):
     serializer_class = TopUpRequestSerializer
     permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_class = TopUpRequestFilter
+    search_fields = ["stripe_session_id"]
+    ordering_fields = ["created_at", "amount", "id"]
+    ordering = ["-created_at"]
 
     def get_queryset(self):
         return TopUpRequest.objects.filter(user=self.request.user).order_by("-created_at")
@@ -125,7 +140,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ["user_type", "verified"]
+    filterset_class = UserFilter
     search_fields = ["username", "email", "phone", "company_name", "address"]
     ordering_fields = ["date_joined", "last_login"]
     ordering = ["-date_joined"]
@@ -137,9 +152,9 @@ class VehicleViewSet(viewsets.ModelViewSet):
     serializer_class = VehicleSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ["truck_type", "gps_enabled", "capacity_kg", "volume_m3"]
-    search_fields = ["plate_number", "brand", "model"]
-    ordering_fields = ["year", "capacity_kg", "volume_m3", "id"]
+    filterset_class = VehicleFilter
+    search_fields = ["plate_number", "brand", "model", "city", "location_from", "possible_unload"]
+    ordering_fields = ["year", "capacity_kg", "volume_m3", "available_from", "id", "created_at"]
     ordering = ["-id"]
 
     def perform_create(self, serializer):
@@ -152,9 +167,9 @@ class CargoViewSet(viewsets.ModelViewSet):
     serializer_class = CargoSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ["status", "pickup_date"]
-    search_fields = ["title", "pickup_address", "delivery_address"]
-    ordering_fields = ["pickup_date", "created_at", "price_offer"]
+    filterset_class = CargoFilter
+    search_fields = ["title", "pickup_address", "delivery_address", "company_name", "city", "route_info"]
+    ordering_fields = ["pickup_date", "created_at", "rate_cash", "weight_kg", "volume_m3"]
     ordering = ["-created_at"]
 
     def perform_create(self, serializer):
@@ -167,9 +182,9 @@ class OfferViewSet(viewsets.ModelViewSet):
     serializer_class = OfferSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ["status", "cargo", "carrier", "vehicle"]
-    search_fields = ["note", "cargo__title", "carrier__username"]
-    ordering_fields = ["price", "created_at"]
+    filterset_class = OfferFilter
+    search_fields = ["note", "cargo__title", "carrier__username", "vehicle__plate_number"]
+    ordering_fields = ["price", "created_at", "id"]
     ordering = ["-created_at"]
 
     def perform_create(self, serializer):
@@ -184,9 +199,9 @@ class ShipmentViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ["cargo", "carrier", "vehicle", "payment_status", "payment_type"]
-    search_fields = ["cargo__title", "carrier__username"]
-    ordering_fields = ["start_time", "end_time", "total_price", "created_at"]
+    filterset_class = ShipmentFilter
+    search_fields = ["cargo__title", "carrier__username", "vehicle__plate_number"]
+    ordering_fields = ["start_time", "end_time", "total_price", "commission_amount", "id"]
     ordering = ["-start_time"]
 
     def perform_create(self, serializer):
@@ -204,8 +219,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ["rating", "created_at"]
+    filterset_class = ReviewFilter
     search_fields = ["comment", "shipment__cargo__title", "reviewer__username"]
-    ordering_fields = ["rating", "created_at"]
+    ordering_fields = ["rating", "created_at", "id"]
     ordering = ["-created_at"]
 

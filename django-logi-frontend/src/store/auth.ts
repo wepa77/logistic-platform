@@ -6,7 +6,11 @@ import { router } from '@/router'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    user: null as IUser | null,
+    // Hydrate user from localStorage so role-based sidebar persists across refresh
+    user: (() => {
+      const raw = localStorage.getItem('user')
+      try { return raw ? (JSON.parse(raw) as IUser) : null } catch { return null }
+    })(),
     access: localStorage.getItem('access') || '',
     refresh: localStorage.getItem('refresh') || ''
   }),
@@ -27,30 +31,32 @@ export const useAuthStore = defineStore('auth', {
       localStorage.setItem('access', data.access)
       localStorage.setItem('refresh', data.refresh)
 
-      // fetch user profile
+      // fetch user profile (will also persist user)
       await this.fetchMe()
 
       // 🔥 redirect to dashboard
       router.push('/')
     },
-      async fetchMe() {
-          try {
-              const { data } = await http.get<IUser>('/auth/me/')
-              this.user = data
-          } catch {
-              this.logout()
-          }
+    async fetchMe() {
+      try {
+        const { data } = await http.get<IUser>('/auth/me/')
+        this.user = data
+        // persist user so UI has immediate access on next load
+        localStorage.setItem('user', JSON.stringify(data))
+      } catch {
+        this.logout()
       }
-      ,
+    },
     logout() {
       this.user = null
       this.access = ''
       this.refresh = ''
+      localStorage.removeItem('user')
       localStorage.removeItem('access')
       localStorage.removeItem('refresh')
       router.push('/login')
     },
-    
+
     async updateUserType(userType: 'carrier' | 'shipper') {
       try {
         await http.patch('/auth/set-type/', { user_type: userType })

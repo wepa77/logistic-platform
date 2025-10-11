@@ -12,9 +12,133 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(Vehicle)
 class VehicleAdmin(admin.ModelAdmin):
-    list_display = ("plate_number", "owner", "capacity_kg", "truck_type", "gps_enabled")
-    search_fields = ("plate_number",)
-    list_filter = ("truck_type",)
+    # --- Görkezilýän kolonkalary ---
+    list_display = (
+        "plate_number",
+        "owner",
+        "brand",
+        "truck_category",
+        "body_type",
+        "capacity_kg",
+        "rate_mode",
+        "rate_currency",
+        "has_gps",
+        "created_at",
+    )
+
+    # --- Filtrler (sagdaky panelde) ---
+    list_filter = (
+        "truck_category",
+        "body_type",
+        "load_type",
+        "has_adr",
+        "has_tir",
+        "has_ekmt",
+        "has_gps",
+        "promote_top",
+        "stealth_mode",
+        "rate_currency",
+        "rate_mode",
+        "created_at",
+    )
+
+    # --- Gözleg meýdanlary ---
+    search_fields = (
+        "plate_number",
+        "brand",
+        "model",
+        "owner__username",
+        "company_name",
+        "city",
+    )
+
+    # --- Sütün boýunça tertipleme ---
+    ordering = ("-created_at",)
+
+    # --- Her bir kategoriýany admin formda toparlaýar ---
+    fieldsets = (
+        ("Esasy maglumatlar", {
+            "fields": (
+                "owner",
+                "plate_number",
+                "brand",
+                "model",
+                "year",
+                "truck_category",
+                "body_type",
+                "load_type",
+                "capacity_kg",
+                "volume_m3",
+                ("length_m", "width_m", "height_m"),
+                "photo",
+            )
+        }),
+        ("Goşmaça aýratynlyklar", {
+            "classes": ("collapse",),
+            "fields": (
+                "has_adr",
+                "has_tir",
+                "has_ekmt",
+                "has_gps",
+                "has_lift",
+                "has_horses",
+                "partial_load",
+            )
+        }),
+        ("Ýük ugradyş maglumatlary", {
+            "classes": ("collapse",),
+            "fields": (
+                "available_from",
+                "available_days",
+                "location_from",
+                "location_from_radius_km",
+                "possible_unload",
+                "unload_radius_km",
+            )
+        }),
+        ("Stawka maglumatlary", {
+            "classes": ("collapse",),
+            "fields": (
+                "rate_mode",
+                ("rate_with_vat", "rate_without_vat", "rate_cash"),
+                "rate_currency",
+                "pay_to_card",
+                "without_bargain",
+            )
+        }),
+        ("Kompaniýa / Kontakt maglumatlary", {
+            "classes": ("collapse",),
+            "fields": (
+                "is_private",
+                "company_name",
+                "city",
+                "contact_name",
+                "contact_phone",
+                "note",
+            )
+        }),
+        ("Premium görkezme", {
+            "classes": ("collapse",),
+            "fields": (
+                "promote_top",
+                "stealth_mode",
+            )
+        }),
+        ("Wagt bellikleri", {
+            "classes": ("collapse",),
+            "fields": (
+                "created_at",
+                "updated_at",
+            )
+        }),
+    )
+
+    readonly_fields = ("created_at", "updated_at")
+
+    # --- Dürli görnüşde has gowy görünüş üçin ---
+    list_per_page = 25
+    date_hierarchy = "created_at"
+    save_on_top = True
 
 
 @admin.register(Cargo)
