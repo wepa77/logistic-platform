@@ -21,6 +21,43 @@
       </div>
     </div>
 
+    <!-- Hero Search Section (ATI-style) -->
+    <el-card class="search-card" shadow="always">
+      <div class="search-grid">
+        <div class="field">
+          <label>From</label>
+          <el-input v-model="search.from" placeholder="City, region, country" />
+        </div>
+        <div class="field">
+          <label>To</label>
+          <el-input v-model="search.to" placeholder="City, region, country" />
+        </div>
+        <div class="field small">
+          <label>Radius, km</label>
+          <el-input-number v-model="search.radius" :min="0" :max="1000" :step="10" controls-position="right" />
+        </div>
+        <div class="field small">
+          <label>Date</label>
+          <el-date-picker v-model="search.date" type="date" placeholder="Select date" style="width: 100%" />
+        </div>
+        <div class="actions">
+          <el-button type="success" size="large" @click="goFind('cargos')">
+            <i class="mdi mdi-package-variant"></i> Find Cargos
+          </el-button>
+          <el-button type="warning" size="large" @click="goFind('vehicles')">
+            <i class="mdi mdi-truck"></i> Find Vehicles
+          </el-button>
+          <el-button size="large" @click="calcDistance">
+            <i class="mdi mdi-ruler"></i> Calculate Distance
+          </el-button>
+        </div>
+      </div>
+      <div v-if="distanceKm !== null" class="distance-result">
+        <i class="mdi mdi-map-marker-distance"></i>
+        <span>Distance: {{ distanceKm.toFixed(0) }} km</span>
+      </div>
+    </el-card>
+
     <!-- Balance Cards -->
     <div class="balance-grid">
       <div class="balance-card primary">
@@ -247,7 +284,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, reactive } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/store/auth'
 import { useRouter } from 'vue-router'
@@ -260,6 +297,7 @@ import {
 
 const auth = useAuthStore()
 const { user } = storeToRefs(useAuthStore())
+const router = useRouter()
 
 // Stats state
 const stats = ref({
@@ -315,6 +353,45 @@ function formatUserType(type?: string) {
 
 function navigateTo(path: string) {
   router.push(path)
+}
+
+// --- Dashboard search panel logic (reused from Marketplace) ---
+const search = reactive({ from: '', to: '', radius: 0, date: '' as any })
+const distanceKm = ref<number | null>(null)
+
+function goFind(kind: 'cargos' | 'vehicles') {
+  router.push({ name: kind, query: {
+    from: search.from || undefined,
+    to: search.to || undefined,
+    radius: search.radius || undefined,
+    date: search.date ? new Date(search.date).toISOString().slice(0,10) : undefined
+  }})
+}
+
+function toRad(d: number) { return (d * Math.PI) / 180 }
+function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number) {
+  const R = 6371
+  const dLat = toRad(lat2 - lat1)
+  const dLon = toRad(lon2 - lon1)
+  const a = Math.sin(dLat/2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2) ** 2
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+  return R * c
+}
+
+async function geocode(q: string): Promise<{ lat: number; lon: number } | null> {
+  if (!q) return null
+  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}`
+  const res = await fetch(url, { headers: { 'Accept-Language': 'en' } })
+  const json = (await res.json()) as Array<{ lat: string; lon: string }> | undefined
+  if (!json || !json.length) return null
+  const first = json[0] as { lat: string; lon: string }
+  return { lat: Number(first.lat), lon: Number(first.lon) }
+}
+
+async function calcDistance() {
+  distanceKm.value = null
+  const [a, b] = await Promise.all([geocode(search.from), geocode(search.to)])
+  if (a && b) distanceKm.value = haversineKm(a.lat, a.lon, b.lat, b.lon)
 }
 
 async function fetchDashboardData() {
@@ -819,4 +896,12 @@ onMounted(() => {
     grid-template-columns: 1fr;
   }
 }
+.search-card { margin: 16px 0 24px; border-radius: 14px; }
+.search-grid { display: grid; grid-template-columns: 1fr 1fr 160px 220px; gap: 16px; align-items: end; }
+.field label { display: block; font-size: 12px; color: #64748b; margin-bottom: 6px; }
+.field.small { min-width: 140px; }
+.actions { display: flex; gap: 12px; align-items: center; }
+.distance-result { margin-top: 12px; color: #334155; display: flex; align-items: center; gap: 8px; }
+@media (max-width: 1024px) { .search-grid { grid-template-columns: 1fr 1fr; } .actions { grid-column: 1 / -1; } }
+
 </style>

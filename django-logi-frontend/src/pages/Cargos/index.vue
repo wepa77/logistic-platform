@@ -1,155 +1,451 @@
 <template>
-  <div class="vehicle-add-page">
-    <el-card class="vehicle-card" shadow="hover">
-      <h1 class="page-title">
-        <i class="mdi mdi-truck-plus-outline"></i>
-        Добавить машину
-      </h1>
-
-      <!-- 1️⃣ Тип кузова и загрузка -->
-      <section class="form-section">
-        <h2>Тип кузова</h2>
-        <div class="grid-2">
-          <el-select v-model="form.body_type" placeholder="Выберите тип кузова">
-            <el-option v-for="(label, value) in bodyTypes" :key="value" :label="label" :value="value" />
-          </el-select>
-
-          <div class="truck-category">
-            <el-radio-group v-model="form.truck_category">
-              <el-radio label="semi_trailer">Полуприцеп</el-radio>
-              <el-radio label="truck">Грузовик</el-radio>
-              <el-radio label="coupling">Сцепка</el-radio>
-            </el-radio-group>
-          </div>
+  <div class="cargos-page">
+    <!-- Header -->
+    <div class="page-header">
+      <div class="header-content">
+        <div class="header-left">
+          <h1 class="page-title">
+            <i class="mdi mdi-package-variant-closed"></i>
+            {{ $t('cargos.title') }}
+          </h1>
+          <p class="page-subtitle">{{ $t('cargos.subtitle') }}</p>
         </div>
-
-        <h3>Загрузка</h3>
-        <el-checkbox-group v-model="form.load_types">
-          <el-checkbox v-for="(label, value) in loadTypes" :key="value" :label="value">{{ label }}</el-checkbox>
-        </el-checkbox-group>
-      </section>
-
-      <!-- 2️⃣ Грузоподъёмность и размеры -->
-      <section class="form-section">
-        <h2>Характеристики</h2>
-        <div class="grid-3">
-          <el-input-number v-model="form.capacity_kg" :min="0" label="Грузоподъёмность (кг)" placeholder="т" />
-          <el-input-number v-model="form.volume_m3" :min="0" step="0.5" label="Объём (м³)" />
+        <div class="header-actions">
+          <router-link to="/cargos/add">
+            <el-button type="primary" size="large" class="add-btn">
+              <i class="mdi mdi-plus"></i>
+              {{ $t('cargos.addNew') }}
+            </el-button>
+          </router-link>
         </div>
-        <div class="grid-3">
-          <el-input-number v-model="form.length_m" :min="0" step="0.1" label="Длина (м)" />
-          <el-input-number v-model="form.width_m" :min="0" step="0.1" label="Ширина (м)" />
-          <el-input-number v-model="form.height_m" :min="0" step="0.1" label="Высота (м)" />
-        </div>
+      </div>
+    </div>
 
-        <div class="extras">
-          <el-checkbox v-model="form.has_adr">ADR</el-checkbox>
-          <el-checkbox v-model="form.has_tir">TIR / EKMT</el-checkbox>
-          <el-checkbox v-model="form.has_gps">GPS мониторинг</el-checkbox>
-          <el-checkbox v-model="form.has_lift">Гидролифт</el-checkbox>
-          <el-checkbox v-model="form.has_horses">Коники</el-checkbox>
-          <el-checkbox v-model="form.partial_load">Догруз</el-checkbox>
-        </div>
-      </section>
+    <!-- Prefilter Summary from marketplace -->
+    <el-alert
+      v-if="prefilterSummary"
+      :title="prefilterSummary"
+      type="info"
+      class="prefilter-banner"
+      show-icon
+      :closable="false"
+    />
 
-      <!-- 3️⃣ Откуда / разгрузка -->
-      <section class="form-section">
-        <h2>Маршрут</h2>
-        <div class="grid-2">
-          <el-input v-model="form.location_from" placeholder="Откуда (населённый пункт)" />
-          <el-input v-model="form.possible_unload" placeholder="Куда (возможная разгрузка)" />
-        </div>
-        <div class="grid-2">
-          <el-input-number v-model="form.location_from_radius_km" :min="0" placeholder="Радиус откуда (км)" />
-          <el-input-number v-model="form.unload_radius_km" :min="0" placeholder="Радиус разгрузки (км)" />
-        </div>
-
-        <div class="grid-2">
-          <el-date-picker v-model="form.available_from" type="date" placeholder="Готов к загрузке" style="width: 100%" />
-          <el-input-number v-model="form.available_days" :min="1" placeholder="Количество дней" />
-        </div>
-      </section>
-
-      <!-- 4️⃣ Ставка -->
-      <section class="form-section">
-        <h2>Ставка</h2>
-        <el-radio-group v-model="form.rate_mode" class="rate-mode">
-          <el-radio label="has_rate">Есть ставка</el-radio>
-          <el-radio label="request_rate">Запросить ставку</el-radio>
-        </el-radio-group>
-
-        <div class="grid-3">
-          <el-input-number v-model="form.rate_with_vat" :min="0" placeholder="С НДС, безнал" />
-          <el-input-number v-model="form.rate_without_vat" :min="0" placeholder="Без НДС, безнал" />
-          <el-input-number v-model="form.rate_cash" :min="0" placeholder="Наличными" />
-        </div>
-
-        <div class="grid-2">
-          <el-select v-model="form.rate_currency" placeholder="Валюта">
-            <el-option label="TMT" value="tmt" />
-            <el-option label="RUB" value="rub" />
-            <el-option label="USD" value="usd" />
-            <el-option label="EUR" value="eur" />
-          </el-select>
-
-          <div>
-            <el-checkbox v-model="form.pay_to_card">на карту</el-checkbox>
-            <el-checkbox v-model="form.without_bargain">без торга</el-checkbox>
-          </div>
-        </div>
-      </section>
-
-      <!-- 5️⃣ Данные компании -->
-      <section class="form-section">
-        <h2>Данные компании</h2>
-        <el-checkbox v-model="form.is_private">Я — частное лицо</el-checkbox>
-
-        <div class="grid-2">
-          <el-select v-model="form.company_type" placeholder="Тип фирмы">
-            <el-option label="ООО" value="ooo" />
-            <el-option label="ИП" value="ip" />
-            <el-option label="Физлицо" value="fl" />
-            <el-option label="Самозанятый" value="self" />
-          </el-select>
-          <el-input v-model="form.company_name" placeholder="Название фирмы" />
-        </div>
-
-        <div class="grid-2">
-          <el-input v-model="form.city" placeholder="Город" />
-          <el-input v-model="form.contact_name" placeholder="Контактное лицо" />
-        </div>
-        <el-input v-model="form.contact_phone" placeholder="Телефон" />
-        <el-input type="textarea" v-model="form.note" :rows="3" placeholder="Примечание" />
-      </section>
-
-      <!-- 6️⃣ Продвижение -->
-      <section class="form-section">
-        <h2>Продвижение</h2>
-        <el-switch v-model="form.promote_top" active-text="TOP поиска" />
-        <el-switch v-model="form.stealth_mode" active-text="Stealth режим" />
-      </section>
-
-      <!-- Submit -->
-      <div class="submit-wrapper">
-        <el-button type="primary" size="large" @click="submitForm">
-          <i class="mdi mdi-truck-check-outline"></i>
-          Опубликовать машину
+    <!-- Filters -->
+    <el-card class="filters-card" shadow="never">
+      <div class="filters-container">
+        <el-input
+          v-model="searchQuery"
+          :placeholder="$t('cargos.searchPlaceholder') as string"
+          class="search-input"
+          clearable
+        >
+          <template #prefix><i class="mdi mdi-magnify"></i></template>
+        </el-input>
+        <el-select v-model="statusFilter" :placeholder="$t('cargos.filterByStatus') as string" clearable class="status-filter">
+          <el-option :label="$t('cargos.allStatus') as string" value="" />
+          <el-option :label="$t('cargos.open') as string" value="open" />
+          <el-option :label="$t('cargos.inProgress') as string" value="in_progress" />
+          <el-option :label="$t('cargos.delivered') as string" value="delivered" />
+          <el-option :label="$t('cargos.cancelled') as string" value="cancelled" />
+        </el-select>
+        <el-button class="filter-btn" @click="refresh">
+          <i class="mdi mdi-refresh"></i>
         </el-button>
       </div>
     </el-card>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon total"><i class="mdi mdi-package-variant"></i></div>
+        <div class="stat-content">
+          <div class="stat-value">{{ cargos.length }}</div>
+          <div class="stat-label">Total Cargos</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon weight"><i class="mdi mdi-weight-kilogram"></i></div>
+        <div class="stat-content">
+          <div class="stat-value">{{ totalWeight.toFixed(0) }}</div>
+          <div class="stat-label">Total Weight (kg)</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon volume"><i class="mdi mdi-cube-outline"></i></div>
+        <div class="stat-content">
+          <div class="stat-value">{{ totalVolume.toFixed(1) }}</div>
+          <div class="stat-label">Total Volume (m³)</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon open"><i class="mdi mdi-clock-outline"></i></div>
+        <div class="stat-content">
+          <div class="stat-value">{{ openCount }}</div>
+          <div class="stat-label">Open</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cargos Table -->
+    <el-card class="table-card" shadow="never">
+      <el-table :data="filteredCargos" style="width: 100%" class="modern-table">
+        <el-table-column label="Cargo" min-width="220">
+          <template #default="{ row }">
+            <div class="cargo-cell">
+              <div class="cargo-title">{{ row.cargo_name || 'Untitled cargo' }}</div>
+              <div class="cargo-meta">
+                <i class="mdi mdi-truck"></i>
+                <span>{{ row.cargo_type ? cargoTypes[row.cargo_type] : 'General' }}</span>
+              </div>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="Route" min-width="260">
+          <template #default="{ row }">
+            <div class="route">
+              <span class="from">{{ row.location_from || '—' }}</span>
+              <i class="mdi mdi-arrow-right"></i>
+              <span class="to">{{ row.possible_unload || '—' }}</span>
+            </div>
+            <div class="route-meta">
+              <i class="mdi mdi-radar"></i>
+              <span>{{ row.location_from_radius_km || 0 }} / {{ row.unload_radius_km || 0 }} km</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="Specs" min-width="220">
+          <template #default="{ row }">
+            <div class="specs">
+              <span class="chip"><i class="mdi mdi-weight-kilogram"></i> {{ row.weight_kg || 0 }} kg</span>
+              <span class="chip"><i class="mdi mdi-cube-outline"></i> {{ row.volume_m3 || 0 }} m³</span>
+              <span class="chip" v-if="row.partial_load"><i class="mdi mdi-package-variant"></i> Part load</span>
+              <span class="chip" v-if="row.has_adr"><i class="mdi mdi-alert"></i> ADR</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="Dates" min-width="180">
+          <template #default="{ row }">
+            <div class="dates">
+              <span><i class="mdi mdi-calendar"></i> {{ formatDate(row.available_from) }}</span>
+              <span class="muted">+{{ row.available_days || 0 }} days</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="Rate" min-width="160">
+          <template #default="{ row }">
+            <div class="rate">
+              <span v-if="row.rate_with_vat">{{ row.rate_with_vat }} {{ row.rate_currency?.toUpperCase() }}</span>
+              <span v-else class="muted">on request</span>
+              <span v-if="row.without_bargain" class="tag">no bargain</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="Status" width="120">
+          <template #default="{ row }">
+            <el-tag :type="statusType(row.status)">{{ statusLabel(row.status) }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="Actions" width="140" fixed="right">
+          <template #default="{ row, $index }">
+            <el-button text size="small" @click="editCargo(row, $index)"><i class="mdi mdi-pencil"></i></el-button>
+            <el-button text size="small" type="danger" @click="removeCargo($index)"><i class="mdi mdi-delete"></i></el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <div v-if="!cargos.length" class="empty-state">
+        <i class="mdi mdi-package-variant"></i>
+        <p>No cargos yet. Click “Add Cargo” to publish your first load.</p>
+      </div>
+    </el-card>
+
+    <!-- Add/Edit Dialog with existing form -->
+    <el-dialog v-model="dialogVisible" :title="editingIndex === -1 ? 'Добавить груз' : 'Редактировать груз'" width="860px" class="cargo-dialog">
+      <div class="vehicle-add-page">
+        <el-card class="vehicle-card" shadow="never">
+          <!-- 1️⃣ Груз и требования к кузову / загрузке -->
+          <section class="form-section">
+            <h2>Груз</h2>
+            <div class="grid-2">
+              <el-select v-model="form.cargo_type" placeholder="Тип груза">
+                <el-option v-for="(label, value) in cargoTypes" :key="value" :label="label" :value="value" />
+              </el-select>
+              <el-input v-model="form.cargo_name" placeholder="Наименование груза" />
+            </div>
+
+            <div class="grid-3">
+              <el-input-number v-model="form.weight_kg" :min="0" label="Вес (кг)" placeholder="кг" />
+              <el-input-number v-model="form.volume_m3" :min="0" step="0.5" label="Объём (м³)" />
+              <el-input-number v-model="form.quantity" :min="1" label="Кол-во мест" />
+            </div>
+
+            <h3>Требования к кузову и загрузке</h3>
+            <div class="grid-2">
+              <el-select v-model="form.body_type" placeholder="Тип кузова">
+                <el-option v-for="(label, value) in bodyTypes" :key="value" :label="label" :value="value" />
+              </el-select>
+              <el-checkbox-group v-model="form.load_types">
+                <el-checkbox v-for="(label, value) in loadTypes" :key="value" :label="value">{{ label }}</el-checkbox>
+              </el-checkbox-group>
+            </div>
+          </section>
+
+          <!-- 2️⃣ Характеристики -->
+          <section class="form-section">
+            <h2>Характеристики</h2>
+            <div class="grid-3">
+              <el-input-number v-model="form.length_m" :min="0" step="0.1" label="Длина (м)" />
+              <el-input-number v-model="form.width_m" :min="0" step="0.1" label="Ширина (м)" />
+              <el-input-number v-model="form.height_m" :min="0" step="0.1" label="Высота (м)" />
+            </div>
+
+            <div class="extras">
+              <el-checkbox v-model="form.has_adr">ADR</el-checkbox>
+              <el-checkbox v-model="form.has_tir">TIR / EKMT</el-checkbox>
+              <el-checkbox v-model="form.has_gps">GPS мониторинг</el-checkbox>
+              <el-checkbox v-model="form.has_lift">Гидролифт</el-checkbox>
+              <el-checkbox v-model="form.has_horses">Коники</el-checkbox>
+              <el-checkbox v-model="form.partial_load">Догруз</el-checkbox>
+            </div>
+          </section>
+
+          <!-- 3️⃣ Маршрут -->
+          <section class="form-section">
+            <h2>Маршрут</h2>
+            <div class="grid-2">
+              <el-input v-model="form.location_from" placeholder="Откуда (населённый пункт)" />
+              <el-input v-model="form.possible_unload" placeholder="Куда (возможная разгрузка)" />
+            </div>
+            <div class="grid-2">
+              <el-input-number v-model="form.location_from_radius_km" :min="0" placeholder="Радиус откуда (км)" />
+              <el-input-number v-model="form.unload_radius_km" :min="0" placeholder="Радиус разгрузки (км)" />
+            </div>
+
+            <div class="grid-2">
+              <el-date-picker v-model="form.available_from" type="date" placeholder="Готов к загрузке" style="width: 100%" />
+              <el-input-number v-model="form.available_days" :min="1" placeholder="Количество дней" />
+            </div>
+          </section>
+
+          <!-- 4️⃣ Ставка -->
+          <section class="form-section">
+            <h2>Ставка</h2>
+            <el-radio-group v-model="form.rate_mode" class="rate-mode">
+              <el-radio label="has_rate">Есть ставка</el-radio>
+              <el-radio label="request_rate">Запросить ставку</el-radio>
+            </el-radio-group>
+
+            <div class="grid-3">
+              <el-input-number v-model="form.rate_with_vat" :min="0" placeholder="С НДС, безнал" />
+              <el-input-number v-model="form.rate_without_vat" :min="0" placeholder="Без НДС, безнал" />
+              <el-input-number v-model="form.rate_cash" :min="0" placeholder="Наличными" />
+            </div>
+
+            <div class="grid-2">
+              <el-select v-model="form.rate_currency" placeholder="Валюта">
+                <el-option label="TMT" value="tmt" />
+                <el-option label="RUB" value="rub" />
+                <el-option label="USD" value="usd" />
+                <el-option label="EUR" value="eur" />
+              </el-select>
+
+              <div>
+                <el-checkbox v-model="form.pay_to_card">на карту</el-checkbox>
+                <el-checkbox v-model="form.without_bargain">без торга</el-checkbox>
+              </div>
+            </div>
+          </section>
+
+          <!-- 5️⃣ Данные компании -->
+          <section class="form-section">
+            <h2>Данные компании</h2>
+            <el-checkbox v-model="form.is_private">Я — частное лицо</el-checkbox>
+
+            <div class="grid-2">
+              <el-select v-model="form.company_type" placeholder="Тип фирмы">
+                <el-option label="ООО" value="ooo" />
+                <el-option label="ИП" value="ip" />
+                <el-option label="Физлицо" value="fl" />
+                <el-option label="Самозанятый" value="self" />
+              </el-select>
+              <el-input v-model="form.company_name" placeholder="Название фирмы" />
+            </div>
+
+            <div class="grid-2">
+              <el-input v-model="form.city" placeholder="Город" />
+              <el-input v-model="form.contact_name" placeholder="Контактное лицо" />
+            </div>
+            <el-input v-model="form.contact_phone" placeholder="Телефон" />
+            <el-input type="textarea" v-model="form.note" :rows="3" placeholder="Примечание" />
+          </section>
+
+          <!-- 6️⃣ Продвижение -->
+          <section class="form-section">
+            <h2>Продвижение</h2>
+            <el-switch v-model="form.promote_top" active-text="TOP поиска" />
+            <el-switch v-model="form.stealth_mode" active-text="Stealth режим" />
+          </section>
+        </el-card>
+      </div>
+
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="dialogVisible = false">Cancel</el-button>
+          <el-button type="primary" @click="submitForm">
+            <i class="mdi mdi-package-check"></i>
+            {{ editingIndex === -1 ? 'Опубликовать груз' : 'Обновить груз' }}
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { reactive } from 'vue'
+import { reactive, ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 
-const form = reactive({
-  body_type: '',
-  truck_category: 'semi_trailer',
-  load_types: [],
-  capacity_kg: null,
+// Local cargo list (demo). Replace with API calls when backend is ready.
+interface CargoItem {
+  cargo_type: string
+  cargo_name: string
+  weight_kg: number | null
+  volume_m3: number | null
+  quantity: number
+  body_type: string
+  load_types: string[]
+  length_m: number | null
+  width_m: number | null
+  height_m: number | null
+  has_adr: boolean
+  has_tir: boolean
+  has_gps: boolean
+  has_lift: boolean
+  has_horses: boolean
+  partial_load: boolean
+  location_from: string
+  location_from_radius_km: number
+  possible_unload: string
+  unload_radius_km: number
+  available_from: any
+  available_days: number | null
+  rate_mode: string
+  rate_with_vat: number | null
+  rate_without_vat: number | null
+  rate_cash: number | null
+  rate_currency: 'tmt'|'rub'|'usd'|'eur'
+  pay_to_card: boolean
+  without_bargain: boolean
+  is_private: boolean
+  company_type: 'ooo'|'ip'|'fl'|'self'
+  company_name: string
+  city: string
+  contact_name: string
+  contact_phone: string
+  note: string
+  promote_top: boolean
+  stealth_mode: boolean
+  status?: 'open'|'in_progress'|'delivered'|'cancelled'
+}
+
+const cargos = ref<CargoItem[]>([])
+const dialogVisible = ref(false)
+const editingIndex = ref(-1)
+const searchQuery = ref('')
+const statusFilter = ref('')
+
+// Prefill from marketplace (like vehicles)
+const route = useRoute()
+const prefilterSummary = computed(() => {
+  const from = (route.query.from as string) || ''
+  const to = (route.query.to as string) || ''
+  const date = (route.query.date as string) || ''
+  const radius = route.query.radius as string | undefined
+  if (!from && !to && !date && !radius) return ''
+  const parts: string[] = []
+  if (from) parts.push(`Откуда: ${from}`)
+  if (to) parts.push(`Куда: ${to}`)
+  if (date) parts.push(`Когда: ${date}`)
+  if (radius) parts.push(`Радиус: ${radius} км`)
+  return `Предзаполнено из поиска — ${parts.join(' • ')}`
+})
+
+function openAdd() {
+  resetForm()
+  // Prefill based on query
+  if (route.query.from) form.location_from = String(route.query.from)
+  if (route.query.to) form.possible_unload = String(route.query.to)
+  if (route.query.radius) form.location_from_radius_km = Number(route.query.radius)
+  editingIndex.value = -1
+  dialogVisible.value = true
+}
+
+function editCargo(row: CargoItem, index: number) {
+  Object.assign(form, row)
+  editingIndex.value = index
+  dialogVisible.value = true
+}
+
+function removeCargo(index: number) {
+  cargos.value.splice(index, 1)
+  ElMessage.success('Cargo deleted')
+}
+
+const totalWeight = computed(() => cargos.value.reduce((s, c) => s + (c.weight_kg || 0), 0))
+const totalVolume = computed(() => cargos.value.reduce((s, c) => s + (c.volume_m3 || 0), 0))
+const openCount = computed(() => cargos.value.filter(c => (c.status || 'open') === 'open').length)
+
+const filteredCargos = computed(() => {
+  let list = cargos.value
+  if (searchQuery.value) {
+    const q = searchQuery.value.toLowerCase()
+    list = list.filter(c =>
+      (c.cargo_name || '').toLowerCase().includes(q) ||
+      (c.location_from || '').toLowerCase().includes(q) ||
+      (c.possible_unload || '').toLowerCase().includes(q)
+    )
+  }
+  if (statusFilter.value) list = list.filter(c => (c.status || 'open') === statusFilter.value)
+  return list
+})
+
+function refresh() {
+  // placeholder for API reload
+}
+
+function statusType(s?: string) {
+  switch (s || 'open') {
+    case 'open': return 'info'
+    case 'in_progress': return 'warning'
+    case 'delivered': return 'success'
+    case 'cancelled': return 'danger'
+    default: return ''
+  }
+}
+function statusLabel(s?: string) {
+  switch (s || 'open') {
+    case 'open': return 'Open'
+    case 'in_progress': return 'In Progress'
+    case 'delivered': return 'Delivered'
+    case 'cancelled': return 'Cancelled'
+    default: return 'Open'
+  }
+}
+function formatDate(d: any) {
+  if (!d) return '—'
+  try { return new Date(d).toISOString().slice(0,10) } catch { return String(d) }
+}
+
+const form = reactive<CargoItem>({
+  cargo_type: '',
+  cargo_name: '',
+  weight_kg: null,
   volume_m3: null,
+  quantity: 1,
+  body_type: '',
+  load_types: [],
   length_m: null,
   width_m: null,
   height_m: null,
@@ -160,9 +456,9 @@ const form = reactive({
   has_horses: false,
   partial_load: false,
   location_from: '',
-  location_from_radius_km: null,
+  location_from_radius_km: 0,
   possible_unload: '',
-  unload_radius_km: null,
+  unload_radius_km: 0,
   available_from: '',
   available_days: null,
   rate_mode: 'has_rate',
@@ -181,9 +477,20 @@ const form = reactive({
   note: '',
   promote_top: false,
   stealth_mode: false,
+  status: 'open'
 })
 
-const bodyTypes = {
+const cargoTypes: Record<string, string> = {
+  general: 'Общий груз',
+  fragile: 'Хрупкий',
+  hazardous: 'Опасный',
+  refrigerated: 'Температурный',
+  oversized: 'Негабарит',
+  bulk: 'Навалочный',
+  liquid: 'Жидкий'
+}
+
+const bodyTypes: Record<string, string> = {
   tent: 'Тентованный',
   refrigerator: 'Рефрижератор',
   open: 'Открытый',
@@ -194,7 +501,7 @@ const bodyTypes = {
   other: 'Другое'
 }
 
-const loadTypes = {
+const loadTypes: Record<string, string> = {
   top: 'Верхняя',
   side: 'Боковая',
   rear: 'Задняя',
@@ -203,75 +510,96 @@ const loadTypes = {
   stand_remove: 'Съём стоек'
 }
 
+function resetForm() {
+  Object.assign(form, {
+    cargo_type: '', cargo_name: '', weight_kg: null, volume_m3: null, quantity: 1,
+    body_type: '', load_types: [], length_m: null, width_m: null, height_m: null,
+    has_adr: false, has_tir: false, has_gps: false, has_lift: false, has_horses: false, partial_load: false,
+    location_from: '', location_from_radius_km: 0, possible_unload: '', unload_radius_km: 0,
+    available_from: '', available_days: null,
+    rate_mode: 'has_rate', rate_with_vat: null, rate_without_vat: null, rate_cash: null, rate_currency: 'tmt',
+    pay_to_card: false, without_bargain: false,
+    is_private: false, company_type: 'ooo', company_name: '', city: '', contact_name: '', contact_phone: '', note: '',
+    promote_top: false, stealth_mode: false, status: 'open'
+  })
+}
+
 function submitForm() {
-  console.log('✅ Vehicle form data:', form)
-  ElMessage.success('Машина успешно опубликована!')
+  // Minimal validation
+  if (!form.cargo_name || !form.location_from) {
+    ElMessage.error('Заполните обязательные поля: Наименование груза и Откуда')
+    return
+  }
+  const payload = { ...form }
+  if (editingIndex.value === -1) {
+    cargos.value.unshift({ ...payload })
+    ElMessage.success('Груз опубликован (демо)')
+  } else {
+    cargos.value.splice(editingIndex.value, 1, { ...payload })
+    ElMessage.success('Груз обновлён (демо)')
+  }
+  dialogVisible.value = false
 }
 </script>
 
 <style scoped>
-.vehicle-card {
-  max-width: 1100px;
-  margin: 30px auto;
-  padding: 30px;
-  border-radius: 14px;
-}
+.cargos-page { padding: 16px; }
 
-.page-title {
-  font-size: 28px;
-  font-weight: 700;
-  margin-bottom: 24px;
-  color: #1e293b;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+/* Header */
+.page-header { margin-bottom: 12px; }
+.header-content { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.page-title { display: flex; align-items: center; gap: 8px; margin: 0; }
+.page-subtitle { margin: 4px 0 0; color: #64748b; font-size: 13px; }
+.add-btn { box-shadow: 0 4px 10px rgba(59,130,246,.25); }
 
-.form-section {
-  margin-bottom: 32px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #e2e8f0;
-}
+/* Filters */
+.filters-card { margin-bottom: 12px; }
+.filters-container { display: flex; gap: 12px; align-items: center; }
+.search-input { max-width: 420px; flex: 1; }
+.status-filter { width: 200px; }
+.filter-btn { }
+.prefilter-banner { margin: 8px 0 12px; }
 
-.form-section h2 {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 16px;
-  color: #334155;
-}
+/* Stats */
+.stats-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 8px 0 16px; }
+.stat-card { display: flex; align-items: center; gap: 12px; padding: 12px; background: #fff; border-radius: 12px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+.stat-icon { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 10px; color: #111827; }
+.stat-icon.total { background: #eef2ff; }
+.stat-icon.weight { background: #fee2e2; }
+.stat-icon.volume { background: #dcfce7; }
+.stat-icon.open { background: #e0f2fe; }
+.stat-content .stat-value { font-weight: 700; font-size: 18px; }
+.stat-content .stat-label { color: #6b7280; font-size: 12px; }
 
-.grid-2 {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-}
+/* Table */
+.table-card { border-radius: 12px; }
+.modern-table :deep(.el-table__row) { transition: background .15s ease; }
+.modern-table :deep(.el-table__row:hover) { background: #f8fafc; }
+.cargo-cell { display: flex; flex-direction: column; }
+.cargo-title { font-weight: 600; }
+.cargo-meta { color: #64748b; display: flex; gap: 6px; align-items: center; font-size: 12px; }
+.route { display: flex; align-items: center; gap: 8px; }
+.route-meta { color: #64748b; font-size: 12px; display: flex; align-items: center; gap: 6px; }
+.specs { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { background: #f1f5f9; border-radius: 999px; padding: 4px 10px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; }
+.dates { display: flex; flex-direction: column; gap: 2px; }
+.dates .muted, .rate .muted { color: #94a3b8; }
+.rate .tag { margin-left: 8px; background: #fee2e2; color: #991b1b; border-radius: 999px; padding: 2px 8px; font-size: 11px; }
+.empty-state { text-align: center; color: #64748b; padding: 24px 0; }
 
-.grid-3 {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-}
+/* Dialog/form inner layout */
+.vehicle-add-page { padding: 0; }
+.vehicle-card { border-radius: 8px; }
+.form-section { margin-top: 14px; }
+.form-section h2 { font-size: 16px; margin: 0 0 10px; color: #334155; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+.extras { display: flex; flex-wrap: wrap; gap: 12px 16px; margin-top: 8px; }
+.rate-mode { margin: 8px 0 12px; }
+.dialog-footer { display: flex; justify-content: flex-end; gap: 8px; }
 
-.extras {
-  margin-top: 10px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px 20px;
-}
-
-.rate-mode {
-  margin-bottom: 16px;
-}
-
-.submit-wrapper {
-  text-align: right;
-  margin-top: 30px;
-}
-
-.submit-wrapper .el-button {
-  padding: 14px 26px;
-  font-weight: 600;
-  border-radius: 10px;
-  font-size: 16px;
+@media (max-width: 1024px) {
+  .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
 }
 </style>

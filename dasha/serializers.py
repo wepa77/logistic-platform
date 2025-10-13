@@ -4,7 +4,7 @@ from .models import User, Vehicle, Cargo, Offer, Shipment, Review, WalletTransac
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
-    phone = serializers.CharField(max_length=20)
+    phone = serializers.CharField(max_length=20, required=False, allow_blank=True, allow_null=True)
 
     class Meta:
         model = User

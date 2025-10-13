@@ -30,12 +30,14 @@ export default {
   
   nav: {
     dashboard: 'Dolandyryş paneli',
+    home: 'Baş sahypa',
     vehicles: 'Ulaglar',
     cargos: 'Ýükler',
     offers: 'Teklipler',
     shipments: 'Daşamalar',
     reviews: 'Synlar',
     wallet: 'Gapjyk',
+    driverRequest: 'Sürüjä ýüzlenme',
     profile: 'Profil',
     settings: 'Sazlamalar',
     logout: 'Çykyş'
@@ -325,5 +327,67 @@ export default {
     passwordMismatch: 'Parollar gabat gelenok',
     minLength: 'Iň az uzynlygy {min} simwol',
     maxLength: 'Iň köp uzynlygy {max} simwol'
+  },
+
+  forms: {
+    // Bölüm atlary
+    cargo: 'Ýük',
+    requirements: 'Kuzow we ýükleme talaplary',
+    specs: 'Aýratynlyklar',
+    route: 'Marşrut',
+    rate: 'Bahasy',
+    companyData: 'Kompaniýanyň maglumatlary',
+    promotion: 'MaHabat',
+
+    // Hereketler / atlar
+    addCargo: 'Ýük goş',
+    publishCargo: 'Ýüki çap et',
+    addVehicle: 'Ulag goş',
+    publishVehicle: 'Ulagy çap et',
+
+    // Meýdanlar
+    cargoType: 'Ýükiň görnüşi',
+    cargoName: 'Ýükiň ady',
+    weightKg: 'Agram (kg)',
+    volumeM3: 'Göwrüm (m³)',
+    quantity: 'Sany',
+    bodyType: 'Kuzowyň görnüşi',
+    loadTypes: 'Ýükleme görnüşleri',
+    lengthM: 'Uzynlyk (m)',
+    widthM: 'Ini (m)',
+    heightM: 'Beýiklik (m)',
+    adr: 'ADR',
+    tir: 'TIR / EKMT',
+    gpsMonitoring: 'GPS gözegçilik',
+    hydrolift: 'Gidrolift',
+    stakes: 'Könikler',
+    partialLoad: 'Bölek ýük',
+
+    locationFrom: 'Nireden (punkt)',
+    possibleUnload: 'Nirä (mümkin düşürmek)',
+    fromRadiusKm: 'Nireden radius (km)',
+    unloadRadiusKm: 'Düşürmek radiusy (km)',
+    availableFrom: 'Ýüklemäge taýýar',
+    availableDays: 'Günleriň sany',
+
+    hasRate: 'Bahasy bar',
+    requestRate: 'Bahany soramak',
+    rateWithVat: 'ÄAÝ bilen, nagt däl',
+    rateWithoutVat: 'ÄAÝ-siz, nagt däl',
+    rateCash: 'Nagt',
+    currency: 'Walýuta',
+    payToCard: 'karta',
+    withoutBargain: 'gepleşik ýok',
+
+    isPrivate: 'Men hususy adam',
+    companyType: 'Kompaniýanyň görnüşi',
+    companyName: 'Kompaniýanyň ady',
+    city: 'Şäher',
+    contactName: 'Kontakt adam',
+    contactPhone: 'Telefon',
+    note: 'Bellik',
+
+    promoteTop: 'Gözleg TOP-y',
+    stealthMode: 'Stealth režimi'
   }
 }

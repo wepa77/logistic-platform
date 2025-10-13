@@ -30,12 +30,14 @@ export default {
   
   nav: {
     dashboard: 'Панель управления',
+    home: 'Главная',
     vehicles: 'Транспорт',
     cargos: 'Грузы',
     offers: 'Предложения',
     shipments: 'Перевозки',
     reviews: 'Отзывы',
     wallet: 'Кошелёк',
+    driverRequest: 'Заявка водителю',
     profile: 'Профиль',
     settings: 'Настройки',
     logout: 'Выход'
@@ -325,5 +327,67 @@ export default {
     passwordMismatch: 'Пароли не совпадают',
     minLength: 'Минимальная длина {min} символов',
     maxLength: 'Максимальная длина {max} символов'
+  },
+
+  forms: {
+    // Заголовки разделов
+    cargo: 'Груз',
+    requirements: 'Требования к кузову и загрузке',
+    specs: 'Характеристики',
+    route: 'Маршрут',
+    rate: 'Ставка',
+    companyData: 'Данные компании',
+    promotion: 'Продвижение',
+
+    // Действия / заголовки
+    addCargo: 'Добавить груз',
+    publishCargo: 'Опубликовать груз',
+    addVehicle: 'Добавить машину',
+    publishVehicle: 'Опубликовать машину',
+
+    // Поля
+    cargoType: 'Тип груза',
+    cargoName: 'Наименование груза',
+    weightKg: 'Вес (кг)',
+    volumeM3: 'Объём (м³)',
+    quantity: 'Количество мест',
+    bodyType: 'Тип кузова',
+    loadTypes: 'Типы загрузки',
+    lengthM: 'Длина (м)',
+    widthM: 'Ширина (м)',
+    heightM: 'Высота (м)',
+    adr: 'ADR',
+    tir: 'TIR / EKMT',
+    gpsMonitoring: 'GPS мониторинг',
+    hydrolift: 'Гидролифт',
+    stakes: 'Коники',
+    partialLoad: 'Догруз',
+
+    locationFrom: 'Откуда (населённый пункт)',
+    possibleUnload: 'Куда (возможная разгрузка)',
+    fromRadiusKm: 'Радиус откуда (км)',
+    unloadRadiusKm: 'Радиус разгрузки (км)',
+    availableFrom: 'Готов к загрузке',
+    availableDays: 'Количество дней',
+
+    hasRate: 'Есть ставка',
+    requestRate: 'Запросить ставку',
+    rateWithVat: 'С НДС, безнал',
+    rateWithoutVat: 'Без НДС, безнал',
+    rateCash: 'Наличными',
+    currency: 'Валюта',
+    payToCard: 'на карту',
+    withoutBargain: 'без торга',
+
+    isPrivate: 'Я — частное лицо',
+    companyType: 'Тип фирмы',
+    companyName: 'Название фирмы',
+    city: 'Город',
+    contactName: 'Контактное лицо',
+    contactPhone: 'Телефон',
+    note: 'Примечание',
+
+    promoteTop: 'TOP поиска',
+    stealthMode: 'Stealth режим'
   }
 }

@@ -23,31 +23,30 @@
           <span>{{ $t('nav.dashboard') }}</span>
         </el-menu-item>
 
-        <!-- Carrier menus -->
-        <template v-if="user?.user_type === 'carrier'">
-          <el-menu-item index="/vehicles">
-            <i class="mdi mdi-truck menu-icon"></i>
-            <span>{{ $t('nav.vehicles') }}</span>
-          </el-menu-item>
-          <el-menu-item index="/shipments">
-            <i class="mdi mdi-transit-connection-variant menu-icon"></i>
-            <span>{{ $t('nav.shipments') }}</span>
-          </el-menu-item>
-        </template>
+        <!-- Carrier & Shipper menus: visible to all authenticated users to avoid backend role mismatch -->
+        <el-menu-item index="/vehicles">
+          <i class="mdi mdi-truck menu-icon"></i>
+          <span>{{ $t('nav.vehicles') }}</span>
+        </el-menu-item>
+        <el-menu-item index="/shipments">
+          <i class="mdi mdi-transit-connection-variant menu-icon"></i>
+          <span>{{ $t('nav.shipments') }}</span>
+        </el-menu-item>
 
-        <!-- Shipper menus -->
-        <template v-if="user?.user_type === 'shipper'">
-          <el-menu-item index="/cargos">
-            <i class="mdi mdi-package-variant-closed menu-icon"></i>
-            <span>{{ $t('nav.cargos') }}</span>
-          </el-menu-item>
-          <el-menu-item index="/offers">
-            <i class="mdi mdi-handshake-outline menu-icon"></i>
-            <span>{{ $t('nav.offers') }}</span>
-          </el-menu-item>
-        </template>
+        <el-menu-item index="/cargos">
+          <i class="mdi mdi-package-variant-closed menu-icon"></i>
+          <span>{{ $t('nav.cargos') }}</span>
+        </el-menu-item>
+        <el-menu-item index="/offers">
+          <i class="mdi mdi-handshake-outline menu-icon"></i>
+          <span>{{ $t('nav.offers') }}</span>
+        </el-menu-item>
 
         <!-- Common -->
+        <el-menu-item index="/driver-request">
+          <i class="mdi mdi-clipboard-text-outline menu-icon"></i>
+          <span>{{ $t('nav.driverRequest') }}</span>
+        </el-menu-item>
         <el-menu-item index="/reviews">
           <i class="mdi mdi-star-outline menu-icon"></i>
           <span>{{ $t('nav.reviews') }}</span>
@@ -130,6 +129,7 @@ const auth = useAuthStore()
 
 const user = computed(() => auth.user)
 const userRole = computed(() => {
+  if (auth.user?.user_type === 'admin') return 'Admin'
   if (auth.isCarrier) return 'Carrier'
   if (auth.isShipper) return 'Shipper'
   return 'Visitor'

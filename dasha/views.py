@@ -82,7 +82,10 @@ class WalletTransactionViewSet(viewsets.ReadOnlyModelViewSet):
     ordering = ["-created_at"]
 
     def get_queryset(self):
-        return WalletTransaction.objects.filter(user=self.request.user).order_by("-created_at")
+        user = self.request.user
+        if getattr(user, 'is_superuser', False) or getattr(user, 'is_staff', False) or getattr(user, 'user_type', None) == 'admin':
+            return WalletTransaction.objects.all().order_by("-created_at")
+        return WalletTransaction.objects.filter(user=user).order_by("-created_at")
 
 
 # --- TopUpRequest ---
@@ -97,7 +100,10 @@ class TopUpRequestViewSet(viewsets.ModelViewSet):
     ordering = ["-created_at"]
 
     def get_queryset(self):
-        return TopUpRequest.objects.filter(user=self.request.user).order_by("-created_at")
+        user = self.request.user
+        if getattr(user, 'is_superuser', False) or getattr(user, 'is_staff', False) or getattr(user, 'user_type', None) == 'admin':
+            return TopUpRequest.objects.all().order_by("-created_at")
+        return TopUpRequest.objects.filter(user=user).order_by("-created_at")
 
     def perform_create(self, serializer):
         # Stripe ulanmaýarys — diňe offline balans goşmak

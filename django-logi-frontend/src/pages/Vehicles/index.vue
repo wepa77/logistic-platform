@@ -6,25 +6,37 @@
         <div class="header-left">
           <h1 class="page-title">
             <i class="mdi mdi-truck"></i>
-            Fleet Management
+            {{ $t('vehicles.title') }}
           </h1>
-          <p class="page-subtitle">Manage your vehicle fleet and track specifications</p>
+          <p class="page-subtitle">{{ $t('vehicles.subtitle') }}</p>
         </div>
         <div class="header-actions">
-          <el-button type="primary" size="large" @click="openDialog()" class="add-btn">
-            <i class="mdi mdi-plus"></i>
-            Add New Vehicle
-          </el-button>
+          <router-link to="/vehicles/add">
+            <el-button type="primary" size="large" class="add-btn">
+              <i class="mdi mdi-plus"></i>
+              {{ $t('vehicles.addNew') }}
+            </el-button>
+          </router-link>
         </div>
       </div>
     </div>
+
+    <!-- Route Prefilter Summary (from marketplace) -->
+    <el-alert
+      v-if="prefilterSummary"
+      :title="prefilterSummary"
+      type="info"
+      class="prefilter-banner"
+      show-icon
+      :closable="false"
+    />
 
     <!-- Filters & Search Section -->
     <el-card class="filters-card" shadow="never">
       <div class="filters-container">
         <el-input
             v-model="searchQuery"
-            placeholder="Search by plate, brand, model..."
+            :placeholder="$t('vehicles.searchPlaceholder') as string"
             class="search-input"
             clearable
         >
@@ -33,18 +45,18 @@
           </template>
         </el-input>
 
-        <el-select v-model="typeFilter" placeholder="Filter by Type" clearable class="type-filter">
-          <el-option label="All Types" value="" />
-          <el-option label="Box Truck" value="box" />
-          <el-option label="Flatbed" value="flatbed" />
-          <el-option label="Refrigerated" value="refrigerated" />
-          <el-option label="Tanker" value="tanker" />
+        <el-select v-model="typeFilter" :placeholder="$t('vehicles.filterByType') as string" clearable class="type-filter">
+          <el-option :label="$t('vehicles.allTypes') as string" value="" />
+          <el-option :label="$t('vehicles.boxTruck') as string" value="box" />
+          <el-option :label="$t('vehicles.flatbed') as string" value="flatbed" />
+          <el-option :label="$t('vehicles.refrigerated') as string" value="refrigerated" />
+          <el-option :label="$t('vehicles.tanker') as string" value="tanker" />
         </el-select>
 
-        <el-select v-model="gpsFilter" placeholder="GPS Status" clearable class="gps-filter">
-          <el-option label="All Vehicles" value="" />
-          <el-option label="GPS Enabled" value="enabled" />
-          <el-option label="GPS Disabled" value="disabled" />
+        <el-select v-model="gpsFilter" :placeholder="$t('vehicles.gpsStatus') as string" clearable class="gps-filter">
+          <el-option :label="$t('vehicles.allVehicles') as string" value="" />
+          <el-option :label="$t('vehicles.gpsEnabled') as string" value="enabled" />
+          <el-option :label="$t('vehicles.disabled') as string" value="disabled" />
         </el-select>
 
         <el-button class="filter-btn" @click="fetchVehicles">
@@ -61,7 +73,7 @@
         </div>
         <div class="stat-content">
           <div class="stat-value">{{ vehicles.length }}</div>
-          <div class="stat-label">Total Vehicles</div>
+          <div class="stat-label">{{ $t('vehicles.totalVehicles') }}</div>
         </div>
       </div>
       <div class="stat-card">
@@ -70,7 +82,7 @@
         </div>
         <div class="stat-content">
           <div class="stat-value">{{ stats.gpsEnabled }}</div>
-          <div class="stat-label">GPS Enabled</div>
+          <div class="stat-label">{{ $t('vehicles.gpsEnabledCount') }}</div>
         </div>
       </div>
       <div class="stat-card">
@@ -79,7 +91,7 @@
         </div>
         <div class="stat-content">
           <div class="stat-value">{{ stats.totalCapacity.toFixed(0) }}</div>
-          <div class="stat-label">Total Capacity (kg)</div>
+          <div class="stat-label">{{ $t('vehicles.totalCapacity') }}</div>
         </div>
       </div>
       <div class="stat-card">
@@ -88,7 +100,7 @@
         </div>
         <div class="stat-content">
           <div class="stat-value">{{ stats.totalVolume.toFixed(1) }}</div>
-          <div class="stat-label">Total Volume (m³)</div>
+          <div class="stat-label">{{ $t('vehicles.totalVolume') }}</div>
         </div>
       </div>
     </div>
@@ -303,6 +315,7 @@
 
 <script lang="ts" setup>
 import { ref, onMounted, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { getVehicles, createVehicle, updateVehicle, deleteVehicleApi } from '@/api/api'
 
@@ -324,6 +337,22 @@ const dialogVisible = ref(false)
 const searchQuery = ref('')
 const typeFilter = ref('')
 const gpsFilter = ref('')
+
+// Prefilter summary from marketplace route query
+const route = useRoute()
+const prefilterSummary = computed(() => {
+  const from = (route.query.from as string) || ''
+  const to = (route.query.to as string) || ''
+  const date = (route.query.date as string) || ''
+  const radius = route.query.radius as string | undefined
+  if (!from && !to && !date && !radius) return ''
+  const parts: string[] = []
+  if (from) parts.push(`From: ${from}`)
+  if (to) parts.push(`To: ${to}`)
+  if (date) parts.push(`Date: ${date}`)
+  if (radius) parts.push(`Radius: ${radius} km`)
+  return `Searching vehicles — ${parts.join(' • ')}`
+})
 
 const form = ref<Vehicle>({
   plate_number: '',

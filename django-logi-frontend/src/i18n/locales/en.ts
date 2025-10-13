@@ -30,12 +30,14 @@ export default {
   
   nav: {
     dashboard: 'Dashboard',
+    home: 'Home',
     vehicles: 'Vehicles',
     cargos: 'Cargos',
     offers: 'Offers',
     shipments: 'Shipments',
     reviews: 'Reviews',
     wallet: 'Wallet',
+    driverRequest: 'Driver Request',
     profile: 'Profile',
     settings: 'Settings',
     logout: 'Logout'
@@ -325,5 +327,67 @@ export default {
     passwordMismatch: 'Passwords do not match',
     minLength: 'Minimum length is {min} characters',
     maxLength: 'Maximum length is {max} characters'
+  },
+
+  forms: {
+    // Section headers
+    cargo: 'Cargo',
+    requirements: 'Body and Loading Requirements',
+    specs: 'Specifications',
+    route: 'Route',
+    rate: 'Rate',
+    companyData: 'Company Data',
+    promotion: 'Promotion',
+
+    // Actions / titles
+    addCargo: 'Add Cargo',
+    publishCargo: 'Publish Cargo',
+    addVehicle: 'Add Vehicle',
+    publishVehicle: 'Publish Vehicle',
+
+    // Common fields
+    cargoType: 'Cargo Type',
+    cargoName: 'Cargo Name',
+    weightKg: 'Weight (kg)',
+    volumeM3: 'Volume (m³)',
+    quantity: 'Quantity',
+    bodyType: 'Body Type',
+    loadTypes: 'Loading Types',
+    lengthM: 'Length (m)',
+    widthM: 'Width (m)',
+    heightM: 'Height (m)',
+    adr: 'ADR',
+    tir: 'TIR / EKMT',
+    gpsMonitoring: 'GPS monitoring',
+    hydrolift: 'Hydrolift',
+    stakes: 'Stakes',
+    partialLoad: 'Part load',
+
+    locationFrom: 'From (locality)',
+    possibleUnload: 'To (possible unload)',
+    fromRadiusKm: 'From radius (km)',
+    unloadRadiusKm: 'Unload radius (km)',
+    availableFrom: 'Ready to load',
+    availableDays: 'Number of days',
+
+    hasRate: 'Has rate',
+    requestRate: 'Request rate',
+    rateWithVat: 'With VAT, cashless',
+    rateWithoutVat: 'Without VAT, cashless',
+    rateCash: 'Cash',
+    currency: 'Currency',
+    payToCard: 'to card',
+    withoutBargain: 'no bargaining',
+
+    isPrivate: 'I am a private person',
+    companyType: 'Company type',
+    companyName: 'Company name',
+    city: 'City',
+    contactName: 'Contact person',
+    contactPhone: 'Phone',
+    note: 'Note',
+
+    promoteTop: 'TOP of search',
+    stealthMode: 'Stealth mode'
   }
 }
