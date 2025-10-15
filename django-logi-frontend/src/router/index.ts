@@ -56,8 +56,12 @@ export const router = createRouter({
 // ✅ Auth guard (allows public routes)
 router.beforeEach((to, _from, next) => {
     const auth = useAuthStore()
-    const isPublic = Boolean(to.meta.public) || to.path === '/market'
-    if (!auth.isAuthed && !isPublic) return next('/market')
+    const isPublic = Boolean(to.meta.public) || to.path === '/market' || to.path === '/home'
+    if (!auth.isAuthed) {
+        // Redirect root to Home for unauthenticated users
+        if (to.path === '/') return next('/home')
+        if (!isPublic) return next('/market')
+    }
     if (auth.isAuthed && (to.path === '/login' || to.path === '/register')) return next('/')
     next()
 })

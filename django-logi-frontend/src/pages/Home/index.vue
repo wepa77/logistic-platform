@@ -1,80 +1,176 @@
 <template>
-  <!-- Simple public Home page separate from authenticated dashboard -->
+  <!-- Home page redesigned to match the provided screenshot style -->
   <div class="home-page">
+    <!-- Hero with quick stats and subtle background illustration -->
     <section class="hero">
       <div class="hero-inner">
         <div class="hero-text">
-          <h1>Welcome to Logistic</h1>
-          <p>Your gateway to cargos, vehicles, and trusted logistics partners.</p>
-          <div class="cta-buttons">
-            <router-link to="/market">
-              <el-button type="primary" size="large">
-                <i class="mdi mdi-storefront"></i>
-                Go to Marketplace
-              </el-button>
-            </router-link>
-            <router-link to="/login">
-              <el-button size="large">
-                <i class="mdi mdi-login"></i>
-                Login
-              </el-button>
-            </router-link>
-            <router-link to="/register">
-              <el-button size="large" type="success">
-                <i class="mdi mdi-account-plus"></i>
-                Register
-              </el-button>
-            </router-link>
-          </div>
+          <h1>Биржа грузоперевозок и сервисы для логистики</h1>
+          <p>Находите грузы и проверенных перевозчиков, экономьте за счёт автоматизации процессов.</p>
+          <ul class="stats">
+            <li><i class="mdi mdi-package-variant"></i> 183 544 грузов</li>
+            <li><i class="mdi mdi-truck"></i> 74 978 машин</li>
+            <li><i class="mdi mdi-account-group"></i> 466 302 участников</li>
+            <li><i class="mdi mdi-file-document"></i> 192 тендера</li>
+          </ul>
         </div>
         <div class="hero-art" aria-hidden="true"></div>
       </div>
     </section>
 
-    <section class="features">
+    <!-- Search panel like in the screenshot -->
+    <el-card class="search-card" shadow="always">
+      <div class="search-grid">
+        <div class="field">
+          <label>Откуда</label>
+          <el-input v-model="search.from" placeholder="Город, регион, страна" />
+        </div>
+        <div class="field">
+          <label>Куда</label>
+          <el-input v-model="search.to" placeholder="Город, регион, страна" />
+        </div>
+        <div class="field small">
+          <label>Радиус, км</label>
+          <el-input-number v-model="search.radius" :min="0" :max="1000" :step="10" controls-position="right" />
+        </div>
+        <div class="field small">
+          <label>Дата</label>
+          <el-date-picker v-model="search.date" type="date" placeholder="Выберите дату" style="width: 100%" />
+        </div>
+        <div class="actions">
+          <el-button type="success" size="large" @click="goFind('cargos')">
+            <i class="mdi mdi-package-variant"></i> Найти грузы
+          </el-button>
+          <el-button type="warning" size="large" @click="goFind('vehicles')">
+            <i class="mdi mdi-truck"></i> Найти машины
+          </el-button>
+          <el-button size="large" @click="calcDistance">
+            <i class="mdi mdi-ruler"></i> Рассчитать расстояние
+          </el-button>
+        </div>
+      </div>
+      <div v-if="distanceKm !== null" class="distance-result">
+        <i class="mdi mdi-map-marker-distance"></i>
+        <span>Расстояние: {{ distanceKm.toFixed(0) }} км</span>
+      </div>
+    </el-card>
+
+    <!-- Services shortcuts -->
+    <section class="services">
       <el-row :gutter="16">
-        <el-col :xs="24" :sm="12" :md="8" :lg="6" v-for="f in features" :key="f.title">
-          <el-card shadow="hover" class="feature-card">
-            <div class="icon" :class="f.kind"><i :class="f.icon"></i></div>
+        <el-col :xs="24" :sm="12" :md="8" :lg="6" v-for="s in services" :key="s.title">
+          <el-card shadow="hover" class="service-card" @click="navigate(s.to)">
+            <div class="icon" :class="s.kind"><i :class="s.icon"></i></div>
             <div class="content">
-              <div class="title">{{ f.title }}</div>
-              <div class="desc">{{ f.desc }}</div>
+              <div class="title">{{ s.title }}</div>
+              <div class="desc">{{ s.desc }}</div>
             </div>
           </el-card>
         </el-col>
       </el-row>
     </section>
+
+    <!-- CTA for auth -->
+    <section class="cta">
+      <el-card class="cta-card" shadow="never">
+        <div class="cta-inner">
+          <div>
+            <h3>Создайте аккаунт, чтобы публиковать грузы и транспорт</h3>
+            <p>Получите доступ к предложениям, заказам и инструментам репутации.</p>
+          </div>
+          <div class="cta-actions">
+            <router-link to="/login"><el-button type="primary">Войти</el-button></router-link>
+            <router-link to="/register"><el-button>Регистрация</el-button></router-link>
+          </div>
+        </div>
+      </el-card>
+    </section>
   </div>
 </template>
 
 <script lang="ts" setup>
-const features = [
-  { title: 'Find Cargos', desc: 'Search thousands of loads daily', icon: 'mdi mdi-package-variant', kind: 'cargo' },
-  { title: 'Find Vehicles', desc: 'Verified carriers across regions', icon: 'mdi mdi-truck', kind: 'vehicle' },
-  { title: 'Orders & Offers', desc: 'Negotiate and track orders', icon: 'mdi mdi-handshake', kind: 'orders' },
-  { title: 'Reputation', desc: 'Reviews and partner checks', icon: 'mdi mdi-shield-check', kind: 'check' }
+import { reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+// Haversine distance (km)
+function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number) {
+  const toRad = (d: number) => (d * Math.PI) / 180
+  const R = 6371
+  const dLat = toRad(lat2 - lat1)
+  const dLon = toRad(lon2 - lon1)
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+  return R * c
+}
+
+// Public Nominatim geocoder (demo)
+async function geocode(q: string): Promise<{ lat: number; lon: number } | null> {
+  if (!q) return null
+  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}`
+  const res = await fetch(url, { headers: { 'Accept-Language': 'ru' } })
+  const json = (await res.json()) as Array<{ lat: string; lon: string }> | undefined
+  if (!json || !json.length) return null
+  const first = json[0] as { lat: string; lon: string }
+  return { lat: Number(first.lat), lon: Number(first.lon) }
+}
+
+const router = useRouter()
+const search = reactive({ from: '', to: '', radius: 0, date: '' as any })
+const distanceKm = ref<number | null>(null)
+
+function goFind(kind: 'cargos' | 'vehicles') {
+  router.push({ name: kind, query: { from: search.from || undefined, to: search.to || undefined, radius: search.radius || undefined, date: search.date ? new Date(search.date).toISOString().slice(0, 10) : undefined } })
+}
+
+async function calcDistance() {
+  distanceKm.value = null
+  const [a, b] = await Promise.all([geocode(search.from), geocode(search.to)])
+  if (a && b) distanceKm.value = haversineKm(a.lat, a.lon, b.lat, b.lon)
+}
+
+const services = [
+  { title: 'Добавьте груз бесплатно', desc: 'Получайте предложения от перевозчиков', icon: 'mdi mdi-package-variant', kind: 'cargo', to: { name: 'cargos' } },
+  { title: 'Добавьте машину бесплатно', desc: 'Получайте предложения от грузоотправителей', icon: 'mdi mdi-truck', kind: 'vehicle', to: { name: 'vehicles' } },
+  { title: 'Гарантия оплаты', desc: 'Защитите себя от неоплаты за рейс', icon: 'mdi mdi-shield-check', kind: 'check', to: { name: 'reviews' } },
+  { title: 'Площадки', desc: 'Инструменты для работы с собственным транспортом', icon: 'mdi mdi-handshake', kind: 'orders', to: { name: 'offers' } }
 ]
+
+function navigate(to: any) { router.push(to) }
 </script>
 
 <style scoped>
 .home-page { padding: 24px; }
-.hero { background: linear-gradient(180deg, #eef2ff, #ffffff); border-radius: 16px; margin-bottom: 20px; }
+.hero { background: linear-gradient(180deg, #eef5ff, #ffffff); border-radius: 16px; margin-bottom: 20px; }
 .hero-inner { display: flex; gap: 24px; padding: 32px; align-items: center; min-height: 220px; }
 .hero-text h1 { margin: 0 0 8px; font-size: 28px; font-weight: 700; }
 .hero-text p { margin: 0 0 16px; color: #475569; }
-.hero-art { flex: 1; min-height: 160px; border-radius: 12px; background: radial-gradient(closest-side, #e0e7ff, transparent), repeating-linear-gradient(45deg, #eef2ff 0 10px, #ffffff 10px 20px); }
-.cta-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
+.stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 0; margin: 0; list-style: none; color: #1f2937; }
+.hero-art { flex: 1; min-height: 160px; border-radius: 12px; background: radial-gradient(closest-side, #dbeafe, transparent), repeating-linear-gradient(45deg, #eff6ff 0 10px, #ffffff 10px 20px); }
 
-.features { margin: 28px 0; }
-.feature-card .icon { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 8px; margin-bottom: 12px; }
-.feature-card .icon.cargo { background: #fef3c7; color: #92400e; }
-.feature-card .icon.vehicle { background: #dbeafe; color: #1e3a8a; }
-.feature-card .icon.orders { background: #dcfce7; color: #166534; }
-.feature-card .icon.check { background: #fee2e2; color: #991b1b; }
-.feature-card .title { font-weight: 600; margin-bottom: 4px; }
-.feature-card .desc { color: #6b7280; font-size: 13px; }
+.search-card { margin-bottom: 24px; }
+.search-grid { display: grid; grid-template-columns: 1fr 1fr 160px 220px; gap: 16px; align-items: end; }
+.field label { display: block; font-size: 12px; color: #64748b; margin-bottom: 6px; }
+.field.small { min-width: 140px; }
+.actions { display: flex; gap: 12px; align-items: center; }
+.distance-result { margin-top: 12px; color: #334155; display: flex; align-items: center; gap: 8px; }
+
+.services { margin: 28px 0; }
+.service-card { cursor: pointer; transition: transform .15s ease; }
+.service-card:hover { transform: translateY(-2px); }
+.service-card .icon { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 8px; margin-bottom: 12px; }
+.service-card .icon.cargo { background: #fef3c7; color: #92400e; }
+.service-card .icon.vehicle { background: #dbeafe; color: #1e3a8a; }
+.service-card .icon.orders { background: #dcfce7; color: #166534; }
+.service-card .icon.check { background: #fee2e2; color: #991b1b; }
+.service-card .title { font-weight: 600; margin-bottom: 4px; }
+.service-card .desc { color: #6b7280; font-size: 13px; }
+
+.cta-card { border-radius: 12px; }
+.cta-inner { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 10px 4px; }
+.cta-actions { display: flex; gap: 10px; }
 
 @media (max-width: 1024px) {
-  .hero-inner { flex-direction: column; align-items: flex-start; }
+  .search-grid { grid-template-columns: 1fr 1fr; }
+  .actions { grid-column: 1 / -1; }
 }
 </style>

@@ -23,6 +23,11 @@
           <span>{{ $t('nav.dashboard') }}</span>
         </el-menu-item>
 
+        <el-menu-item index="/home">
+          <i class="mdi mdi-home-outline menu-icon"></i>
+          <span>{{ $t('nav.home') }}</span>
+        </el-menu-item>
+
         <!-- Carrier & Shipper menus: visible to all authenticated users to avoid backend role mismatch -->
         <el-menu-item index="/vehicles">
           <i class="mdi mdi-truck menu-icon"></i>
