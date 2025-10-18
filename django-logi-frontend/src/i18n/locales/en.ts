@@ -106,7 +106,29 @@ export default {
     uploadPhoto: 'Upload Photo',
     dropFile: 'Drop file here or',
     clickToUpload: 'click to upload',
-    supportedFormats: 'Support: JPG, PNG (max 5MB)'
+    supportedFormats: 'Support: JPG, PNG (max 5MB)',
+    
+    // Added for page UI
+    totalCargos: 'Total Cargos',
+    totalWeightKg: 'Total Weight (kg)',
+    totalVolumeM3: 'Total Volume (m³)',
+    table: {
+      cargo: 'Cargo',
+      route: 'Route',
+      specs: 'Specs',
+      dates: 'Dates',
+      rate: 'Rate'
+    },
+    untitled: 'Untitled cargo',
+    general: 'General',
+    onRequest: 'on request',
+    noCargosYet: 'No cargos yet. Click “Add Cargo” to publish your first load.',
+    prefilledFromSearch: 'Prefilled from search',
+    prefillFrom: 'From',
+    prefillTo: 'To',
+    prefillWhen: 'When',
+    prefillRadius: 'Radius',
+    days: 'days'
   },
   
   vehicles: {
@@ -463,6 +485,51 @@ export default {
     ctaDesc: 'Access offers, orders, and reputation features once authenticated.',
     login: 'Login',
     register: 'Register'
+  },
+
+  driverRequest: {
+    title: 'Driver request for transportation',
+    description: 'You will be able to track the transportation, the cargo location and its statuses on the map. Only the selected driver will see the request data.',
+    sections: {
+      driverVehicle: 'Driver and Vehicle',
+      routeCargo: 'Route and Cargo',
+      unload: 'Unload',
+      additional: 'Additional'
+    },
+    placeholders: {
+      driver: 'Enter last name or first name',
+      vehicle: 'Select vehicle',
+      loadCity: 'Loading locality',
+      loadAddress: 'Address without city',
+      cargoName: 'Cargo name',
+      weight: 'Weight',
+      volume: 'Volume',
+      unloadCity: 'Unloading locality',
+      unloadAddress: 'Address without city'
+    },
+    units: {
+      t: 't',
+      kg: 'kg',
+      m3: 'm³'
+    },
+    actions: {
+      addMoreCargo: 'More cargo',
+      packages: 'Packaging and quantity',
+      dimensions: 'Dimensions',
+      addWaypointLoad: 'Add route point: Loading',
+      addWaypointUnload: 'Add route point: Unloading'
+    },
+    additional: {
+      contact: 'Contact',
+      note: 'Note',
+      loadDateTime: 'Loading date and time',
+      unloadDateTime: 'Unloading date and time',
+      strapsCount: 'Straps, pcs.',
+      photosDocs: 'Cargo photos and documents',
+      customs: 'Customs'
+    },
+    submit: 'Add request',
+    createdDemo: 'Request created (demo)'
   }
 }
 

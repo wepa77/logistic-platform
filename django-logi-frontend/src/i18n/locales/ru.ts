@@ -106,7 +106,29 @@ export default {
     uploadPhoto: 'Загрузить фото',
     dropFile: 'Перетащите файл сюда или',
     clickToUpload: 'нажмите для загрузки',
-    supportedFormats: 'Поддержка: JPG, PNG (макс 5МБ)'
+    supportedFormats: 'Поддержка: JPG, PNG (макс 5МБ)',
+
+    // Доп. ярлыки UI
+    totalCargos: 'Всего грузов',
+    totalWeightKg: 'Общий вес (кг)',
+    totalVolumeM3: 'Общий объём (м³)',
+    table: {
+      cargo: 'Груз',
+      route: 'Маршрут',
+      specs: 'Характеристики',
+      dates: 'Даты',
+      rate: 'Ставка'
+    },
+    untitled: 'Без названия',
+    general: 'Общий',
+    onRequest: 'по запросу',
+    noCargosYet: 'Пока нет грузов. Нажмите «Добавить груз», чтобы опубликовать первый.',
+    prefilledFromSearch: 'Предзаполнено из поиска',
+    prefillFrom: 'Откуда',
+    prefillTo: 'Куда',
+    prefillWhen: 'Когда',
+    prefillRadius: 'Радиус',
+    days: 'дней'
   },
   
   vehicles: {
@@ -460,5 +482,50 @@ export default {
     ctaDesc: 'Доступ к предложениям, заказам и репутации после входа.',
     login: 'Войти',
     register: 'Регистрация'
+  },
+
+  driverRequest: {
+    title: 'Заявка водителю на перевозку',
+    description: 'Вы сможете отслеживать перевозку, местоположение груза и его статусы на карте. Данные из заявки увидит только водитель, которого вы выберете.',
+    sections: {
+      driverVehicle: 'Водитель и ТС',
+      routeCargo: 'Маршрут и груз',
+      unload: 'Разгрузка',
+      additional: 'Дополнительно'
+    },
+    placeholders: {
+      driver: 'Введите фамилию или имя',
+      vehicle: 'Выберите ТС',
+      loadCity: 'Населённый пункт загрузки',
+      loadAddress: 'Адрес без города',
+      cargoName: 'Наименование груза',
+      weight: 'Вес',
+      volume: 'Объём',
+      unloadCity: 'Населённый пункт разгрузки',
+      unloadAddress: 'Адрес без города'
+    },
+    units: {
+      t: 'т',
+      kg: 'кг',
+      m3: 'м³'
+    },
+    actions: {
+      addMoreCargo: 'Ещё груз',
+      packages: 'Упаковка и кол-во',
+      dimensions: 'Габариты',
+      addWaypointLoad: 'Добавить точку маршрута: Загрузка',
+      addWaypointUnload: 'Добавить точку маршрута: Разгрузка'
+    },
+    additional: {
+      contact: 'Контакт',
+      note: 'Примечание',
+      loadDateTime: 'Дата и время загрузки',
+      unloadDateTime: 'Дата и время разгрузки',
+      strapsCount: 'Ремней, шт.',
+      photosDocs: 'Фото грузов и документы',
+      customs: 'Таможня'
+    },
+    submit: 'Добавить заявку',
+    createdDemo: 'Заявка создана (демо)'
   }
 }

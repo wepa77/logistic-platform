@@ -6,14 +6,14 @@
         <div class="header-left">
           <h1 class="page-title">
             <i class="mdi mdi-handshake-outline"></i>
-            Offers Management
+            {{ $t('offers.title') }}
           </h1>
-          <p class="page-subtitle">Manage carrier offers and negotiate prices</p>
+          <p class="page-subtitle">{{ $t('offers.subtitle') }}</p>
         </div>
         <div class="header-actions">
           <el-button type="primary" size="large" @click="openDialog()" class="add-btn">
             <i class="mdi mdi-plus"></i>
-            Create Offer
+            {{ $t('offers.createOffer') }}
           </el-button>
         </div>
       </div>
@@ -24,7 +24,7 @@
       <div class="filters-container">
         <el-input
             v-model="searchQuery"
-            placeholder="Search by cargo, carrier..."
+            :placeholder="$t('offers.searchPlaceholder')"
             class="search-input"
             clearable
         >
@@ -33,11 +33,11 @@
           </template>
         </el-input>
 
-        <el-select v-model="statusFilter" placeholder="Filter by Status" clearable class="status-filter">
-          <el-option label="All Status" value="" />
-          <el-option label="Pending" value="pending" />
-          <el-option label="Accepted" value="accepted" />
-          <el-option label="Rejected" value="rejected" />
+        <el-select v-model="statusFilter" :placeholder="$t('offers.filterByStatus')" clearable class="status-filter">
+          <el-option :label="$t('offers.allStatus')" value="" />
+          <el-option :label="$t('offers.pending')" value="pending" />
+          <el-option :label="$t('offers.accepted')" value="accepted" />
+          <el-option :label="$t('offers.rejected')" value="rejected" />
         </el-select>
 
         <el-button class="filter-btn" @click="fetchOffers">
@@ -54,7 +54,7 @@
         </div>
         <div class="stat-content">
           <div class="stat-value">{{ offers.length }}</div>
-          <div class="stat-label">Total Offers</div>
+          <div class="stat-label">{{ $t('offers.totalOffers') }}</div>
         </div>
       </div>
       <div class="stat-card">
@@ -63,7 +63,7 @@
         </div>
         <div class="stat-content">
           <div class="stat-value">{{ stats.pending }}</div>
-          <div class="stat-label">Pending</div>
+          <div class="stat-label">{{ $t('offers.pending') }}</div>
         </div>
       </div>
       <div class="stat-card">
@@ -72,7 +72,7 @@
         </div>
         <div class="stat-content">
           <div class="stat-value">{{ stats.accepted }}</div>
-          <div class="stat-label">Accepted</div>
+          <div class="stat-label">{{ $t('offers.accepted') }}</div>
         </div>
       </div>
       <div class="stat-card">
@@ -81,7 +81,7 @@
         </div>
         <div class="stat-content">
           <div class="stat-value">{{ stats.averagePrice.toFixed(0) }}</div>
-          <div class="stat-label">Avg Price (TMT)</div>
+          <div class="stat-label">{{ $t('offers.averagePrice') }}</div>
         </div>
       </div>
     </div>
@@ -89,27 +89,27 @@
     <!-- Offers Table -->
     <el-card class="table-card" shadow="never">
       <el-table :data="filteredOffers" style="width: 100%" class="modern-table">
-        <el-table-column label="Cargo" min-width="220">
+        <el-table-column :label="$t('offers.cargo')" min-width="220">
           <template #default="{ row }">
             <div class="cargo-cell">
               <i class="mdi mdi-package-variant-closed"></i>
-              <span>{{ row.cargo?.title || 'N/A' }}</span>
+              <span>{{ row.cargo?.title || $t('common.noData') }}</span>
             </div>
           </template>
         </el-table-column>
 
-        <el-table-column label="Carrier" min-width="180">
+        <el-table-column :label="$t('offers.carrier')" min-width="180">
           <template #default="{ row }">
             <div class="carrier-cell">
               <el-avatar :size="32" class="carrier-avatar">
                 <i class="mdi mdi-account"></i>
               </el-avatar>
-              <span>{{ row.carrier?.username || 'N/A' }}</span>
+              <span>{{ row.carrier?.username || $t('common.noData') }}</span>
             </div>
           </template>
         </el-table-column>
 
-        <el-table-column label="Price" width="140">
+        <el-table-column :label="$t('offers.price')" width="140">
           <template #default="{ row }">
             <div class="price-cell">
               <i class="mdi mdi-cash"></i>
@@ -118,26 +118,26 @@
           </template>
         </el-table-column>
 
-        <el-table-column label="Vehicle" min-width="180">
+        <el-table-column :label="$t('offers.vehicle')" min-width="180">
           <template #default="{ row }">
             <div class="vehicle-cell" v-if="row.vehicle">
               <i class="mdi mdi-truck"></i>
               <span>{{ getVehicleLabel(row.vehicle) }}</span>
             </div>
-            <span v-else class="no-vehicle">No vehicle assigned</span>
+            <span v-else class="no-vehicle">{{ $t('offers.noVehicle') }}</span>
           </template>
         </el-table-column>
 
-        <el-table-column label="Note" min-width="200">
+        <el-table-column :label="$t('offers.note')" min-width="200">
           <template #default="{ row }">
             <div class="note-cell">
               <i class="mdi mdi-note-text-outline"></i>
-              <span>{{ row.note || 'No notes' }}</span>
+              <span>{{ row.note || $t('offers.noNotes') }}</span>
             </div>
           </template>
         </el-table-column>
 
-        <el-table-column label="Status" width="140">
+        <el-table-column :label="$t('offers.status')" width="140">
           <template #default="{ row }">
             <el-tag
                 :type="statusType(row.status)"
@@ -150,25 +150,25 @@
           </template>
         </el-table-column>
 
-        <el-table-column fixed="right" label="Actions" width="160">
+        <el-table-column fixed="right" :label="$t('common.actions')" width="160">
           <template #default="{ row }">
             <div class="action-buttons">
-              <el-tooltip content="Edit" placement="top">
+              <el-tooltip :content="$t('common.edit')" placement="top">
                 <el-button link type="primary" @click="openDialog(row)">
                   <i class="mdi mdi-pencil"></i>
                 </el-button>
               </el-tooltip>
-              <el-tooltip content="View Details" placement="top">
+              <el-tooltip :content="$t('common.viewDetails')" placement="top">
                 <el-button link type="info">
                   <i class="mdi mdi-eye"></i>
                 </el-button>
               </el-tooltip>
               <el-popconfirm
-                  title="Are you sure to delete this offer?"
+                  :title="$t('offers.deleteConfirm')"
                   @confirm="deleteOffer(row.id!)"
               >
                 <template #reference>
-                  <el-tooltip content="Delete" placement="top">
+                  <el-tooltip :content="$t('common.delete')" placement="top">
                     <el-button link type="danger">
                       <i class="mdi mdi-delete"></i>
                     </el-button>
@@ -184,13 +184,13 @@
     <!-- Modern Dialog for create/update -->
     <el-dialog
         v-model="dialogVisible"
-        :title="form.id ? 'Edit Offer' : 'Create New Offer'"
+        :title="form.id ? $t('offers.editOffer') : $t('offers.createNew')"
         width="600px"
         class="modern-dialog"
     >
       <el-form :model="form" label-position="top" class="offer-form">
-        <el-form-item label="Cargo">
-          <el-select v-model="form.cargo" placeholder="Select cargo" filterable style="width:100%">
+        <el-form-item :label="$t('offers.cargo')">
+          <el-select v-model="form.cargo" :placeholder="$t('offers.selectCargo')" filterable style="width:100%">
             <el-option
                 v-for="c in cargoOptions"
                 :key="c.id"
@@ -205,12 +205,12 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="Price (TMT)">
+        <el-form-item :label="$t('offers.price')">
           <el-input-number v-model="form.price" :min="0" :step="10" style="width:100%" />
         </el-form-item>
 
-        <el-form-item label="Vehicle (Optional)">
-          <el-select v-model="form.vehicle" placeholder="Select vehicle" filterable clearable style="width:100%">
+        <el-form-item :label="`${t('offers.vehicle')} (${t('offers.optional')})`">
+          <el-select v-model="form.vehicle" :placeholder="$t('offers.selectVehicle')" filterable clearable style="width:100%">
             <el-option
                 v-for="v in vehicleOptions"
                 :key="v.id"
@@ -225,12 +225,12 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="Note">
+        <el-form-item :label="$t('offers.note')">
           <el-input
               v-model="form.note"
               type="textarea"
               :rows="3"
-              placeholder="Add any additional notes or terms..."
+              :placeholder="$t('offers.addNotes')"
               maxlength="300"
               show-word-limit
           />
@@ -241,11 +241,11 @@
         <div class="dialog-footer">
           <el-button size="large" @click="dialogVisible = false">
             <i class="mdi mdi-close"></i>
-            Cancel
+            {{ $t('common.cancel') }}
           </el-button>
           <el-button type="primary" size="large" @click="saveOffer">
             <i class="mdi mdi-check"></i>
-            {{ form.id ? 'Update' : 'Create' }} Offer
+            {{ form.id ? $t('offers.editOffer') : $t('offers.createOffer') }}
           </el-button>
         </div>
       </template>
@@ -256,6 +256,7 @@
 <script lang="ts" setup>
 import { ref, onMounted, computed } from 'vue'
 import { ElMessage } from 'element-plus'
+import { useI18n } from 'vue-i18n'
 import {
   getOffers as apiGetOffers,
   createOffer as apiCreateOffer,
@@ -287,6 +288,8 @@ interface VehicleOption {
   model: string
   capacity_kg: number
 }
+
+const { t } = useI18n()
 
 const offers = ref<Offer[]>([])
 const cargoOptions = ref<CargoOption[]>([])
@@ -349,8 +352,12 @@ function statusIcon(status?: string) {
 }
 
 function formatStatus(status?: string) {
-  if (!status) return 'Pending'
-  return status.charAt(0).toUpperCase() + status.slice(1)
+  switch (status) {
+    case 'accepted': return t('offers.accepted')
+    case 'rejected': return t('offers.rejected')
+    case 'pending':
+    default: return t('offers.pending')
+  }
 }
 
 function getVehicleLabel(vehicle: any) {
@@ -389,10 +396,10 @@ function openDialog(offer?: Offer) {
 async function saveOffer() {
   if (form.value.id) {
     await apiUpdateOffer(form.value.id, form.value)
-    ElMessage.success('Offer updated successfully')
+    ElMessage.success(t('offers.offerUpdated'))
   } else {
     await apiCreateOffer(form.value)
-    ElMessage.success('Offer created successfully')
+    ElMessage.success(t('offers.offerCreated'))
   }
   dialogVisible.value = false
   await fetchOffers()
@@ -400,7 +407,7 @@ async function saveOffer() {
 
 async function deleteOffer(id: number) {
   await apiDeleteOffer(id)
-  ElMessage.success('Offer deleted successfully')
+  ElMessage.success(t('offers.offerDeleted'))
   await fetchOffers()
 }
 

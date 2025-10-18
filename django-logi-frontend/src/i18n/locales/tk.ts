@@ -106,7 +106,29 @@ export default {
     uploadPhoto: 'Surat ýükle',
     dropFile: 'Faýly şu ýere taşlaň ýa-da',
     clickToUpload: 'ýüklemek üçin basyň',
-    supportedFormats: 'Goldaw: JPG, PNG (maks 5MB)'
+    supportedFormats: 'Goldaw: JPG, PNG (maks 5MB)',
+
+    // Goşmaça UI bellikler
+    totalCargos: 'Jemi ýükler',
+    totalWeightKg: 'Jemi agram (kg)',
+    totalVolumeM3: 'Jemi göwrüm (m³)',
+    table: {
+      cargo: 'Ýük',
+      route: 'Marşrut',
+      specs: 'Aýratynlyklar',
+      dates: 'Seneler',
+      rate: 'Bahasy'
+    },
+    untitled: 'Ady ýok',
+    general: 'Umumy',
+    onRequest: 'soranynda',
+    noCargosYet: 'Häzirlikçe ýük ýok. Ilkinji ýügi çap etmek üçin «Ýük goş» düwmesine basyň.',
+    prefilledFromSearch: 'Gözlegden öňden dolduryldy',
+    prefillFrom: 'Nireden',
+    prefillTo: 'Nirä',
+    prefillWhen: 'Haçan',
+    prefillRadius: 'Radius',
+    days: 'gün'
   },
   
   vehicles: {
@@ -460,5 +482,50 @@ export default {
     ctaDesc: 'Giriş edeninden soň tekliplere, sargytlara we abraý aýratynlyklaryna giriş.',
     login: 'Giriş',
     register: 'Hasaba al'
+  },
+
+  driverRequest: {
+    title: 'Daşaýjy üçin ýüztalma haýyşy',
+    description: 'Daşamany, ýüküň ýerleşýän ýerini we derejesini kartada yzarlaň. Haýyşdaky maglumatlary diňe saýlan sürüji görer.',
+    sections: {
+      driverVehicle: 'Sürüji we ulag',
+      routeCargo: 'Marşrut we ýük',
+      unload: 'Düşürme',
+      additional: 'Goşmaça'
+    },
+    placeholders: {
+      driver: 'Familiýa ýa-da ady giriziň',
+      vehicle: 'Ulagy saýlaň',
+      loadCity: 'Ýükleme nokady',
+      loadAddress: 'Şäherden başga salgy',
+      cargoName: 'Ýükiň ady',
+      weight: 'Agram',
+      volume: 'Göwrüm',
+      unloadCity: 'Düşürme nokady',
+      unloadAddress: 'Şäherden başga salgy'
+    },
+    units: {
+      t: 't',
+      kg: 'kg',
+      m3: 'm³'
+    },
+    actions: {
+      addMoreCargo: 'Ýene bir ýük',
+      packages: 'Gaplama we sany',
+      dimensions: 'Ölçegler',
+      addWaypointLoad: 'Marşrut nokady goş: Ýükleme',
+      addWaypointUnload: 'Marşrut nokady goş: Düşürme'
+    },
+    additional: {
+      contact: 'Kontakt',
+      note: 'Bellik',
+      loadDateTime: 'Ýükleme sene we wagty',
+      unloadDateTime: 'Düşürme sene we wagty',
+      strapsCount: 'Gurşak sany, sany',
+      photosDocs: 'Ýük suratlary we resminamalar',
+      customs: 'Gümrük'
+    },
+    submit: 'Haýyş goş',
+    createdDemo: 'Haýyş döredildi (demo)'
   }
 }

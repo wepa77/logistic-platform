@@ -1,24 +1,24 @@
 <template>
   <div class="driver-request-page">
     <el-card class="request-card" shadow="hover">
-      <h1 class="page-title"><i class="mdi mdi-clipboard-text-outline"></i> Заявка водителю на перевозку</h1>
-      <p class="page-desc">Вы сможете отслеживать перевозку, местоположение груза и его статусы на карте. Данные из заявки увидит только водитель, которого вы выберете.</p>
+      <h1 class="page-title"><i class="mdi mdi-clipboard-text-outline"></i> {{ $t('driverRequest.title') }}</h1>
+      <p class="page-desc">{{ $t('driverRequest.description') }}</p>
 
       <!-- Driver and Vehicle -->
       <section class="form-section">
-        <h2>Водитель и ТС</h2>
+        <h2>{{ $t('driverRequest.sections.driverVehicle') }}</h2>
         <div class="grid-2">
-          <el-input v-model="form.driver" placeholder="Введите фамилию или имя" />
-          <el-input v-model="form.vehicle" placeholder="Выберите ТС" />
+          <el-input v-model="form.driver" :placeholder="$t('driverRequest.placeholders.driver')" />
+          <el-input v-model="form.vehicle" :placeholder="$t('driverRequest.placeholders.vehicle')" />
         </div>
       </section>
 
       <!-- Route and Cargo -->
       <section class="form-section">
-        <h2>Маршрут и груз</h2>
+        <h2>{{ $t('driverRequest.sections.routeCargo') }}</h2>
         <div class="grid-2">
-          <el-input v-model="form.load_city" placeholder="Населённый пункт загрузки" />
-          <el-input v-model="form.load_address" placeholder="Адрес без города" />
+          <el-input v-model="form.load_city" :placeholder="$t('driverRequest.placeholders.loadCity')" />
+          <el-input v-model="form.load_address" :placeholder="$t('driverRequest.placeholders.loadAddress')" />
         </div>
 
         <el-divider />
@@ -26,48 +26,48 @@
         <!-- Cargo items -->
         <div class="cargo-list">
           <div class="cargo-row" v-for="(c, idx) in form.cargos" :key="idx">
-            <el-input v-model="c.name" placeholder="Наименование груза" />
-            <el-input-number v-model="c.weight" :min="0" placeholder="Вес" />
+            <el-input v-model="c.name" :placeholder="$t('driverRequest.placeholders.cargoName')" />
+            <el-input-number v-model="c.weight" :min="0" :placeholder="$t('driverRequest.placeholders.weight')" />
             <el-select v-model="c.weightUnit" class="small">
-              <el-option label="т" value="t" />
-              <el-option label="кг" value="kg" />
+              <el-option :label="$t('driverRequest.units.t')" value="t" />
+              <el-option :label="$t('driverRequest.units.kg')" value="kg" />
             </el-select>
-            <el-input-number v-model="c.volume" :min="0" step="0.1" placeholder="Объём" />
+            <el-input-number v-model="c.volume" :min="0" step="0.1" :placeholder="$t('driverRequest.placeholders.volume')" />
             <el-select v-model="c.volumeUnit" class="small">
-              <el-option label="м³" value="m3" />
+              <el-option :label="$t('driverRequest.units.m3')" value="m3" />
             </el-select>
             <el-button type="danger" text @click="removeCargo(idx)"><i class="mdi mdi-delete"></i></el-button>
           </div>
-          <el-button type="primary" text @click="addCargo"><i class="mdi mdi-plus"></i> Ещё груз</el-button>
-          <el-button type="default" text @click="togglePackages"><i class="mdi mdi-package-variant"></i> Упаковка и кол-во</el-button>
-          <el-button type="default" text @click="toggleDims"><i class="mdi mdi-ruler"></i> Габариты</el-button>
+          <el-button type="primary" text @click="addCargo"><i class="mdi mdi-plus"></i> {{ $t('driverRequest.actions.addMoreCargo') }}</el-button>
+          <el-button type="default" text @click="togglePackages"><i class="mdi mdi-package-variant"></i> {{ $t('driverRequest.actions.packages') }}</el-button>
+          <el-button type="default" text @click="toggleDims"><i class="mdi mdi-ruler"></i> {{ $t('driverRequest.actions.dimensions') }}</el-button>
         </div>
       </section>
 
       <!-- Unload -->
       <section class="form-section">
-        <h2>Разгрузка</h2>
+        <h2>{{ $t('driverRequest.sections.unload') }}</h2>
         <div class="grid-2">
-          <el-input v-model="form.unload_city" placeholder="Населённый пункт разгрузки" />
-          <el-input v-model="form.unload_address" placeholder="Адрес без города" />
+          <el-input v-model="form.unload_city" :placeholder="$t('driverRequest.placeholders.unloadCity')" />
+          <el-input v-model="form.unload_address" :placeholder="$t('driverRequest.placeholders.unloadAddress')" />
         </div>
         <div class="grid-2">
-          <el-button type="default" text @click="addWaypoint('load')"><i class="mdi mdi-plus-circle-outline"></i> Добавить точку маршрута: Загрузка</el-button>
-          <el-button type="default" text @click="addWaypoint('unload')"><i class="mdi mdi-plus-circle-outline"></i> Добавить точку маршрута: Разгрузка</el-button>
+          <el-button type="default" text @click="addWaypoint('load')"><i class="mdi mdi-plus-circle-outline"></i> {{ $t('driverRequest.actions.addWaypointLoad') }}</el-button>
+          <el-button type="default" text @click="addWaypoint('unload')"><i class="mdi mdi-plus-circle-outline"></i> {{ $t('driverRequest.actions.addWaypointUnload') }}</el-button>
         </div>
       </section>
 
       <!-- Additional -->
       <section class="form-section">
-        <h2>Дополнительно</h2>
+        <h2>{{ $t('driverRequest.sections.additional') }}</h2>
         <div class="chip-row">
-          <el-button type="default" text @click="openDialog('contact')"><i class="mdi mdi-account-card-outline"></i> Контакт</el-button>
-          <el-button type="default" text @click="openDialog('note')"><i class="mdi mdi-note-text-outline"></i> Примечание</el-button>
-          <el-button type="default" text @click="openDialog('datetime')"><i class="mdi mdi-calendar-clock"></i> Дата и время загрузки</el-button>
-          <el-button type="default" text @click="openDialog('unload_datetime')"><i class="mdi mdi-calendar-clock"></i> Дата и время разгрузки</el-button>
-          <el-button type="default" text @click="openDialog('chain')"><i class="mdi mdi-link"></i> Ремней, шт.</el-button>
-          <el-button type="default" text @click="openDialog('photos')"><i class="mdi mdi-file-image-outline"></i> Фото грузов и документы</el-button>
-          <el-button type="default" text @click="openDialog('customs')"><i class="mdi mdi-shield-check-outline"></i> Таможня</el-button>
+          <el-button type="default" text @click="openDialog('contact')"><i class="mdi mdi-account-card-outline"></i> {{ $t('driverRequest.additional.contact') }}</el-button>
+          <el-button type="default" text @click="openDialog('note')"><i class="mdi mdi-note-text-outline"></i> {{ $t('driverRequest.additional.note') }}</el-button>
+          <el-button type="default" text @click="openDialog('datetime')"><i class="mdi mdi-calendar-clock"></i> {{ $t('driverRequest.additional.loadDateTime') }}</el-button>
+          <el-button type="default" text @click="openDialog('unload_datetime')"><i class="mdi mdi-calendar-clock"></i> {{ $t('driverRequest.additional.unloadDateTime') }}</el-button>
+          <el-button type="default" text @click="openDialog('chain')"><i class="mdi mdi-link"></i> {{ $t('driverRequest.additional.strapsCount') }}</el-button>
+          <el-button type="default" text @click="openDialog('photos')"><i class="mdi mdi-file-image-outline"></i> {{ $t('driverRequest.additional.photosDocs') }}</el-button>
+          <el-button type="default" text @click="openDialog('customs')"><i class="mdi mdi-shield-check-outline"></i> {{ $t('driverRequest.additional.customs') }}</el-button>
         </div>
       </section>
 
@@ -75,7 +75,7 @@
       <div class="submit-wrapper">
         <el-button type="primary" size="large" @click="submit">
           <i class="mdi mdi-send"></i>
-          Добавить заявку
+          {{ $t('driverRequest.submit') }}
         </el-button>
       </div>
     </el-card>
@@ -85,8 +85,11 @@
 <script lang="ts" setup>
 import { reactive } from 'vue'
 import { ElMessage } from 'element-plus'
+import { useI18n } from 'vue-i18n'
 
 interface CargoRow { name: string; weight: number | null; weightUnit: 't' | 'kg'; volume: number | null; volumeUnit: 'm3' }
+
+const { t } = useI18n()
 
 const form = reactive({
   driver: '',
@@ -107,7 +110,7 @@ function openDialog(_kind: string) { /* open corresponding dialog - left as stub
 
 function submit() {
   // Demo only: just show toast and reset
-  ElMessage.success('Заявка создана (демо)')
+  ElMessage.success(t('driverRequest.createdDemo'))
 }
 </script>
 

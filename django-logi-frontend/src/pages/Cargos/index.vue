@@ -61,28 +61,28 @@
         <div class="stat-icon total"><i class="mdi mdi-package-variant"></i></div>
         <div class="stat-content">
           <div class="stat-value">{{ cargos.length }}</div>
-          <div class="stat-label">Total Cargos</div>
+          <div class="stat-label">{{ $t('cargos.totalCargos') }}</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon weight"><i class="mdi mdi-weight-kilogram"></i></div>
         <div class="stat-content">
           <div class="stat-value">{{ totalWeight.toFixed(0) }}</div>
-          <div class="stat-label">Total Weight (kg)</div>
+          <div class="stat-label">{{ $t('cargos.totalWeightKg') }}</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon volume"><i class="mdi mdi-cube-outline"></i></div>
         <div class="stat-content">
           <div class="stat-value">{{ totalVolume.toFixed(1) }}</div>
-          <div class="stat-label">Total Volume (m³)</div>
+          <div class="stat-label">{{ $t('cargos.totalVolumeM3') }}</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon open"><i class="mdi mdi-clock-outline"></i></div>
         <div class="stat-content">
           <div class="stat-value">{{ openCount }}</div>
-          <div class="stat-label">Open</div>
+          <div class="stat-label">{{ $t('cargos.open') }}</div>
         </div>
       </div>
     </div>
@@ -90,18 +90,18 @@
     <!-- Cargos Table -->
     <el-card class="table-card" shadow="never">
       <el-table :data="filteredCargos" style="width: 100%" class="modern-table">
-        <el-table-column label="Cargo" min-width="220">
+        <el-table-column :label="$t('cargos.table.cargo')" min-width="220">
           <template #default="{ row }">
             <div class="cargo-cell">
-              <div class="cargo-title">{{ row.cargo_name || 'Untitled cargo' }}</div>
+              <div class="cargo-title">{{ row.cargo_name || ($t('cargos.untitled') as string) }}</div>
               <div class="cargo-meta">
                 <i class="mdi mdi-truck"></i>
-                <span>{{ row.cargo_type ? cargoTypes[row.cargo_type] : 'General' }}</span>
+                <span>{{ row.cargo_type ? cargoTypes[row.cargo_type] : ($t('cargos.general') as string) }}</span>
               </div>
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="Route" min-width="260">
+        <el-table-column :label="$t('cargos.table.route')" min-width="260">
           <template #default="{ row }">
             <div class="route">
               <span class="from">{{ row.location_from || '—' }}</span>
@@ -114,39 +114,39 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="Specs" min-width="220">
+        <el-table-column :label="$t('cargos.table.specs')" min-width="220">
           <template #default="{ row }">
             <div class="specs">
               <span class="chip"><i class="mdi mdi-weight-kilogram"></i> {{ row.weight_kg || 0 }} kg</span>
               <span class="chip"><i class="mdi mdi-cube-outline"></i> {{ row.volume_m3 || 0 }} m³</span>
-              <span class="chip" v-if="row.partial_load"><i class="mdi mdi-package-variant"></i> Part load</span>
-              <span class="chip" v-if="row.has_adr"><i class="mdi mdi-alert"></i> ADR</span>
+              <span class="chip" v-if="row.partial_load"><i class="mdi mdi-package-variant"></i> {{ $t('forms.partialLoad') }}</span>
+              <span class="chip" v-if="row.has_adr"><i class="mdi mdi-alert"></i> {{ $t('forms.adr') }}</span>
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="Dates" min-width="180">
+        <el-table-column :label="$t('cargos.table.dates')" min-width="180">
           <template #default="{ row }">
             <div class="dates">
               <span><i class="mdi mdi-calendar"></i> {{ formatDate(row.available_from) }}</span>
-              <span class="muted">+{{ row.available_days || 0 }} days</span>
+              <span class="muted">+{{ row.available_days || 0 }} {{ $t('cargos.days') }}</span>
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="Rate" min-width="160">
+        <el-table-column :label="$t('cargos.table.rate')" min-width="160">
           <template #default="{ row }">
             <div class="rate">
               <span v-if="row.rate_with_vat">{{ row.rate_with_vat }} {{ row.rate_currency?.toUpperCase() }}</span>
-              <span v-else class="muted">on request</span>
-              <span v-if="row.without_bargain" class="tag">no bargain</span>
+              <span v-else class="muted">{{ $t('cargos.onRequest') }}</span>
+              <span v-if="row.without_bargain" class="tag">{{ $t('forms.withoutBargain') }}</span>
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="Status" width="120">
+        <el-table-column :label="$t('common.status')" width="120">
           <template #default="{ row }">
             <el-tag :type="statusType(row.status)">{{ statusLabel(row.status) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="Actions" width="140" fixed="right">
+        <el-table-column :label="$t('common.actions')" width="140" fixed="right">
           <template #default="{ row, $index }">
             <el-button text size="small" @click="editCargo(row, $index)"><i class="mdi mdi-pencil"></i></el-button>
             <el-button text size="small" type="danger" @click="removeCargo($index)"><i class="mdi mdi-delete"></i></el-button>
@@ -156,17 +156,17 @@
 
       <div v-if="!cargos.length" class="empty-state">
         <i class="mdi mdi-package-variant"></i>
-        <p>No cargos yet. Click “Add Cargo” to publish your first load.</p>
+        <p>{{ $t('cargos.noCargosYet') }}</p>
       </div>
     </el-card>
 
     <!-- Add/Edit Dialog with existing form -->
-    <el-dialog v-model="dialogVisible" :title="editingIndex === -1 ? 'Добавить груз' : 'Редактировать груз'" width="860px" class="cargo-dialog">
+    <el-dialog v-model="dialogVisible" :title="editingIndex === -1 ? ($t('cargos.addNew') as string) : ($t('cargos.editCargo') as string)" width="860px" class="cargo-dialog">
       <div class="vehicle-add-page">
         <el-card class="vehicle-card" shadow="never">
           <!-- 1️⃣ Груз и требования к кузову / загрузке -->
           <section class="form-section">
-            <h2>Груз</h2>
+            <h2>{{ $t('forms.cargo') }}</h2>
             <div class="grid-2">
               <el-select v-model="form.cargo_type" placeholder="Тип груза">
                 <el-option v-for="(label, value) in cargoTypes" :key="value" :label="label" :value="value" />
@@ -193,7 +193,7 @@
 
           <!-- 2️⃣ Характеристики -->
           <section class="form-section">
-            <h2>Характеристики</h2>
+            <h2>{{ $t('forms.specs') }}</h2>
             <div class="grid-3">
               <el-input-number v-model="form.length_m" :min="0" step="0.1" label="Длина (м)" />
               <el-input-number v-model="form.width_m" :min="0" step="0.1" label="Ширина (м)" />
@@ -212,7 +212,7 @@
 
           <!-- 3️⃣ Маршрут -->
           <section class="form-section">
-            <h2>Маршрут</h2>
+            <h2>{{ $t('forms.route') }}</h2>
             <div class="grid-2">
               <el-input v-model="form.location_from" placeholder="Откуда (населённый пункт)" />
               <el-input v-model="form.possible_unload" placeholder="Куда (возможная разгрузка)" />
@@ -230,10 +230,10 @@
 
           <!-- 4️⃣ Ставка -->
           <section class="form-section">
-            <h2>Ставка</h2>
+            <h2>{{ $t('forms.rate') }}</h2>
             <el-radio-group v-model="form.rate_mode" class="rate-mode">
-              <el-radio label="has_rate">Есть ставка</el-radio>
-              <el-radio label="request_rate">Запросить ставку</el-radio>
+              <el-radio label="has_rate">{{ $t('forms.hasRate') }}</el-radio>
+              <el-radio label="request_rate">{{ $t('forms.requestRate') }}</el-radio>
             </el-radio-group>
 
             <div class="grid-3">
@@ -259,7 +259,7 @@
 
           <!-- 5️⃣ Данные компании -->
           <section class="form-section">
-            <h2>Данные компании</h2>
+            <h2>{{ $t('forms.companyData') }}</h2>
             <el-checkbox v-model="form.is_private">Я — частное лицо</el-checkbox>
 
             <div class="grid-2">
@@ -282,7 +282,7 @@
 
           <!-- 6️⃣ Продвижение -->
           <section class="form-section">
-            <h2>Продвижение</h2>
+            <h2>{{ $t('forms.promotion') }}</h2>
             <el-switch v-model="form.promote_top" active-text="TOP поиска" />
             <el-switch v-model="form.stealth_mode" active-text="Stealth режим" />
           </section>
@@ -291,10 +291,10 @@
 
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="dialogVisible = false">Cancel</el-button>
+          <el-button @click="dialogVisible = false">{{ $t('common.cancel') }}</el-button>
           <el-button type="primary" @click="submitForm">
             <i class="mdi mdi-package-check"></i>
-            {{ editingIndex === -1 ? 'Опубликовать груз' : 'Обновить груз' }}
+            {{ editingIndex === -1 ? ($t('forms.publishCargo') as string) : ($t('common.update') as string) }}
           </el-button>
         </div>
       </template>
@@ -306,6 +306,7 @@
 import { reactive, ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { useI18n } from 'vue-i18n'
 
 // Local cargo list (demo). Replace with API calls when backend is ready.
 interface CargoItem {
@@ -358,6 +359,7 @@ const statusFilter = ref('')
 
 // Prefill from marketplace (like vehicles)
 const route = useRoute()
+const { t } = useI18n()
 const prefilterSummary = computed(() => {
   const from = (route.query.from as string) || ''
   const to = (route.query.to as string) || ''
@@ -365,11 +367,11 @@ const prefilterSummary = computed(() => {
   const radius = route.query.radius as string | undefined
   if (!from && !to && !date && !radius) return ''
   const parts: string[] = []
-  if (from) parts.push(`Откуда: ${from}`)
-  if (to) parts.push(`Куда: ${to}`)
-  if (date) parts.push(`Когда: ${date}`)
-  if (radius) parts.push(`Радиус: ${radius} км`)
-  return `Предзаполнено из поиска — ${parts.join(' • ')}`
+  if (from) parts.push(`${t('cargos.prefillFrom')}: ${from}`)
+  if (to) parts.push(`${t('cargos.prefillTo')}: ${to}`)
+  if (date) parts.push(`${t('cargos.prefillWhen')}: ${date}`)
+  if (radius) parts.push(`${t('cargos.prefillRadius')}: ${radius} ${t('home.distanceKm')}`)
+  return `${t('cargos.prefilledFromSearch')} — ${parts.join(' • ')}`
 })
 
 
@@ -381,7 +383,7 @@ function editCargo(row: CargoItem, index: number) {
 
 function removeCargo(index: number) {
   cargos.value.splice(index, 1)
-  ElMessage.success('Cargo deleted')
+  ElMessage.success(t('cargos.cargoDeleted') as string)
 }
 
 const totalWeight = computed(() => cargos.value.reduce((s, c) => s + (c.weight_kg || 0), 0))
@@ -417,11 +419,11 @@ function statusType(s?: string) {
 }
 function statusLabel(s?: string) {
   switch (s || 'open') {
-    case 'open': return 'Open'
-    case 'in_progress': return 'In Progress'
-    case 'delivered': return 'Delivered'
-    case 'cancelled': return 'Cancelled'
-    default: return 'Open'
+    case 'open': return t('cargos.open') as string
+    case 'in_progress': return t('cargos.inProgress') as string
+    case 'delivered': return t('cargos.delivered') as string
+    case 'cancelled': return t('cargos.cancelled') as string
+    default: return t('cargos.open') as string
   }
 }
 function formatDate(d: any) {
@@ -505,16 +507,16 @@ const loadTypes: Record<string, string> = {
 function submitForm() {
   // Minimal validation
   if (!form.cargo_name || !form.location_from) {
-    ElMessage.error('Заполните обязательные поля: Наименование груза и Откуда')
+    ElMessage.error(t('messages.required'))
     return
   }
   const payload = { ...form }
   if (editingIndex.value === -1) {
     cargos.value.unshift({ ...payload })
-    ElMessage.success('Груз опубликован (демо)')
+    ElMessage.success(t('cargos.cargoCreated'))
   } else {
     cargos.value.splice(editingIndex.value, 1, { ...payload })
-    ElMessage.success('Груз обновлён (демо)')
+    ElMessage.success(t('cargos.cargoUpdated'))
   }
   dialogVisible.value = false
 }
