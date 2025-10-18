@@ -1,7 +1,7 @@
 <template>
   <el-container class="app-layout">
-    <!-- SIDEBAR -->
-    <el-aside width="260px" class="sidebar">
+    <!-- SIDEBAR (hidden after redesign) -->
+    <el-aside v-if="false" width="260px" class="sidebar">
       <div class="logo">
         <div class="logo-icon">
           <i class="mdi mdi-truck-fast"></i>
@@ -19,11 +19,6 @@
           class="menu"
       >
         <el-menu-item index="/">
-          <i class="mdi mdi-view-dashboard-outline menu-icon"></i>
-          <span>{{ $t('nav.dashboard') }}</span>
-        </el-menu-item>
-
-        <el-menu-item index="/home">
           <i class="mdi mdi-home-outline menu-icon"></i>
           <span>{{ $t('nav.home') }}</span>
         </el-menu-item>
@@ -78,11 +73,34 @@
     <el-container>
       <el-header class="header">
         <div class="header-left">
-          <el-button text class="menu-toggle">
-            <i class="mdi mdi-menu"></i>
-          </el-button>
+          <div class="logo-inline">
+            <div class="logo-icon small"><i class="mdi mdi-truck-fast"></i></div>
+            <span class="brand">Logistic</span>
+          </div>
           <span class="page-title">{{ pageTitle }}</span>
         </div>
+
+        <div class="nav-wrap">
+          <el-menu
+            mode="horizontal"
+            router
+            :default-active="$route.path"
+            class="top-menu"
+            background-color="transparent"
+            text-color="#334155"
+            active-text-color="#111827"
+          >
+            <el-menu-item index="/"><i class="mdi mdi-home-outline"></i> {{ $t('nav.home') }}</el-menu-item>
+            <el-menu-item index="/vehicles"><i class="mdi mdi-truck"></i> {{ $t('nav.vehicles') }}</el-menu-item>
+            <el-menu-item index="/shipments"><i class="mdi mdi-transit-connection-variant"></i> {{ $t('nav.shipments') }}</el-menu-item>
+            <el-menu-item index="/cargos"><i class="mdi mdi-package-variant-closed"></i> {{ $t('nav.cargos') }}</el-menu-item>
+            <el-menu-item index="/offers"><i class="mdi mdi-handshake-outline"></i> {{ $t('nav.offers') }}</el-menu-item>
+            <el-menu-item index="/driver-request"><i class="mdi mdi-clipboard-text-outline"></i> {{ $t('nav.driverRequest') }}</el-menu-item>
+            <el-menu-item index="/reviews"><i class="mdi mdi-star-outline"></i> {{ $t('nav.reviews') }}</el-menu-item>
+            <el-menu-item index="/wallet"><i class="mdi mdi-wallet-outline"></i> {{ $t('nav.wallet') }}</el-menu-item>
+          </el-menu>
+        </div>
+
         <div class="header-right">
           <LanguageSwitcher />
           <el-button text class="header-action">
@@ -114,7 +132,21 @@
       </el-header>
 
       <el-main class="main">
-        <router-view />
+        <div class="ad-banner">
+          <el-card class="ad-card" shadow="never">
+            <div class="ad-placeholder">{{ $t('common.advertisement') }}</div>
+          </el-card>
+        </div>
+        <div class="content-with-ads">
+          <aside class="ad-rail">
+            <el-card class="ad-rail-card" shadow="never">
+              <div class="ad-rail-placeholder">{{ $t('common.adShort') }}</div>
+            </el-card>
+          </aside>
+          <div class="page-content">
+            <router-view />
+          </div>
+        </div>
       </el-main>
     </el-container>
   </el-container>
@@ -124,7 +156,6 @@
 import { computed, ref, onMounted } from 'vue'
 import { useAuthStore } from '@/store/auth'
 import { useRoute, useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
 import { http } from '@/api/http'
 import LanguageSwitcher from '@/components/LanguageSwitcher.vue'
 
@@ -133,14 +164,25 @@ const router = useRouter()
 const auth = useAuthStore()
 
 const user = computed(() => auth.user)
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
+
 const userRole = computed(() => {
-  if (auth.user?.user_type === 'admin') return 'Admin'
-  if (auth.isCarrier) return 'Carrier'
-  if (auth.isShipper) return 'Shipper'
-  return 'Visitor'
+  if (auth.isCarrier) return t('userTypes.carrier')
+  if (auth.isShipper) return t('userTypes.cargo_owner')
+  return t('userTypes.user')
 })
 
-const pageTitle = computed(() => route.meta.title || 'Dashboard')
+const pageTitle = computed(() => {
+  // Prefer nav.* translation by route name if available, else fallback to meta title
+  const name = route.name as string | undefined
+  if (name) {
+    const key = `nav.${name}`
+    const translated = t(key)
+    if (translated !== key) return translated
+  }
+  return (route.meta.title as string) || t('nav.home')
+})
 const notifications = ref(0)
 
 // Fetch notifications when component mounts
@@ -420,4 +462,23 @@ async function logout() {
 .main::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
+.top-menu :deep(.el-menu-item) { padding: 0 12px; }
+.top-menu :deep(.el-menu-item i) { margin-right: 6px; }
+.nav-wrap { flex: 1; display: flex; justify-content: center; }
+.logo-inline { display: flex; align-items: center; gap: 8px; }
+.logo-icon.small { width: 28px; height: 28px; font-size: 18px; }
+
+/* Ad areas */
+.ad-banner { margin: 12px 0 16px; }
+.ad-placeholder { height: 64px; display: grid; place-items: center; color: #334155; background: #f1f5f9; border: 1px dashed #cbd5e1; border-radius: 8px; }
+
+.content-with-ads { display: grid; grid-template-columns: 300px 1fr; gap: 16px; }
+.ad-rail-placeholder { height: 520px; display: grid; place-items: center; color: #334155; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px; }
+.page-content { min-width: 0; }
+
+@media (max-width: 1024px) {
+  .content-with-ads { grid-template-columns: 1fr; }
+  .ad-rail { display: none; }
+}
+
 </style>

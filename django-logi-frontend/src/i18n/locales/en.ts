@@ -25,6 +25,8 @@ export default {
     success: 'Success',
     error: 'Error',
     warning: 'Warning',
+    advertisement: 'Advertisement',
+    adShort: 'AD',
     info: 'Information'
   },
   
@@ -271,7 +273,11 @@ export default {
     searchPlaceholder: 'Search transactions...',
     topupCreated: 'Top-up created successfully',
     noTransactions: 'No transactions found',
-    noDescription: 'No description'
+    noDescription: 'No description',
+    addAmountToBalance: 'Add {amount} TMT to Balance',
+    dateTime: 'Date & Time',
+    enterTopupAmount: 'Enter top-up amount',
+    topupFailed: 'Failed to create top-up'
   },
   
   auth: {
@@ -300,7 +306,6 @@ export default {
     cargoOwnerDescription: 'I have cargo, looking for carriers',
     showMore: 'Show more',
     selectProfileWarning: 'Please select an activity profile',
-    login: 'Login',
     phone: 'Mobile phone',
     agreeToTerms: 'I agree to receive newsletters with training and advertising',
     continue: 'Continue',
@@ -389,5 +394,76 @@ export default {
 
     promoteTop: 'TOP of search',
     stealthMode: 'Stealth mode'
+  },
+
+  home: {
+    heroTitle: 'Logistics marketplace and services',
+    heroSubtitle: 'Find cargos and trusted carriers, save through automation.',
+    fromLabel: 'From',
+    fromPlaceholder: 'City, region, country',
+    toLabel: 'To',
+    toPlaceholder: 'City, region, country',
+    radiusLabel: 'Radius, km',
+    dateLabel: 'Date',
+    datePlaceholder: 'Select date',
+    findCargos: 'Find Cargos',
+    findVehicles: 'Find Vehicles',
+    calcDistance: 'Calculate Distance',
+    distance: 'Distance',
+    distanceKm: 'km',
+    // quick stats labels
+    cargosLabel: 'cargos',
+    vehiclesLabel: 'vehicles',
+    usersLabel: 'users',
+    tendersLabel: 'tenders',
+    // services
+    services: {
+      addCargoTitle: 'Add Cargo for free',
+      addCargoDesc: 'Get proposals from carriers',
+      addVehicleTitle: 'Add Vehicle for free',
+      addVehicleDesc: 'Receive cargo offers',
+      guaranteeTitle: 'Payment guarantee',
+      guaranteeDesc: 'Protect yourself from non-payment',
+      platformsTitle: 'Platforms',
+      platformsDesc: 'Tools for your fleet'
+    },
+    // CTA section
+    ctaTitle: 'Create an account to publish cargos and vehicles',
+    ctaDesc: 'Access offers, orders, and reputation tools.',
+    login: 'Login',
+    register: 'Register'
+  },
+
+  marketplace: {
+    heroTitle: 'Logistics Marketplace for CIS',
+    heroSubtitle: 'Find cargos, trusted carriers, and save through automation.',
+    fromLabel: 'From',
+    fromPlaceholder: 'City, region, country',
+    toLabel: 'To',
+    toPlaceholder: 'City, region, country',
+    radiusLabel: 'Radius, km',
+    dateLabel: 'Date',
+    datePlaceholder: 'Select date',
+    findCargos: 'Find Cargos',
+    findVehicles: 'Find Vehicles',
+    calcDistance: 'Calculate Distance',
+    distance: 'Distance',
+    distanceKm: 'km',
+    services: {
+      addCargoTitle: 'Add Cargo',
+      addCargoDesc: 'Get proposals from carriers',
+      addVehicleTitle: 'Add Vehicle',
+      addVehicleDesc: 'Receive cargo offers',
+      ordersTitle: 'Orders',
+      ordersDesc: 'Negotiate and sign deals',
+      checksTitle: 'Checks',
+      checksDesc: 'Verify partners reputation'
+    },
+    ctaTitle: 'Create an account to publish cargos and vehicles',
+    ctaDesc: 'Access offers, orders, and reputation features once authenticated.',
+    login: 'Login',
+    register: 'Register'
   }
 }
+
+

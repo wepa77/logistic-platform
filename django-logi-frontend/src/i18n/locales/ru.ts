@@ -25,6 +25,8 @@ export default {
     success: 'Успешно',
     error: 'Ошибка',
     warning: 'Предупреждение',
+    advertisement: 'Реклама',
+    adShort: 'AD',
     info: 'Информация'
   },
   
@@ -271,7 +273,11 @@ export default {
     searchPlaceholder: 'Поиск транзакций...',
     topupCreated: 'Пополнение успешно создано',
     noTransactions: 'Транзакции не найдены',
-    noDescription: 'Нет описания'
+    noDescription: 'Нет описания',
+    addAmountToBalance: 'Пополнить на {amount} TMT',
+    dateTime: 'Дата и время',
+    enterTopupAmount: 'Введите сумму пополнения',
+    topupFailed: 'Не удалось создать пополнение'
   },
   
   auth: {
@@ -300,7 +306,6 @@ export default {
     cargoOwnerDescription: 'У меня есть груз, ищу перевозчиков',
     showMore: 'Показать ещё',
     selectProfileWarning: 'Пожалуйста, выберите профиль деятельности',
-    login: 'Логин',
     phone: 'Мобильный телефон',
     agreeToTerms: 'Соглашаюсь получать рассылки с обучением и рекламой',
     continue: 'Продолжить',
@@ -389,5 +394,71 @@ export default {
 
     promoteTop: 'TOP поиска',
     stealthMode: 'Stealth режим'
+  },
+
+  home: {
+    heroTitle: 'Биржа грузоперевозок и сервисы для логистики',
+    heroSubtitle: 'Находите грузы и проверенных перевозчиков, экономьте за счёт автоматизации процессов.',
+    fromLabel: 'Откуда',
+    fromPlaceholder: 'Город, регион, страна',
+    toLabel: 'Куда',
+    toPlaceholder: 'Город, регион, страна',
+    radiusLabel: 'Радиус, км',
+    dateLabel: 'Дата',
+    datePlaceholder: 'Выберите дату',
+    findCargos: 'Найти грузы',
+    findVehicles: 'Найти машины',
+    calcDistance: 'Рассчитать расстояние',
+    distance: 'Расстояние',
+    distanceKm: 'км',
+    cargosLabel: 'грузов',
+    vehiclesLabel: 'машин',
+    usersLabel: 'участников',
+    tendersLabel: 'тендера',
+    services: {
+      addCargoTitle: 'Добавьте груз бесплатно',
+      addCargoDesc: 'Получайте предложения от перевозчиков',
+      addVehicleTitle: 'Добавьте машину бесплатно',
+      addVehicleDesc: 'Получайте предложения от грузоотправителей',
+      guaranteeTitle: 'Гарантия оплаты',
+      guaranteeDesc: 'Защитите себя от неоплаты за рейс',
+      platformsTitle: 'Площадки',
+      platformsDesc: 'Инструменты для работы с собственным транспортом'
+    },
+    ctaTitle: 'Создайте аккаунт, чтобы публиковать грузы и транспорт',
+    ctaDesc: 'Получите доступ к предложениям, заказам и инструментам репутации.',
+    login: 'Войти',
+    register: 'Регистрация'
+  },
+
+  marketplace: {
+    heroTitle: 'Маркетплейс логистики для СНГ',
+    heroSubtitle: 'Находите грузы, проверенных перевозчиков и экономьте за счёт автоматизации.',
+    fromLabel: 'Откуда',
+    fromPlaceholder: 'Город, регион, страна',
+    toLabel: 'Куда',
+    toPlaceholder: 'Город, регион, страна',
+    radiusLabel: 'Радиус, км',
+    dateLabel: 'Дата',
+    datePlaceholder: 'Выберите дату',
+    findCargos: 'Найти грузы',
+    findVehicles: 'Найти машины',
+    calcDistance: 'Рассчитать расстояние',
+    distance: 'Расстояние',
+    distanceKm: 'км',
+    services: {
+      addCargoTitle: 'Добавить груз',
+      addCargoDesc: 'Получайте предложения от перевозчиков',
+      addVehicleTitle: 'Добавить машину',
+      addVehicleDesc: 'Получайте предложения от грузоотправителей',
+      ordersTitle: 'Заказы',
+      ordersDesc: 'Переговоры и заключение сделок',
+      checksTitle: 'Проверки',
+      checksDesc: 'Проверка репутации партнёров'
+    },
+    ctaTitle: 'Создайте аккаунт, чтобы публиковать грузы и транспорт',
+    ctaDesc: 'Доступ к предложениям, заказам и репутации после входа.',
+    login: 'Войти',
+    register: 'Регистрация'
   }
 }

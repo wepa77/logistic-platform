@@ -25,6 +25,8 @@ export default {
     success: 'Üstünlikli',
     error: 'Ýalňyşlyk',
     warning: 'Duýduryş',
+    advertisement: 'Mahabat',
+    adShort: 'AD',
     info: 'Maglumat'
   },
   
@@ -271,7 +273,11 @@ export default {
     searchPlaceholder: 'Amallary gözle...',
     topupCreated: 'Doldurma üstünlikli döredildi',
     noTransactions: 'Amal tapylmady',
-    noDescription: 'Düşündiriş ýok'
+    noDescription: 'Düşündiriş ýok',
+    addAmountToBalance: 'Balansa {amount} TMT goş',
+    dateTime: 'Sene we wagt',
+    enterTopupAmount: 'Doldurma mukdaryny giriziň',
+    topupFailed: 'Doldurma döretmek şowsuz boldy'
   },
   
   auth: {
@@ -300,7 +306,6 @@ export default {
     cargoOwnerDescription: 'Meniň ýüküm bar, daşaýjy gözleýärin',
     showMore: 'Has köp görkez',
     selectProfileWarning: 'Işiňiziň profilini saýlaň',
-    login: 'Login',
     phone: 'Ykjam telefon',
     agreeToTerms: 'Okuw we mahabat bilen habarlaşmalary almaga razy',
     continue: 'Dowam et',
@@ -389,5 +394,71 @@ export default {
 
     promoteTop: 'Gözleg TOP-y',
     stealthMode: 'Stealth režimi'
+  },
+
+  home: {
+    heroTitle: 'Logistika biržasy we hyzmatlar',
+    heroSubtitle: 'Ýükleri we ynamdar daşaýjylary tapyň, awtomatizasiýa bilen tygşytlaň.',
+    fromLabel: 'Nireden',
+    fromPlaceholder: 'Şäher, welaýat, ýurt',
+    toLabel: 'Nirä',
+    toPlaceholder: 'Şäher, welaýat, ýurt',
+    radiusLabel: 'Radius, km',
+    dateLabel: 'Sene',
+    datePlaceholder: 'Senäni saýlaň',
+    findCargos: 'Ýükleri tap',
+    findVehicles: 'Ulaglary tap',
+    calcDistance: 'Aralygy hasapla',
+    distance: 'Aralyk',
+    distanceKm: 'km',
+    cargosLabel: 'ýük',
+    vehiclesLabel: 'ulag',
+    usersLabel: 'ulanyjy',
+    tendersLabel: 'tender',
+    services: {
+      addCargoTitle: 'Ýüki mugt goşuň',
+      addCargoDesc: 'Daşaýjylardan teklipleri alyň',
+      addVehicleTitle: 'Ulagy mugt goşuň',
+      addVehicleDesc: 'Ýük tekliplerini alyň',
+      guaranteeTitle: 'Töleg kepilligi',
+      guaranteeDesc: 'Tölegsizlige garşy özüňizi gorap saklaň',
+      platformsTitle: 'Platformalar',
+      platformsDesc: 'Öz awtoulaglaryňyz üçin gurallar'
+    },
+    ctaTitle: 'Ýükleri we ulaglary çap etmek üçin hasap dörediň',
+    ctaDesc: 'Tekliplere, sargytlara we abraý gurallaryna giriş alyň.',
+    login: 'Giriş',
+    register: 'Hasaba al'
+  },
+
+  marketplace: {
+    heroTitle: 'GDA üçin logistika marketplace',
+    heroSubtitle: 'Ýükleri, ynamdar daşaýjylary tapyň we awtomatizasiýa bilen tygşytlaň.',
+    fromLabel: 'Nireden',
+    fromPlaceholder: 'Şäher, welaýat, ýurt',
+    toLabel: 'Nirä',
+    toPlaceholder: 'Şäher, welaýat, ýurt',
+    radiusLabel: 'Radius, km',
+    dateLabel: 'Sene',
+    datePlaceholder: 'Senäni saýlaň',
+    findCargos: 'Ýükleri tap',
+    findVehicles: 'Ulaglary tap',
+    calcDistance: 'Aralygy hasapla',
+    distance: 'Aralyk',
+    distanceKm: 'km',
+    services: {
+      addCargoTitle: 'Ýük goş',
+      addCargoDesc: 'Daşaýjylardan teklipleri alyň',
+      addVehicleTitle: 'Ulag goş',
+      addVehicleDesc: 'Ýük tekliplerini alyň',
+      ordersTitle: 'Sargytlar',
+      ordersDesc: 'Gepleşik we ylalaşyk baglaşmak',
+      checksTitle: 'Barlaglar',
+      checksDesc: 'Hyzmatdaşlaryň abraýyny barlaň'
+    },
+    ctaTitle: 'Ýükleri we ulaglary çap etmek üçin hasap dörediň',
+    ctaDesc: 'Giriş edeninden soň tekliplere, sargytlara we abraý aýratynlyklaryna giriş.',
+    login: 'Giriş',
+    register: 'Hasaba al'
   }
 }

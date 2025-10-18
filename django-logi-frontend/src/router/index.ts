@@ -4,7 +4,6 @@ import { defineAsyncComponent } from 'vue'
 import { useAuthStore } from '@/store/auth'
 
 // Lazy loaded pages (defineAsyncComponent gives better error messages)
-const DashboardPage = defineAsyncComponent(() => import('@/pages/Dashboard/index.vue'))
 const VehiclesPage = defineAsyncComponent(() => import('@/pages/Vehicles/index.vue'))
 const VehiclesAddPage = defineAsyncComponent(() => import('@/pages/Vehicles/Add.vue'))
 const CargosPage = defineAsyncComponent(() => import('@/pages/Cargos/index.vue'))
@@ -24,13 +23,12 @@ const DriverRequestPage = defineAsyncComponent(() => import('@/pages/DriverReque
 
 const routes = [
     // Public routes
-    { path: '/home', name: 'home', component: HomePage, meta: { title: 'Home', public: true } },
     { path: '/market', name: 'market', component: MarketPage, meta: { title: 'Marketplace', public: true } },
     {
         path: '/',
         component: AppLayout,
         children: [
-            { path: '', name: 'dashboard', component: DashboardPage, meta: { title: 'Dashboard' } },
+            { path: '', name: 'home', component: HomePage, meta: { title: 'Home', public: true } },
             { path: 'vehicles', name: 'vehicles', component: VehiclesPage, meta: { title: 'Vehicles' } },
             { path: 'vehicles/add', name: 'vehicle-add', component: VehiclesAddPage, meta: { title: 'Add Vehicle' } },
             { path: 'cargos', name: 'cargos', component: CargosPage, meta: { title: 'Cargos' } },
@@ -56,10 +54,8 @@ export const router = createRouter({
 // ✅ Auth guard (allows public routes)
 router.beforeEach((to, _from, next) => {
     const auth = useAuthStore()
-    const isPublic = Boolean(to.meta.public) || to.path === '/market' || to.path === '/home'
+    const isPublic = Boolean(to.meta.public) || to.path === '/market'
     if (!auth.isAuthed) {
-        // Redirect root to Home for unauthenticated users
-        if (to.path === '/') return next('/home')
         if (!isPublic) return next('/market')
     }
     if (auth.isAuthed && (to.path === '/login' || to.path === '/register')) return next('/')

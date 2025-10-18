@@ -372,15 +372,6 @@ const prefilterSummary = computed(() => {
   return `Предзаполнено из поиска — ${parts.join(' • ')}`
 })
 
-function openAdd() {
-  resetForm()
-  // Prefill based on query
-  if (route.query.from) form.location_from = String(route.query.from)
-  if (route.query.to) form.possible_unload = String(route.query.to)
-  if (route.query.radius) form.location_from_radius_km = Number(route.query.radius)
-  editingIndex.value = -1
-  dialogVisible.value = true
-}
 
 function editCargo(row: CargoItem, index: number) {
   Object.assign(form, row)
@@ -510,19 +501,6 @@ const loadTypes: Record<string, string> = {
   stand_remove: 'Съём стоек'
 }
 
-function resetForm() {
-  Object.assign(form, {
-    cargo_type: '', cargo_name: '', weight_kg: null, volume_m3: null, quantity: 1,
-    body_type: '', load_types: [], length_m: null, width_m: null, height_m: null,
-    has_adr: false, has_tir: false, has_gps: false, has_lift: false, has_horses: false, partial_load: false,
-    location_from: '', location_from_radius_km: 0, possible_unload: '', unload_radius_km: 0,
-    available_from: '', available_days: null,
-    rate_mode: 'has_rate', rate_with_vat: null, rate_without_vat: null, rate_cash: null, rate_currency: 'tmt',
-    pay_to_card: false, without_bargain: false,
-    is_private: false, company_type: 'ooo', company_name: '', city: '', contact_name: '', contact_phone: '', note: '',
-    promote_top: false, stealth_mode: false, status: 'open'
-  })
-}
 
 function submitForm() {
   // Minimal validation

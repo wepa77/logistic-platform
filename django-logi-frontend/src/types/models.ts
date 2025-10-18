@@ -10,6 +10,7 @@ export interface IUser {
   verified: boolean
   balance?: string
   deposit_balance?: string
+  avatar?: string
 }
 export interface IVehicle {
   id: number

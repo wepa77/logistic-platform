@@ -5,14 +5,9 @@
     <section class="hero">
       <div class="hero-inner">
         <div class="hero-text">
-          <h1>Биржа грузоперевозок и сервисы для логистики</h1>
-          <p>Находите грузы и проверенных перевозчиков, экономьте за счёт автоматизации процессов.</p>
-          <ul class="stats">
-            <li><i class="mdi mdi-package-variant"></i> 183 544 грузов</li>
-            <li><i class="mdi mdi-truck"></i> 74 978 машин</li>
-            <li><i class="mdi mdi-account-group"></i> 466 302 участников</li>
-            <li><i class="mdi mdi-file-document"></i> 192 тендера</li>
-          </ul>
+          <h1>{{ $t('home.heroTitle') }}</h1>
+          <p>{{ $t('home.heroSubtitle') }}</p>
+          <QuickStats />
         </div>
         <div class="hero-art" aria-hidden="true"></div>
       </div>
@@ -22,36 +17,36 @@
     <el-card class="search-card" shadow="always">
       <div class="search-grid">
         <div class="field">
-          <label>Откуда</label>
-          <el-input v-model="search.from" placeholder="Город, регион, страна" />
+          <label>{{ $t('home.fromLabel') }}</label>
+          <el-input v-model="search.from" :placeholder="$t('home.fromPlaceholder')" />
         </div>
         <div class="field">
-          <label>Куда</label>
-          <el-input v-model="search.to" placeholder="Город, регион, страна" />
+          <label>{{ $t('home.toLabel') }}</label>
+          <el-input v-model="search.to" :placeholder="$t('home.toPlaceholder')" />
         </div>
         <div class="field small">
-          <label>Радиус, км</label>
+          <label>{{ $t('home.radiusLabel') }}</label>
           <el-input-number v-model="search.radius" :min="0" :max="1000" :step="10" controls-position="right" />
         </div>
         <div class="field small">
-          <label>Дата</label>
-          <el-date-picker v-model="search.date" type="date" placeholder="Выберите дату" style="width: 100%" />
+          <label>{{ $t('home.dateLabel') }}</label>
+          <el-date-picker v-model="search.date" type="date" :placeholder="$t('home.datePlaceholder')" style="width: 100%" />
         </div>
         <div class="actions">
           <el-button type="success" size="large" @click="goFind('cargos')">
-            <i class="mdi mdi-package-variant"></i> Найти грузы
+            <i class="mdi mdi-package-variant"></i> {{ $t('home.findCargos') }}
           </el-button>
           <el-button type="warning" size="large" @click="goFind('vehicles')">
-            <i class="mdi mdi-truck"></i> Найти машины
+            <i class="mdi mdi-truck"></i> {{ $t('home.findVehicles') }}
           </el-button>
           <el-button size="large" @click="calcDistance">
-            <i class="mdi mdi-ruler"></i> Рассчитать расстояние
+            <i class="mdi mdi-ruler"></i> {{ $t('home.calcDistance') }}
           </el-button>
         </div>
       </div>
       <div v-if="distanceKm !== null" class="distance-result">
         <i class="mdi mdi-map-marker-distance"></i>
-        <span>Расстояние: {{ distanceKm.toFixed(0) }} км</span>
+        <span>{{ $t('home.distance') }}: {{ distanceKm.toFixed(0) }} {{ $t('home.distanceKm') }}</span>
       </div>
     </el-card>
 
@@ -75,12 +70,12 @@
       <el-card class="cta-card" shadow="never">
         <div class="cta-inner">
           <div>
-            <h3>Создайте аккаунт, чтобы публиковать грузы и транспорт</h3>
-            <p>Получите доступ к предложениям, заказам и инструментам репутации.</p>
+            <h3>{{ $t('home.ctaTitle') }}</h3>
+            <p>{{ $t('home.ctaDesc') }}</p>
           </div>
           <div class="cta-actions">
-            <router-link to="/login"><el-button type="primary">Войти</el-button></router-link>
-            <router-link to="/register"><el-button>Регистрация</el-button></router-link>
+            <router-link to="/login"><el-button type="primary">{{ $t('home.login') }}</el-button></router-link>
+            <router-link to="/register"><el-button>{{ $t('home.register') }}</el-button></router-link>
           </div>
         </div>
       </el-card>
@@ -89,8 +84,11 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue'
+import { reactive, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+
+const { t, locale } = useI18n()
 
 // Haversine distance (km)
 function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -107,7 +105,7 @@ function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number) {
 async function geocode(q: string): Promise<{ lat: number; lon: number } | null> {
   if (!q) return null
   const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}`
-  const res = await fetch(url, { headers: { 'Accept-Language': 'ru' } })
+  const res = await fetch(url, { headers: { 'Accept-Language': locale.value } })
   const json = (await res.json()) as Array<{ lat: string; lon: string }> | undefined
   if (!json || !json.length) return null
   const first = json[0] as { lat: string; lon: string }
@@ -128,12 +126,12 @@ async function calcDistance() {
   if (a && b) distanceKm.value = haversineKm(a.lat, a.lon, b.lat, b.lon)
 }
 
-const services = [
-  { title: 'Добавьте груз бесплатно', desc: 'Получайте предложения от перевозчиков', icon: 'mdi mdi-package-variant', kind: 'cargo', to: { name: 'cargos' } },
-  { title: 'Добавьте машину бесплатно', desc: 'Получайте предложения от грузоотправителей', icon: 'mdi mdi-truck', kind: 'vehicle', to: { name: 'vehicles' } },
-  { title: 'Гарантия оплаты', desc: 'Защитите себя от неоплаты за рейс', icon: 'mdi mdi-shield-check', kind: 'check', to: { name: 'reviews' } },
-  { title: 'Площадки', desc: 'Инструменты для работы с собственным транспортом', icon: 'mdi mdi-handshake', kind: 'orders', to: { name: 'offers' } }
-]
+const services = computed(() => [
+  { title: t('home.services.addCargoTitle'), desc: t('home.services.addCargoDesc'), icon: 'mdi mdi-package-variant', kind: 'cargo', to: { name: 'cargos' } },
+  { title: t('home.services.addVehicleTitle'), desc: t('home.services.addVehicleDesc'), icon: 'mdi mdi-truck', kind: 'vehicle', to: { name: 'vehicles' } },
+  { title: t('home.services.guaranteeTitle'), desc: t('home.services.guaranteeDesc'), icon: 'mdi mdi-shield-check', kind: 'check', to: { name: 'reviews' } },
+  { title: t('home.services.platformsTitle'), desc: t('home.services.platformsDesc'), icon: 'mdi mdi-handshake', kind: 'orders', to: { name: 'offers' } }
+])
 
 function navigate(to: any) { router.push(to) }
 </script>

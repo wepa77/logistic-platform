@@ -7,14 +7,9 @@
     <section class="hero">
       <div class="hero-inner">
         <div class="hero-text">
-          <h1>Logistics Marketplace for CIS</h1>
-          <p>Find cargos, trusted carriers, and save through automation.</p>
-          <ul class="stats">
-            <li><i class="mdi mdi-package-variant"></i> 183 544 cargos</li>
-            <li><i class="mdi mdi-truck"></i> 74 978 vehicles</li>
-            <li><i class="mdi mdi-account-group"></i> 466 302 users</li>
-            <li><i class="mdi mdi-file-document"></i> 192 tenders</li>
-          </ul>
+          <h1>{{ $t('marketplace.heroTitle') }}</h1>
+          <p>{{ $t('marketplace.heroSubtitle') }}</p>
+          <QuickStats />
         </div>
         <div class="hero-art" aria-hidden="true"></div>
       </div>
@@ -24,36 +19,36 @@
     <el-card class="search-card" shadow="always">
       <div class="search-grid">
         <div class="field">
-          <label>From</label>
-          <el-input v-model="search.from" placeholder="City, region, country" />
+          <label>{{ $t('marketplace.fromLabel') }}</label>
+          <el-input v-model="search.from" :placeholder="$t('marketplace.fromPlaceholder')" />
         </div>
         <div class="field">
-          <label>To</label>
-          <el-input v-model="search.to" placeholder="City, region, country" />
+          <label>{{ $t('marketplace.toLabel') }}</label>
+          <el-input v-model="search.to" :placeholder="$t('marketplace.toPlaceholder')" />
         </div>
         <div class="field small">
-          <label>Radius, km</label>
+          <label>{{ $t('marketplace.radiusLabel') }}</label>
           <el-input-number v-model="search.radius" :min="0" :max="1000" :step="10" controls-position="right" />
         </div>
         <div class="field small">
-          <label>Date</label>
-          <el-date-picker v-model="search.date" type="date" placeholder="Select date" style="width: 100%" />
+          <label>{{ $t('marketplace.dateLabel') }}</label>
+          <el-date-picker v-model="search.date" type="date" :placeholder="$t('marketplace.datePlaceholder')" style="width: 100%" />
         </div>
         <div class="actions">
           <el-button type="success" size="large" @click="goFind('cargos')">
-            <i class="mdi mdi-package-variant"></i> Find Cargos
+            <i class="mdi mdi-package-variant"></i> {{ $t('marketplace.findCargos') }}
           </el-button>
           <el-button type="warning" size="large" @click="goFind('vehicles')">
-            <i class="mdi mdi-truck"></i> Find Vehicles
+            <i class="mdi mdi-truck"></i> {{ $t('marketplace.findVehicles') }}
           </el-button>
           <el-button size="large" @click="calcDistance">
-            <i class="mdi mdi-ruler"></i> Calculate Distance
+            <i class="mdi mdi-ruler"></i> {{ $t('marketplace.calcDistance') }}
           </el-button>
         </div>
       </div>
       <div v-if="distanceKm !== null" class="distance-result">
         <i class="mdi mdi-map-marker-distance"></i>
-        <span>Distance: {{ distanceKm.toFixed(0) }} km</span>
+        <span>{{ $t('marketplace.distance') }}: {{ distanceKm.toFixed(0) }} {{ $t('marketplace.distanceKm') }}</span>
       </div>
     </el-card>
 
@@ -77,12 +72,12 @@
       <el-card class="cta-card" shadow="never">
         <div class="cta-inner">
           <div>
-            <h3>Create an account to publish cargos and vehicles</h3>
-            <p>Access offers, orders, and reputation features once authenticated.</p>
+            <h3>{{ $t('marketplace.ctaTitle') }}</h3>
+            <p>{{ $t('marketplace.ctaDesc') }}</p>
           </div>
           <div class="cta-actions">
-            <router-link to="/login"><el-button type="primary">Login</el-button></router-link>
-            <router-link to="/register"><el-button>Register</el-button></router-link>
+            <router-link to="/login"><el-button type="primary">{{ $t('marketplace.login') }}</el-button></router-link>
+            <router-link to="/register"><el-button>{{ $t('marketplace.register') }}</el-button></router-link>
           </div>
         </div>
       </el-card>
@@ -91,8 +86,11 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue'
+import { reactive, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+
+const { t, locale } = useI18n()
 
 // Simple, dependency-free Haversine distance (km)
 function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -109,7 +107,7 @@ function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number) {
 async function geocode(q: string): Promise<{ lat: number; lon: number } | null> {
   if (!q) return null
   const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}`
-  const res = await fetch(url, { headers: { 'Accept-Language': 'en' } })
+  const res = await fetch(url, { headers: { 'Accept-Language': locale.value } })
   const json = (await res.json()) as Array<{ lat: string; lon: string }> | undefined
   if (!json || !json.length) return null
   const first = json[0] as { lat: string; lon: string }
@@ -131,12 +129,12 @@ async function calcDistance() {
   if (a && b) distanceKm.value = haversineKm(a.lat, a.lon, b.lat, b.lon)
 }
 
-const services = [
-  { title: 'Add Cargo', desc: 'Get proposals from carriers', icon: 'mdi mdi-package-variant', kind: 'cargo', to: { name: 'cargos' } },
-  { title: 'Add Vehicle', desc: 'Receive cargo offers', icon: 'mdi mdi-truck', kind: 'vehicle', to: { name: 'vehicles' } },
-  { title: 'Orders', desc: 'Negotiate and sign deals', icon: 'mdi mdi-handshake', kind: 'orders', to: { name: 'offers' } },
-  { title: 'Checks', desc: 'Verify partners reputation', icon: 'mdi mdi-shield-check', kind: 'check', to: { name: 'reviews' } }
-]
+const services = computed(() => [
+  { title: t('marketplace.services.addCargoTitle'), desc: t('marketplace.services.addCargoDesc'), icon: 'mdi mdi-package-variant', kind: 'cargo', to: { name: 'cargos' } },
+  { title: t('marketplace.services.addVehicleTitle'), desc: t('marketplace.services.addVehicleDesc'), icon: 'mdi mdi-truck', kind: 'vehicle', to: { name: 'vehicles' } },
+  { title: t('marketplace.services.ordersTitle'), desc: t('marketplace.services.ordersDesc'), icon: 'mdi mdi-handshake', kind: 'orders', to: { name: 'offers' } },
+  { title: t('marketplace.services.checksTitle'), desc: t('marketplace.services.checksDesc'), icon: 'mdi mdi-shield-check', kind: 'check', to: { name: 'reviews' } }
+])
 
 function navigate(to: any) { router.push(to) }
 </script>

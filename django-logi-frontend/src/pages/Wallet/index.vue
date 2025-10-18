@@ -6,9 +6,9 @@
         <div class="header-left">
           <h1 class="page-title">
             <i class="mdi mdi-wallet-outline"></i>
-            Wallet Management
+            {{ $t('wallet.title') }}
           </h1>
-          <p class="page-subtitle">Manage your balance and view transaction history</p>
+          <p class="page-subtitle">{{ $t('wallet.subtitle') }}</p>
         </div>
       </div>
     </div>
@@ -20,7 +20,7 @@
           <i class="mdi mdi-wallet"></i>
         </div>
         <div class="balance-content">
-          <div class="balance-label">Current Balance</div>
+          <div class="balance-label">{{ $t('wallet.currentBalance') }}</div>
           <div class="balance-value">{{ balance.toFixed(2) }} TMT</div>
         </div>
       </div>
@@ -31,7 +31,7 @@
         </div>
         <div class="stat-content">
           <div class="stat-value">{{ stats.totalIncome.toFixed(2) }}</div>
-          <div class="stat-label">Total Income</div>
+          <div class="stat-label">{{ $t('wallet.totalIncome') }}</div>
         </div>
       </div>
 
@@ -41,7 +41,7 @@
         </div>
         <div class="stat-content">
           <div class="stat-value">{{ Math.abs(stats.totalExpense).toFixed(2) }}</div>
-          <div class="stat-label">Total Expense</div>
+          <div class="stat-label">{{ $t('wallet.totalExpense') }}</div>
         </div>
       </div>
 
@@ -51,7 +51,7 @@
         </div>
         <div class="stat-content">
           <div class="stat-value">{{ transactions.length }}</div>
-          <div class="stat-label">Transactions</div>
+          <div class="stat-label">{{ $t('wallet.transactions') }}</div>
         </div>
       </div>
     </div>
@@ -61,13 +61,13 @@
       <div class="topup-header">
         <div class="topup-title">
           <i class="mdi mdi-cash-plus"></i>
-          <span>Add Balance</span>
+          <span>{{ $t('wallet.addBalance') }}</span>
         </div>
-        <p class="topup-subtitle">Top up your wallet to continue using services</p>
+        <p class="topup-subtitle">{{ $t('wallet.topUp') }}</p>
       </div>
       <div class="topup-content">
         <div class="amount-input-wrapper">
-          <label class="input-label">Amount (TMT)</label>
+          <label class="input-label">{{ $t('wallet.amount') }}</label>
           <el-input-number
               v-model="amount"
               :min="1"
@@ -96,7 +96,7 @@
             class="topup-btn"
         >
           <i class="mdi mdi-plus-circle"></i>
-          Add {{ amount }} TMT to Balance
+          {{ $t('wallet.addAmountToBalance', { amount }) }}
         </el-button>
       </div>
     </el-card>
@@ -106,7 +106,7 @@
       <div class="filters-container">
         <el-input
             v-model="searchQuery"
-            placeholder="Search transactions..."
+            :placeholder="$t('wallet.searchPlaceholder')"
             class="search-input"
             clearable
         >
@@ -115,17 +115,17 @@
           </template>
         </el-input>
 
-        <el-select v-model="typeFilter" placeholder="Filter by Type" clearable class="type-filter">
-          <el-option label="All Types" value="" />
-          <el-option label="Top-up" value="topup" />
-          <el-option label="Commission" value="commission" />
-          <el-option label="Payment" value="payment" />
+        <el-select v-model="typeFilter" :placeholder="$t('wallet.filterByType')" clearable class="type-filter">
+          <el-option :label="$t('wallet.allTypes')" value="" />
+          <el-option :label="$t('wallet.topup')" value="topup" />
+          <el-option :label="$t('wallet.commission')" value="commission" />
+          <el-option :label="$t('wallet.payment')" value="payment" />
         </el-select>
 
-        <el-select v-model="statusFilter" placeholder="Filter by Status" clearable class="status-filter">
-          <el-option label="All Status" value="" />
-          <el-option label="Success" value="success" />
-          <el-option label="Failed" value="failed" />
+        <el-select v-model="statusFilter" :placeholder="$t('wallet.filterByStatus')" clearable class="status-filter">
+          <el-option :label="$t('wallet.allStatus')" value="" />
+          <el-option :label="$t('wallet.success')" value="success" />
+          <el-option :label="$t('wallet.failed')" value="failed" />
         </el-select>
 
         <el-button class="filter-btn" @click="fetchWallet">
@@ -139,16 +139,16 @@
       <div class="table-header">
         <h3 class="table-title">
           <i class="mdi mdi-history"></i>
-          Transaction History
+          {{ $t('wallet.transactionHistory') }}
         </h3>
         <el-button text class="export-btn">
           <i class="mdi mdi-download"></i>
-          Export
+          {{ $t('common.export') }}
         </el-button>
       </div>
 
       <el-table :data="filteredTransactions" style="width: 100%" class="modern-table">
-        <el-table-column prop="created_at" label="Date & Time" width="200">
+        <el-table-column prop="created_at" :label="$t('wallet.dateTime')" width="200">
           <template #default="{ row }">
             <div class="date-cell">
               <i class="mdi mdi-calendar-clock"></i>
@@ -157,7 +157,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column prop="tx_type" label="Type" width="150">
+        <el-table-column prop="tx_type" :label="$t('wallet.type')" width="150">
           <template #default="{ row }">
             <el-tag 
                 :type="typeColor(row.tx_type)"
@@ -170,7 +170,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column prop="amount" label="Amount" width="160">
+        <el-table-column prop="amount" :label="$t('wallet.amount')" width="160">
           <template #default="{ row }">
             <div class="amount-cell" :class="row.amount >= 0 ? 'positive' : 'negative'">
               <i :class="row.amount >= 0 ? 'mdi mdi-plus-circle' : 'mdi mdi-minus-circle'"></i>
@@ -179,15 +179,15 @@
           </template>
         </el-table-column>
 
-        <el-table-column prop="description" label="Description" min-width="250">
+        <el-table-column prop="description" :label="$t('wallet.description')" min-width="250">
           <template #default="{ row }">
             <div class="description-cell">
-              {{ row.description || 'No description' }}
+              {{ row.description || $t('wallet.noDescription') }}
             </div>
           </template>
         </el-table-column>
 
-        <el-table-column prop="success" label="Status" width="120">
+        <el-table-column prop="success" :label="$t('common.status')" width="120">
           <template #default="{ row }">
             <el-tag 
                 :type="row.success ? 'success' : 'danger'"
@@ -195,7 +195,7 @@
                 effect="plain"
             >
               <i :class="row.success ? 'mdi mdi-check-circle' : 'mdi mdi-close-circle'"></i>
-              {{ row.success ? 'Success' : 'Failed' }}
+              {{ row.success ? $t('wallet.success') : $t('wallet.failed') }}
             </el-tag>
           </template>
         </el-table-column>
@@ -203,7 +203,7 @@
 
       <div v-if="filteredTransactions.length === 0" class="empty-state">
         <i class="mdi mdi-inbox-outline"></i>
-        <p>No transactions found</p>
+        <p>{{ $t('wallet.noTransactions') }}</p>
       </div>
     </el-card>
   </div>
@@ -213,6 +213,7 @@
 import { ref, onMounted, computed } from "vue";
 import { ElMessage } from "element-plus";
 import { getBalance, getWalletTransactions, createTopUp } from "@/api/api";
+import { useI18n } from 'vue-i18n'
 
 interface WalletTx {
   id: number;
@@ -222,6 +223,8 @@ interface WalletTx {
   description: string;
   success: boolean;
 }
+
+const { t, locale } = useI18n()
 
 const balance = ref<number>(0);
 const amount = ref<number>(50);
@@ -284,23 +287,24 @@ async function fetchWallet() {
 
 async function handleTopup() {
   if (!amount.value || amount.value <= 0) {
-    return ElMessage.warning("Enter top-up amount");
+    return ElMessage.warning(t('wallet.enterTopupAmount'));
   }
   loading.value = true;
   try {
     await createTopUp({ amount: amount.value });
-    ElMessage.success("Top-up created successfully");
+    ElMessage.success(t('wallet.topupCreated'));
     await fetchWallet();
   } catch (err) {
     console.error(err);
-    ElMessage.error("Failed to create top-up");
+    ElMessage.error(t('wallet.topupFailed'));
   } finally {
     loading.value = false;
   }
 }
 
 function formatDate(date: string) {
-  return new Date(date).toLocaleString('en-US', {
+  const loc = (locale?.value as unknown as string) || 'en-US'
+  return new Date(date).toLocaleString(loc, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -336,7 +340,16 @@ function typeIcon(type: string) {
 }
 
 function formatType(type: string) {
-  return type.charAt(0).toUpperCase() + type.slice(1);
+  switch (type) {
+    case 'topup':
+      return t('wallet.topup')
+    case 'commission':
+      return t('wallet.commission')
+    case 'payment':
+      return t('wallet.payment')
+    default:
+      return type
+  }
 }
 
 onMounted(fetchWallet);
