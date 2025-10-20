@@ -33,6 +33,13 @@ export default {
   nav: {
     dashboard: 'Dashboard',
     home: 'Home',
+    // Search sections (public)
+    searchVehicles: 'Search vehicles',
+    searchCargos: 'Search cargos',
+    // Personal sections
+    myVehicles: 'My vehicles',
+    myCargos: 'My cargos',
+    // Backward compat fallbacks (used in some pages)
     vehicles: 'Vehicles',
     cargos: 'Cargos',
     offers: 'Offers',
@@ -356,6 +363,13 @@ export default {
     maxLength: 'Maximum length is {max} characters'
   },
 
+  filters: {
+    anytime: 'any time',
+    today: 'today',
+    last3Days: 'last 3 days',
+    last7Days: 'last 7 days'
+  },
+
   forms: {
     // Section headers
     cargo: 'Cargo',
@@ -363,6 +377,7 @@ export default {
     specs: 'Specifications',
     route: 'Route',
     rate: 'Rate',
+    paymentTerms: 'Payment terms',
     companyData: 'Company Data',
     promotion: 'Promotion',
 
@@ -378,8 +393,10 @@ export default {
     weightKg: 'Weight (kg)',
     volumeM3: 'Volume (m³)',
     quantity: 'Quantity',
+    packingType: 'Packing type',
     bodyType: 'Body Type',
     loadTypes: 'Loading Types',
+    unloadType: 'Unload type',
     lengthM: 'Length (m)',
     widthM: 'Width (m)',
     heightM: 'Height (m)',
@@ -388,7 +405,18 @@ export default {
     gpsMonitoring: 'GPS monitoring',
     hydrolift: 'Hydrolift',
     stakes: 'Stakes',
+    pneumatic: 'Pneumatic',
+    straps: 'Straps',
     partialLoad: 'Part load',
+    fullTruck: 'Full truck (FTL)',
+
+    readyStatus: 'Ready status',
+    pickupTimeFrom: 'Pickup from',
+    pickupTimeTo: 'Pickup to',
+    deliveryTimeFrom: 'Delivery from',
+    deliveryTimeTo: 'Delivery to',
+    customsRequired: 'Customs',
+    routeInfo: 'Route info',
 
     locationFrom: 'From (locality)',
     possibleUnload: 'To (possible unload)',
@@ -405,6 +433,14 @@ export default {
     currency: 'Currency',
     payToCard: 'to card',
     withoutBargain: 'no bargaining',
+    mutualOffersOnly: 'Mutual offers only',
+
+    paymentTerms: 'Payment terms',
+    prepaymentPercent: 'Prepayment (%)',
+    paymentMethod: 'Payment method',
+    paymentDays: 'Payment delay (days)',
+    paymentOnUnload: 'Payment on unload',
+    directContract: 'Direct contract',
 
     isPrivate: 'I am a private person',
     companyType: 'Company type',

@@ -91,9 +91,11 @@
             active-text-color="#111827"
           >
             <el-menu-item index="/"><i class="mdi mdi-home-outline"></i> {{ $t('nav.home') }}</el-menu-item>
-            <el-menu-item index="/vehicles"><i class="mdi mdi-truck"></i> {{ $t('nav.vehicles') }}</el-menu-item>
+            <el-menu-item index="/search/cargos"><i class="mdi mdi-magnify"></i> {{ $t('nav.searchCargos') }}</el-menu-item>
+            <el-menu-item index="/search/vehicles"><i class="mdi mdi-magnify"></i> {{ $t('nav.searchVehicles') }}</el-menu-item>
+            <el-menu-item index="/vehicles"><i class="mdi mdi-truck"></i> {{ $t('nav.myVehicles') }}</el-menu-item>
             <el-menu-item index="/shipments"><i class="mdi mdi-transit-connection-variant"></i> {{ $t('nav.shipments') }}</el-menu-item>
-            <el-menu-item index="/cargos"><i class="mdi mdi-package-variant-closed"></i> {{ $t('nav.cargos') }}</el-menu-item>
+            <el-menu-item index="/cargos"><i class="mdi mdi-package-variant-closed"></i> {{ $t('nav.myCargos') }}</el-menu-item>
             <el-menu-item index="/offers"><i class="mdi mdi-handshake-outline"></i> {{ $t('nav.offers') }}</el-menu-item>
             <el-menu-item index="/driver-request"><i class="mdi mdi-clipboard-text-outline"></i> {{ $t('nav.driverRequest') }}</el-menu-item>
             <el-menu-item index="/reviews"><i class="mdi mdi-star-outline"></i> {{ $t('nav.reviews') }}</el-menu-item>

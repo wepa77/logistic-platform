@@ -33,6 +33,13 @@ export default {
   nav: {
     dashboard: 'Dolandyryş paneli',
     home: 'Baş sahypa',
+    // Gözleg bölümleri (publik)
+    searchVehicles: 'Maşyn gözlegi',
+    searchCargos: 'Ýük gözlegi',
+    // Şahsy bölümler
+    myVehicles: 'Meniň ulaglarym',
+    myCargos: 'Meniň ýüklerim',
+    // Yzygiderlilik üçin köne açarlar
     vehicles: 'Ulaglar',
     cargos: 'Ýükler',
     offers: 'Teklipler',
@@ -356,6 +363,13 @@ export default {
     maxLength: 'Iň köp uzynlygy {max} simwol'
   },
 
+  filters: {
+    anytime: 'islendik wagt',
+    today: 'şu gün',
+    last3Days: 'soňky 3 gün',
+    last7Days: 'soňky 7 gün'
+  },
+
   forms: {
     // Bölüm atlary
     cargo: 'Ýük',
@@ -378,8 +392,10 @@ export default {
     weightKg: 'Agram (kg)',
     volumeM3: 'Göwrüm (m³)',
     quantity: 'Sany',
+    packingType: 'Gaplaýyş görnüşi',
     bodyType: 'Kuzowyň görnüşi',
     loadTypes: 'Ýükleme görnüşleri',
+    unloadType: 'Düşürme görnüşi',
     lengthM: 'Uzynlyk (m)',
     widthM: 'Ini (m)',
     heightM: 'Beýiklik (m)',
@@ -388,7 +404,18 @@ export default {
     gpsMonitoring: 'GPS gözegçilik',
     hydrolift: 'Gidrolift',
     stakes: 'Könikler',
+    pneumatic: 'Pnewmohod',
+    straps: 'Remenler',
     partialLoad: 'Bölek ýük',
+    fullTruck: 'Aýry maşyn (FTL)',
+
+    readyStatus: 'Taýýarlyk',
+    pickupTimeFrom: 'Ýükleme wagtyndan',
+    pickupTimeTo: 'Ýükleme wagtyna çenli',
+    deliveryTimeFrom: 'Düşürme wagtyndan',
+    deliveryTimeTo: 'Düşürme wagtyna çenli',
+    customsRequired: 'Gümrük',
+    routeInfo: 'Marşrut barada maglumat',
 
     locationFrom: 'Nireden (punkt)',
     possibleUnload: 'Nirä (mümkin düşürmek)',
@@ -405,6 +432,14 @@ export default {
     currency: 'Walýuta',
     payToCard: 'karta',
     withoutBargain: 'gepleşik ýok',
+    mutualOffersOnly: 'Diňe garşy teklipler',
+
+    paymentTerms: 'Töleg şertleri',
+    prepaymentPercent: 'Öňünden töleg (%)',
+    paymentMethod: 'Töleg usuly',
+    paymentDays: 'Töleg gijikmesi (gün)',
+    paymentOnUnload: 'Düşürilende töleg',
+    directContract: 'Göni şertnama',
 
     isPrivate: 'Men hususy adam',
     companyType: 'Kompaniýanyň görnüşi',

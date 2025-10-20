@@ -1,7 +1,7 @@
 <template>
   <div class="vehicles-page">
     <!-- Header Section -->
-    <div class="page-header">
+    <div class="page-header" v-if="!embedded">
       <div class="header-content">
         <div class="header-left">
           <h1 class="page-title">
@@ -32,7 +32,7 @@
     />
 
     <!-- Filters & Search Section -->
-    <el-card class="filters-card" shadow="never">
+    <el-card class="filters-card" shadow="never" v-if="!embedded">
       <div class="filters-container">
         <el-input
             v-model="searchQuery"
@@ -66,7 +66,7 @@
     </el-card>
 
     <!-- Stats Cards -->
-    <div class="stats-grid">
+    <div class="stats-grid" v-if="!embedded">
       <div class="stat-card">
         <div class="stat-icon total">
           <i class="mdi mdi-truck-outline"></i>
@@ -184,7 +184,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column fixed="right" label="Actions" width="160">
+        <el-table-column v-if="!embedded" fixed="right" label="Actions" width="160">
           <template #default="scope">
             <div class="action-buttons">
               <el-tooltip content="Edit" placement="top">
@@ -217,6 +217,7 @@
 
     <!-- Modern Dialog for create/update -->
     <el-dialog 
+        v-if="!embedded"
         v-model="dialogVisible" 
         :title="form.id ? 'Edit Vehicle' : 'Add New Vehicle'" 
         width="700px"
@@ -318,6 +319,8 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { getVehicles, createVehicle, updateVehicle, deleteVehicleApi } from '@/api/api'
+
+const { embedded = false } = defineProps<{ embedded?: boolean }>()
 
 interface Vehicle {
   id?: number

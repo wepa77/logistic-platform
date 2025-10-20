@@ -20,6 +20,9 @@ const HomePage = defineAsyncComponent(() => import('@/pages/Home/index.vue'))
 const MarketPage = defineAsyncComponent(() => import('@/pages/Marketplace/index.vue'))
 // Driver request page
 const DriverRequestPage = defineAsyncComponent(() => import('@/pages/DriverRequest/index.vue'))
+// Search pages
+const SearchVehiclesPage = defineAsyncComponent(() => import('@/pages/Search/Vehicles.vue'))
+const SearchCargosPage = defineAsyncComponent(() => import('@/pages/Search/Cargos.vue'))
 
 const routes = [
     // Public routes
@@ -29,15 +32,19 @@ const routes = [
         component: AppLayout,
         children: [
             { path: '', name: 'home', component: HomePage, meta: { title: 'Home', public: true } },
-            { path: 'vehicles', name: 'vehicles', component: VehiclesPage, meta: { title: 'Vehicles' } },
+            // Public search routes
+            { path: 'search/vehicles', name: 'search-vehicles', component: SearchVehiclesPage, meta: { title: 'Search Vehicles', public: true } },
+            { path: 'search/cargos', name: 'search-cargos', component: SearchCargosPage, meta: { title: 'Search Cargos', public: true } },
+            // Personal sections
+            { path: 'vehicles', name: 'vehicles', component: VehiclesPage, meta: { title: 'Vehicles', public: true } },
             { path: 'vehicles/add', name: 'vehicle-add', component: VehiclesAddPage, meta: { title: 'Add Vehicle' } },
-            { path: 'cargos', name: 'cargos', component: CargosPage, meta: { title: 'Cargos' } },
+            { path: 'cargos', name: 'cargos', component: CargosPage, meta: { title: 'Cargos', public: true } },
             { path: 'cargos/add', name: 'cargo-add', component: CargosAddPage, meta: { title: 'Add Cargo' } },
-            { path: 'offers', name: 'offers', component: OffersPage, meta: { title: 'Offers' } },
-            { path: 'shipments', name: 'shipments', component: ShipmentsPage, meta: { title: 'Shipments' } },
-            { path: 'reviews', name: 'reviews', component: ReviewsPage, meta: { title: 'Reviews' } },
+            { path: 'offers', name: 'offers', component: OffersPage, meta: { title: 'Offers', public: true } },
+            { path: 'shipments', name: 'shipments', component: ShipmentsPage, meta: { title: 'Shipments', public: true } },
+            { path: 'reviews', name: 'reviews', component: ReviewsPage, meta: { title: 'Reviews', public: true } },
             { path: 'wallet', name: 'wallet', component: WalletPage, meta: { title: 'Wallet' } },
-            { path: 'driver-request', name: 'driver-request', component: DriverRequestPage, meta: { title: 'Driver Request' } }
+            { path: 'driver-request', name: 'driver-request', component: DriverRequestPage, meta: { title: 'Driver Request', public: true } }
         ]
     },
     { path: '/login', name: 'login', component: LoginPage, meta: { title: 'Login', public: true } },
@@ -47,7 +54,7 @@ const routes = [
 ]
 
 export const router = createRouter({
-    history: createWebHistory(),
+    history: createWebHistory(import.meta.env.BASE_URL),
     routes
 })
 

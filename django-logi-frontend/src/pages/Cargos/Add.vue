@@ -31,6 +31,7 @@
           <el-input-number v-model="form.volume_m3" :min="0" step="0.5" label="Объём (м³)" />
           <el-input-number v-model="form.quantity" :min="1" label="Кол-во мест" />
         </div>
+        <el-input v-model="form.packing_type" :placeholder="$t('forms.packingType') as string" />
 
         <h3>{{ $t('forms.requirements') }}</h3>
         <div class="grid-2">
@@ -58,6 +59,8 @@
           <el-checkbox v-model="form.has_gps">GPS мониторинг</el-checkbox>
           <el-checkbox v-model="form.has_lift">Гидролифт</el-checkbox>
           <el-checkbox v-model="form.has_horses">Коники</el-checkbox>
+          <el-checkbox v-model="form.has_pneumatic">{{ $t('forms.pneumatic') }}</el-checkbox>
+          <el-checkbox v-model="form.has_straps">{{ $t('forms.straps') }}</el-checkbox>
           <el-checkbox v-model="form.partial_load">Догруз</el-checkbox>
         </div>
       </section>
@@ -65,19 +68,48 @@
       <!-- 3) Маршрут -->
       <section class="form-section">
         <h2>{{ $t('forms.route') }}</h2>
-        <div class="grid-2">
-          <el-input v-model="form.location_from" :placeholder="$t('forms.locationFrom') as string" />
-          <el-input v-model="form.possible_unload" :placeholder="$t('forms.possibleUnload') as string" />
-        </div>
-        <div class="grid-2">
-          <el-input-number v-model="form.location_from_radius_km" :min="0" :placeholder="$t('forms.fromRadiusKm') as string" />
-          <el-input-number v-model="form.unload_radius_km" :min="0" :placeholder="$t('forms.unloadRadiusKm') as string" />
+        <!-- Ready status and dates -->
+        <div class="grid-3">
+          <el-select v-model="form.ready_status" :placeholder="$t('forms.readyStatus') as string">
+            <el-option :label="$t('filters.today') as string" value="ready" />
+            <el-option :label="$t('filters.last3Days') as string" value="in_3_days" />
+            <el-option :label="$t('filters.last7Days') as string" value="in_7_days" />
+          </el-select>
+          <el-date-picker v-model="form.pickup_date" type="date" :placeholder="$t('cargos.pickupDate') as string" />
+          <el-date-picker v-model="form.delivery_date" type="date" :placeholder="$t('cargos.deliveryDate') as string" />
         </div>
 
+        <!-- Pickup and delivery addresses -->
         <div class="grid-2">
-          <el-date-picker v-model="form.available_from" type="date" :placeholder="$t('forms.availableFrom') as string" style="width: 100%" />
-          <el-input-number v-model="form.available_days" :min="1" :placeholder="$t('forms.availableDays') as string" />
+          <el-input v-model="form.pickup_address" :placeholder="$t('cargos.pickupAddress') as string" />
+          <el-input v-model="form.delivery_address" :placeholder="$t('cargos.deliveryAddress') as string" />
         </div>
+
+        <!-- Time ranges -->
+        <div class="grid-2">
+          <el-time-picker v-model="form.pickup_time" is-range range-separator="-" :start-placeholder="$t('forms.pickupTimeFrom') as string" :end-placeholder="$t('forms.pickupTimeTo') as string" />
+          <el-time-picker v-model="form.delivery_time" is-range range-separator="-" :start-placeholder="$t('forms.deliveryTimeFrom') as string" :end-placeholder="$t('forms.deliveryTimeTo') as string" />
+        </div>
+
+        <!-- Load/unload types -->
+        <div class="grid-2">
+          <el-select v-model="form.load_type" :placeholder="$t('forms.loadTypes') as string">
+            <el-option v-for="(label, value) in loadTypes" :key="value" :label="label" :value="value" />
+          </el-select>
+          <el-select v-model="form.unload_type" :placeholder="$t('forms.unloadType') as string">
+            <el-option v-for="(label, value) in loadTypes" :key="value" :label="label" :value="value" />
+          </el-select>
+        </div>
+
+        <!-- Extra flags -->
+        <div class="extras">
+          <el-checkbox v-model="form.full_truck">{{ $t('forms.fullTruck') }}</el-checkbox>
+          <el-checkbox v-model="form.partial_load">{{ $t('forms.partialLoad') }}</el-checkbox>
+          <el-checkbox v-model="form.gps_required">{{ $t('forms.gpsMonitoring') }}</el-checkbox>
+          <el-checkbox v-model="form.customs_required">{{ $t('forms.customsRequired') }}</el-checkbox>
+        </div>
+
+        <el-input type="textarea" v-model="form.route_info" :rows="2" :placeholder="$t('forms.routeInfo') as string" />
       </section>
 
       <!-- 4) Ставка -->
@@ -105,11 +137,30 @@
           <div>
             <el-checkbox v-model="form.pay_to_card">{{ $t('forms.payToCard') }}</el-checkbox>
             <el-checkbox v-model="form.without_bargain">{{ $t('forms.withoutBargain') }}</el-checkbox>
+            <el-checkbox v-model="form.mutual_offers_only">{{ $t('forms.mutualOffersOnly') }}</el-checkbox>
           </div>
         </div>
       </section>
 
-      <!-- 5) Данные компании -->
+      <!-- 5) Payment terms -->
+      <section class="form-section">
+        <h2>{{ $t('forms.paymentTerms') }}</h2>
+        <div class="grid-3">
+          <el-input-number v-model="form.prepayment_percent" :min="0" :max="100" :placeholder="$t('forms.prepaymentPercent') as string" />
+          <el-select v-model="form.payment_method" :placeholder="$t('forms.paymentMethod') as string">
+            <el-option label="Cash" value="cash" />
+            <el-option label="Bank" value="bank" />
+            <el-option label="Online" value="stripe" />
+          </el-select>
+          <el-input-number v-model="form.payment_days" :min="0" :placeholder="$t('forms.paymentDays') as string" />
+        </div>
+        <div class="extras">
+          <el-checkbox v-model="form.payment_on_unload">{{ $t('forms.paymentOnUnload') }}</el-checkbox>
+          <el-checkbox v-model="form.direct_contract">{{ $t('forms.directContract') }}</el-checkbox>
+        </div>
+      </section>
+
+      <!-- 6) Данные компании -->
       <section class="form-section">
         <h2>{{ $t('forms.companyData') }}</h2>
         <el-checkbox v-model="form.is_private">{{ $t('forms.isPrivate') }}</el-checkbox>
@@ -156,11 +207,13 @@ import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 
 interface CargoForm {
+  // Cargo basics
   cargo_type: string
   cargo_name: string
   weight_kg: number | null
   volume_m3: number | null
   quantity: number
+  packing_type: string
   body_type: string
   load_types: string[]
   length_m: number | null
@@ -171,13 +224,30 @@ interface CargoForm {
   has_gps: boolean
   has_lift: boolean
   has_horses: boolean
+  has_pneumatic: boolean
+  has_straps: boolean
   partial_load: boolean
-  location_from: string
+
+  // Route and schedule (aligned with Cargo model)
+  ready_status: string
+  pickup_date: any
+  delivery_date: any
+  pickup_address: string
+  delivery_address: string
+  pickup_time: [any, any] | null
+  delivery_time: [any, any] | null
+  load_type: string
+  unload_type: string
+  full_truck: boolean
+  gps_required: boolean
+  customs_required: boolean
+  route_info: string
+
+  // Legacy marketplace radius (optional)
   location_from_radius_km: number
-  possible_unload: string
   unload_radius_km: number
-  available_from: any
-  available_days: number | null
+
+  // Rate and payment
   rate_mode: string
   rate_with_vat: number | null
   rate_without_vat: number | null
@@ -185,6 +255,14 @@ interface CargoForm {
   rate_currency: 'tmt'|'rub'|'usd'|'eur'
   pay_to_card: boolean
   without_bargain: boolean
+  mutual_offers_only: boolean
+  prepayment_percent: number | null
+  payment_method: 'cash'|'bank'|'stripe' | ''
+  payment_days: number | null
+  payment_on_unload: boolean
+  direct_contract: boolean
+
+  // Company/contact
   is_private: boolean
   company_type: 'ooo'|'ip'|'fl'|'self'
   company_name: string
@@ -192,16 +270,20 @@ interface CargoForm {
   contact_name: string
   contact_phone: string
   note: string
+
+  // Promo
   promote_top: boolean
   stealth_mode: boolean
 }
 
 const form = reactive<CargoForm>({
+  // Cargo basics
   cargo_type: '',
   cargo_name: '',
   weight_kg: null,
   volume_m3: null,
   quantity: 1,
+  packing_type: '',
   body_type: '',
   load_types: [],
   length_m: null,
@@ -212,13 +294,30 @@ const form = reactive<CargoForm>({
   has_gps: false,
   has_lift: false,
   has_horses: false,
+  has_pneumatic: false,
+  has_straps: false,
   partial_load: false,
-  location_from: '',
+
+  // Route and schedule
+  ready_status: 'ready',
+  pickup_date: '',
+  delivery_date: '',
+  pickup_address: '',
+  delivery_address: '',
+  pickup_time: null,
+  delivery_time: null,
+  load_type: '',
+  unload_type: '',
+  full_truck: true,
+  gps_required: false,
+  customs_required: false,
+  route_info: '',
+
+  // Legacy optional radiuses from marketplace
   location_from_radius_km: 0,
-  possible_unload: '',
   unload_radius_km: 0,
-  available_from: '',
-  available_days: null,
+
+  // Rate and payment
   rate_mode: 'has_rate',
   rate_with_vat: null,
   rate_without_vat: null,
@@ -226,6 +325,14 @@ const form = reactive<CargoForm>({
   rate_currency: 'tmt',
   pay_to_card: false,
   without_bargain: false,
+  mutual_offers_only: false,
+  prepayment_percent: null,
+  payment_method: '',
+  payment_days: null,
+  payment_on_unload: false,
+  direct_contract: false,
+
+  // Company/contact
   is_private: false,
   company_type: 'ooo',
   company_name: '',
@@ -233,6 +340,8 @@ const form = reactive<CargoForm>({
   contact_name: '',
   contact_phone: '',
   note: '',
+
+  // Promo
   promote_top: false,
   stealth_mode: false,
 })
@@ -269,8 +378,9 @@ const loadTypes: Record<string, string> = {
 
 // Prefill from marketplace
 const route = useRoute()
-if (route.query.from) form.location_from = String(route.query.from)
-if (route.query.to) form.possible_unload = String(route.query.to)
+if (route.query.from) form.pickup_address = String(route.query.from)
+if (route.query.to) form.delivery_address = String(route.query.to)
+if (route.query.date) form.pickup_date = String(route.query.date)
 if (route.query.radius) form.location_from_radius_km = Number(route.query.radius)
 
 const prefilterSummary = computed(() => {
@@ -290,20 +400,25 @@ const prefilterSummary = computed(() => {
 function resetForm() {
   Object.assign(form, {
     cargo_type: '', cargo_name: '', weight_kg: null, volume_m3: null, quantity: 1,
+    packing_type: '',
     body_type: '', load_types: [], length_m: null, width_m: null, height_m: null,
-    has_adr: false, has_tir: false, has_gps: false, has_lift: false, has_horses: false, partial_load: false,
-    location_from: '', location_from_radius_km: 0, possible_unload: '', unload_radius_km: 0,
-    available_from: '', available_days: null,
+    has_adr: false, has_tir: false, has_gps: false, has_lift: false, has_horses: false,
+    has_pneumatic: false, has_straps: false, partial_load: false,
+    ready_status: 'ready', pickup_date: '', delivery_date: '', pickup_address: '', delivery_address: '',
+    pickup_time: null, delivery_time: null, load_type: '', unload_type: '', full_truck: true,
+    gps_required: false, customs_required: false, route_info: '',
+    location_from_radius_km: 0, unload_radius_km: 0,
     rate_mode: 'has_rate', rate_with_vat: null, rate_without_vat: null, rate_cash: null, rate_currency: 'tmt',
-    pay_to_card: false, without_bargain: false,
+    pay_to_card: false, without_bargain: false, mutual_offers_only: false, prepayment_percent: null, payment_method: '', payment_days: null,
+    payment_on_unload: false, direct_contract: false,
     is_private: false, company_type: 'ooo', company_name: '', city: '', contact_name: '', contact_phone: '', note: '',
     promote_top: false, stealth_mode: false,
   })
 }
 
 function submitForm() {
-  if (!form.cargo_name || !form.location_from) {
-    ElMessage.error('Заполните обязательные поля: Наименование груза и Откуда')
+  if (!form.cargo_name || !form.pickup_address || !form.delivery_address || !form.pickup_date) {
+    ElMessage.error('Заполните обязательные поля: Наименование, адреса и дата погрузки')
     return
   }
   // Here you would call backend API to create cargo

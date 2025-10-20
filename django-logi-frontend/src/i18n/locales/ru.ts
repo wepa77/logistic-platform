@@ -33,6 +33,13 @@ export default {
   nav: {
     dashboard: 'Панель управления',
     home: 'Главная',
+    // Поисковые разделы (публичные)
+    searchVehicles: 'Поиск машин',
+    searchCargos: 'Поиск грузов',
+    // Личные разделы
+    myVehicles: 'Мои машины',
+    myCargos: 'Мои грузы',
+    // Совместимость со старыми ключами
     vehicles: 'Транспорт',
     cargos: 'Грузы',
     offers: 'Предложения',
@@ -356,6 +363,13 @@ export default {
     maxLength: 'Максимальная длина {max} символов'
   },
 
+  filters: {
+    anytime: 'когда угодно',
+    today: 'за сегодня',
+    last3Days: 'за 3 дня',
+    last7Days: 'за неделю'
+  },
+
   forms: {
     // Заголовки разделов
     cargo: 'Груз',
@@ -378,8 +392,10 @@ export default {
     weightKg: 'Вес (кг)',
     volumeM3: 'Объём (м³)',
     quantity: 'Количество мест',
+    packingType: 'Тип упаковки',
     bodyType: 'Тип кузова',
     loadTypes: 'Типы загрузки',
+    unloadType: 'Тип разгрузки',
     lengthM: 'Длина (м)',
     widthM: 'Ширина (м)',
     heightM: 'Высота (м)',
@@ -388,7 +404,18 @@ export default {
     gpsMonitoring: 'GPS мониторинг',
     hydrolift: 'Гидролифт',
     stakes: 'Коники',
+    pneumatic: 'Пневмоход',
+    straps: 'Ремни',
     partialLoad: 'Догруз',
+    fullTruck: 'Отдельной машиной (FTL)',
+
+    readyStatus: 'Готовность',
+    pickupTimeFrom: 'Время погрузки с',
+    pickupTimeTo: 'Время погрузки до',
+    deliveryTimeFrom: 'Время разгрузки с',
+    deliveryTimeTo: 'Время разгрузки до',
+    customsRequired: 'Таможня',
+    routeInfo: 'Информация о маршруте',
 
     locationFrom: 'Откуда (населённый пункт)',
     possibleUnload: 'Куда (возможная разгрузка)',
@@ -405,6 +432,14 @@ export default {
     currency: 'Валюта',
     payToCard: 'на карту',
     withoutBargain: 'без торга',
+    mutualOffersOnly: 'Только встречные предложения',
+
+    paymentTerms: 'Условия оплаты',
+    prepaymentPercent: 'Предоплата (%)',
+    paymentMethod: 'Способ оплаты',
+    paymentDays: 'Отсрочка платежа (дней)',
+    paymentOnUnload: 'Оплата при выгрузке',
+    directContract: 'Прямая заявка',
 
     isPrivate: 'Я — частное лицо',
     companyType: 'Тип фирмы',

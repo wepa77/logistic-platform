@@ -1,7 +1,7 @@
 <template>
   <div class="cargos-page">
     <!-- Header -->
-    <div class="page-header">
+    <div class="page-header" v-if="!embedded">
       <div class="header-content">
         <div class="header-left">
           <h1 class="page-title">
@@ -32,7 +32,7 @@
     />
 
     <!-- Filters -->
-    <el-card class="filters-card" shadow="never">
+    <el-card class="filters-card" shadow="never" v-if="!embedded">
       <div class="filters-container">
         <el-input
           v-model="searchQuery"
@@ -56,7 +56,7 @@
     </el-card>
 
     <!-- Stats -->
-    <div class="stats-grid">
+    <div class="stats-grid" v-if="!embedded">
       <div class="stat-card">
         <div class="stat-icon total"><i class="mdi mdi-package-variant"></i></div>
         <div class="stat-content">
@@ -93,10 +93,10 @@
         <el-table-column :label="$t('cargos.table.cargo')" min-width="220">
           <template #default="{ row }">
             <div class="cargo-cell">
-              <div class="cargo-title">{{ row.cargo_name || ($t('cargos.untitled') as string) }}</div>
+              <div class="cargo-title">{{ row.title || ($t('cargos.untitled') as string) }}</div>
               <div class="cargo-meta">
                 <i class="mdi mdi-truck"></i>
-                <span>{{ row.cargo_type ? cargoTypes[row.cargo_type] : ($t('cargos.general') as string) }}</span>
+                <span>{{ row.body_type ? bodyTypes[row.body_type] : ($t('cargos.general') as string) }}</span>
               </div>
             </div>
           </template>
@@ -104,13 +104,13 @@
         <el-table-column :label="$t('cargos.table.route')" min-width="260">
           <template #default="{ row }">
             <div class="route">
-              <span class="from">{{ row.location_from || '—' }}</span>
+              <span class="from">{{ row.pickup_address || '—' }}</span>
               <i class="mdi mdi-arrow-right"></i>
-              <span class="to">{{ row.possible_unload || '—' }}</span>
+              <span class="to">{{ row.delivery_address || '—' }}</span>
             </div>
             <div class="route-meta">
-              <i class="mdi mdi-radar"></i>
-              <span>{{ row.location_from_radius_km || 0 }} / {{ row.unload_radius_km || 0 }} km</span>
+              <i class="mdi mdi-city"></i>
+              <span>{{ row.city || '—' }}</span>
             </div>
           </template>
         </el-table-column>
@@ -127,15 +127,15 @@
         <el-table-column :label="$t('cargos.table.dates')" min-width="180">
           <template #default="{ row }">
             <div class="dates">
-              <span><i class="mdi mdi-calendar"></i> {{ formatDate(row.available_from) }}</span>
-              <span class="muted">+{{ row.available_days || 0 }} {{ $t('cargos.days') }}</span>
+              <span><i class="mdi mdi-calendar"></i> {{ formatDate(row.pickup_date) }}</span>
+              <span class="muted"><i class="mdi mdi-calendar-end"></i> {{ formatDate(row.delivery_date) }}</span>
             </div>
           </template>
         </el-table-column>
         <el-table-column :label="$t('cargos.table.rate')" min-width="160">
           <template #default="{ row }">
             <div class="rate">
-              <span v-if="row.rate_with_vat">{{ row.rate_with_vat }} {{ row.rate_currency?.toUpperCase() }}</span>
+              <span v-if="row.rate_cash">{{ row.rate_cash }} {{ row.rate_currency?.toUpperCase() }}</span>
               <span v-else class="muted">{{ $t('cargos.onRequest') }}</span>
               <span v-if="row.without_bargain" class="tag">{{ $t('forms.withoutBargain') }}</span>
             </div>
@@ -146,7 +146,7 @@
             <el-tag :type="statusType(row.status)">{{ statusLabel(row.status) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('common.actions')" width="140" fixed="right">
+        <el-table-column v-if="!embedded" :label="$t('common.actions')" width="140" fixed="right">
           <template #default="{ row, $index }">
             <el-button text size="small" @click="editCargo(row, $index)"><i class="mdi mdi-pencil"></i></el-button>
             <el-button text size="small" type="danger" @click="removeCargo($index)"><i class="mdi mdi-delete"></i></el-button>
@@ -154,14 +154,14 @@
         </el-table-column>
       </el-table>
 
-      <div v-if="!cargos.length" class="empty-state">
+      <div v-if="!embedded && !cargos.length" class="empty-state">
         <i class="mdi mdi-package-variant"></i>
         <p>{{ $t('cargos.noCargosYet') }}</p>
       </div>
     </el-card>
 
     <!-- Add/Edit Dialog with existing form -->
-    <el-dialog v-model="dialogVisible" :title="editingIndex === -1 ? ($t('cargos.addNew') as string) : ($t('cargos.editCargo') as string)" width="860px" class="cargo-dialog">
+    <el-dialog v-if="!embedded" v-model="dialogVisible" :title="editingIndex === -1 ? ($t('cargos.addNew') as string) : ($t('cargos.editCargo') as string)" width="860px" class="cargo-dialog">
       <div class="vehicle-add-page">
         <el-card class="vehicle-card" shadow="never">
           <!-- 1️⃣ Груз и требования к кузову / загрузке -->
@@ -303,15 +303,34 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, computed } from 'vue'
+import { reactive, ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useI18n } from 'vue-i18n'
+import { http } from '@/api/http'
+
+const { embedded = false } = defineProps<{ embedded?: boolean }>()
 
 // Local cargo list (demo). Replace with API calls when backend is ready.
 interface CargoItem {
+  // Legacy form fields (kept for local dialog)
   cargo_type: string
   cargo_name: string
+  location_from: string
+  location_from_radius_km: number
+  possible_unload: string
+  unload_radius_km: number
+  available_from: any
+  available_days: number | null
+
+  // Cargo model aligned fields for table/API
+  title?: string
+  pickup_address?: string
+  delivery_address?: string
+  pickup_date?: any
+  delivery_date?: any
+
+  // Specs
   weight_kg: number | null
   volume_m3: number | null
   quantity: number
@@ -326,12 +345,8 @@ interface CargoItem {
   has_lift: boolean
   has_horses: boolean
   partial_load: boolean
-  location_from: string
-  location_from_radius_km: number
-  possible_unload: string
-  unload_radius_km: number
-  available_from: any
-  available_days: number | null
+
+  // Rate
   rate_mode: string
   rate_with_vat: number | null
   rate_without_vat: number | null
@@ -339,6 +354,8 @@ interface CargoItem {
   rate_currency: 'tmt'|'rub'|'usd'|'eur'
   pay_to_card: boolean
   without_bargain: boolean
+
+  // Company/contact
   is_private: boolean
   company_type: 'ooo'|'ip'|'fl'|'self'
   company_name: string
@@ -346,12 +363,14 @@ interface CargoItem {
   contact_name: string
   contact_phone: string
   note: string
+
+  // Promotion/status
   promote_top: boolean
   stealth_mode: boolean
   status?: 'open'|'in_progress'|'delivered'|'cancelled'
 }
 
-const cargos = ref<CargoItem[]>([])
+const cargos = ref<CargoItem[] | any[]>([])
 const dialogVisible = ref(false)
 const editingIndex = ref(-1)
 const searchQuery = ref('')
@@ -395,17 +414,142 @@ const filteredCargos = computed(() => {
   if (searchQuery.value) {
     const q = searchQuery.value.toLowerCase()
     list = list.filter(c =>
-      (c.cargo_name || '').toLowerCase().includes(q) ||
-      (c.location_from || '').toLowerCase().includes(q) ||
-      (c.possible_unload || '').toLowerCase().includes(q)
+      (c.title || '').toLowerCase().includes(q) ||
+      (c.pickup_address || '').toLowerCase().includes(q) ||
+      (c.delivery_address || '').toLowerCase().includes(q)
     )
   }
   if (statusFilter.value) list = list.filter(c => (c.status || 'open') === statusFilter.value)
   return list
 })
 
+async function loadCargos() {
+  try {
+    const { data } = await http.get('/cargos/')
+    const list = Array.isArray(data) ? data : (data?.results || [])
+    if (list && list.length > 0) {
+      cargos.value = list as any
+    } else {
+      cargos.value = generateMockCargos()
+    }
+  } catch (e) {
+    console.warn('Failed to load cargos, using mock data', e)
+    cargos.value = generateMockCargos()
+  }
+}
+
+function generateMockCargos(): CargoItem[] {
+  const from = (route.query.from as string) || ''
+  const to = (route.query.to as string) || ''
+  const fromRadius = Number(route.query.from_radius || route.query.radius || 0)
+  const toRadius = Number(route.query.to_radius || 0)
+  const weightMin = route.query.weight_min ? Number(route.query.weight_min) : undefined
+  const weightMax = route.query.weight_max ? Number(route.query.weight_max) : undefined
+  const volumeMin = route.query.volume_min ? Number(route.query.volume_min) : undefined
+  const volumeMax = route.query.volume_max ? Number(route.query.volume_max) : undefined
+  const bodyType = (route.query.body_type as string) || ''
+  const loadType = (route.query.load_type as string) || ''
+  const rateMin = route.query.rate_min ? Number(route.query.rate_min) : undefined
+  const rateMax = route.query.rate_max ? Number(route.query.rate_max) : undefined
+  const hasADR = route.query.has_adr === '1' || route.query.has_adr === 'true'
+  const partialLoad = route.query.partial_load === '1' || route.query.partial_load === 'true'
+  const withoutBargain = route.query.without_bargain === '1' || route.query.without_bargain === 'true'
+  const cargoName = (route.query.cargo_name as string) || ''
+
+  const today = new Date()
+  const cities = [from, to].filter(Boolean) as string[]
+  const fallbackCities = ['Ashgabat', 'Mary', 'Balkanabat', 'Turkmenabat', 'Dashoguz']
+  const cityPool = cities.length ? cities : fallbackCities
+
+  const bodyKeys = Object.keys(bodyTypes)
+  const items: CargoItem[] = []
+  const count = 18
+  for (let i = 0; i < count; i++) {
+    const pickup = cityPool[i % cityPool.length]
+    const delivery = cityPool[(i + 1) % cityPool.length]
+    const d1 = new Date(today)
+    d1.setDate(today.getDate() + i)
+    const d2 = new Date(d1)
+    d2.setDate(d1.getDate() + 2)
+    const weight = 500 + (i * 150)
+    const volume = +(8 + (i % 6) * 1.2).toFixed(1)
+    const rate = 1000 + i * 90
+
+    items.push({
+      // legacy form props (unused in table)
+      cargo_type: 'general',
+      cargo_name: cargoName || `Mock Cargo ${i + 1}`,
+      location_from: pickup,
+      location_from_radius_km: fromRadius || 0,
+      possible_unload: delivery,
+      unload_radius_km: toRadius || 0,
+      available_from: d1.toISOString(),
+      available_days: 2,
+
+      // table/API aligned
+      title: cargoName || `Mock Cargo ${i + 1}`,
+      pickup_address: pickup,
+      delivery_address: delivery,
+      pickup_date: d1.toISOString(),
+      delivery_date: d2.toISOString(),
+
+      // specs
+      weight_kg: weight,
+      volume_m3: volume,
+      quantity: 1 + (i % 4),
+      body_type: bodyType || bodyKeys[i % bodyKeys.length],
+      load_types: [loadType || 'top'].filter(Boolean) as string[],
+      length_m: null,
+      width_m: null,
+      height_m: null,
+      has_adr: hasADR ? true : (i % 7 === 0),
+      has_tir: i % 5 === 0,
+      has_gps: false,
+      has_lift: i % 6 === 0,
+      has_horses: false,
+      partial_load: partialLoad ? true : (i % 3 === 0),
+
+      // rate
+      rate_mode: 'has_rate',
+      rate_with_vat: null,
+      rate_without_vat: null,
+      rate_cash: rate,
+      rate_currency: 'tmt',
+      pay_to_card: false,
+      without_bargain: withoutBargain ? true : (i % 4 === 0),
+
+      // company/contact
+      is_private: false,
+      company_type: 'ooo',
+      company_name: 'Demo LLC',
+      city: pickup,
+      contact_name: 'Dispatcher',
+      contact_phone: '+99365000000',
+      note: '',
+
+      // meta
+      promote_top: i % 5 === 0,
+      stealth_mode: false,
+      status: 'open'
+    })
+  }
+
+  // Apply numeric filters
+  let out = items
+  if (weightMin != null) out = out.filter(i => (i.weight_kg || 0) >= weightMin)
+  if (weightMax != null) out = out.filter(i => (i.weight_kg || 0) <= weightMax)
+  if (volumeMin != null) out = out.filter(i => (i.volume_m3 || 0) >= volumeMin)
+  if (volumeMax != null) out = out.filter(i => (i.volume_m3 || 0) <= volumeMax)
+  if (rateMin != null) out = out.filter(i => (i.rate_cash || 0) >= rateMin)
+  if (rateMax != null) out = out.filter(i => (i.rate_cash || 0) <= rateMax)
+
+  return out
+}
+
+onMounted(() => loadCargos())
+
 function refresh() {
-  // placeholder for API reload
+  loadCargos()
 }
 
 function statusType(s?: string) {
@@ -510,15 +654,24 @@ function submitForm() {
     ElMessage.error(t('messages.required'))
     return
   }
-  const payload = { ...form }
+  // Map legacy form fields to cargo fields expected by the table
+  const mapped: CargoItem = {
+    ...form,
+    title: form.cargo_name,
+    pickup_address: form.location_from,
+    delivery_address: form.possible_unload,
+    pickup_date: form.available_from,
+    delivery_date: form.available_from,
+  }
   if (editingIndex.value === -1) {
-    cargos.value.unshift({ ...payload })
+    cargos.value.unshift({ ...mapped })
     ElMessage.success(t('cargos.cargoCreated'))
   } else {
-    cargos.value.splice(editingIndex.value, 1, { ...payload })
+    cargos.value.splice(editingIndex.value, 1, { ...mapped })
     ElMessage.success(t('cargos.cargoUpdated'))
   }
   dialogVisible.value = false
+  // No server roundtrip required for local mock
 }
 </script>
 
