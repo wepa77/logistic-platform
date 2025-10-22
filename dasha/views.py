@@ -11,13 +11,22 @@ import stripe
 
 from .models import (
     User, Vehicle, Cargo, Offer, Shipment, Review,
-    WalletTransaction, TopUpRequest
+    WalletTransaction, TopUpRequest,
+    UserTypeDict, ShipmentPaymentTypeDict, ShipmentPaymentStatusDict, WalletTransactionTypeDict,
+    VehicleBodyTypeDict, VehicleLoadTypeDict, VehicleTruckCategoryDict, VehicleRateTypeDict,
+    CurrencyDict, CargoBodyTypeDict, CargoLoadTypeDict, CargoRateTypeDict, CargoPaymentMethodDict,
+    CompanyTypeDict, CargoStatusDict
 )
 from .serializers import (
     UserSerializer, VehicleSerializer, CargoSerializer,
     OfferSerializer, ShipmentSerializer, ReviewSerializer,
     RegisterSerializer, MeSerializer,
-    WalletTransactionSerializer, TopUpRequestSerializer
+    WalletTransactionSerializer, TopUpRequestSerializer,
+    UserTypeDictSerializer, ShipmentPaymentTypeDictSerializer, ShipmentPaymentStatusDictSerializer,
+    WalletTransactionTypeDictSerializer, VehicleBodyTypeDictSerializer, VehicleLoadTypeDictSerializer,
+    VehicleTruckCategoryDictSerializer, VehicleRateTypeDictSerializer, CurrencyDictSerializer,
+    CargoBodyTypeDictSerializer, CargoLoadTypeDictSerializer, CargoRateTypeDictSerializer,
+    CargoPaymentMethodDictSerializer, CompanyTypeDictSerializer, CargoStatusDictSerializer
 )
 from .permissions import IsOwnerOrReadOnly
 from .filters import (
@@ -229,4 +238,88 @@ class ReviewViewSet(viewsets.ModelViewSet):
     search_fields = ["comment", "shipment__cargo__title", "reviewer__username"]
     ordering_fields = ["rating", "created_at", "id"]
     ordering = ["-created_at"]
+
+
+# --- Dictionary read-only viewsets ---
+class BaseDictViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = [permissions.AllowAny]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ["code", "name_tk", "name_ru", "name_en"]
+    ordering_fields = ["ordering", "code", "id"]
+    ordering = ["ordering", "code"]
+
+
+class UserTypeDictViewSet(BaseDictViewSet):
+    queryset = UserTypeDict.objects.filter(is_active=True).order_by("ordering", "code")
+    serializer_class = UserTypeDictSerializer
+
+
+class ShipmentPaymentTypeDictViewSet(BaseDictViewSet):
+    queryset = ShipmentPaymentTypeDict.objects.filter(is_active=True).order_by("ordering", "code")
+    serializer_class = ShipmentPaymentTypeDictSerializer
+
+
+class ShipmentPaymentStatusDictViewSet(BaseDictViewSet):
+    queryset = ShipmentPaymentStatusDict.objects.filter(is_active=True).order_by("ordering", "code")
+    serializer_class = ShipmentPaymentStatusDictSerializer
+
+
+class WalletTransactionTypeDictViewSet(BaseDictViewSet):
+    queryset = WalletTransactionTypeDict.objects.filter(is_active=True).order_by("ordering", "code")
+    serializer_class = WalletTransactionTypeDictSerializer
+
+
+class VehicleBodyTypeDictViewSet(BaseDictViewSet):
+    queryset = VehicleBodyTypeDict.objects.filter(is_active=True).order_by("ordering", "code")
+    serializer_class = VehicleBodyTypeDictSerializer
+
+
+class VehicleLoadTypeDictViewSet(BaseDictViewSet):
+    queryset = VehicleLoadTypeDict.objects.filter(is_active=True).order_by("ordering", "code")
+    serializer_class = VehicleLoadTypeDictSerializer
+
+
+class VehicleTruckCategoryDictViewSet(BaseDictViewSet):
+    queryset = VehicleTruckCategoryDict.objects.filter(is_active=True).order_by("ordering", "code")
+    serializer_class = VehicleTruckCategoryDictSerializer
+
+
+class VehicleRateTypeDictViewSet(BaseDictViewSet):
+    queryset = VehicleRateTypeDict.objects.filter(is_active=True).order_by("ordering", "code")
+    serializer_class = VehicleRateTypeDictSerializer
+
+
+class CurrencyDictViewSet(BaseDictViewSet):
+    queryset = CurrencyDict.objects.filter(is_active=True).order_by("ordering", "code")
+    serializer_class = CurrencyDictSerializer
+
+
+class CargoBodyTypeDictViewSet(BaseDictViewSet):
+    queryset = CargoBodyTypeDict.objects.filter(is_active=True).order_by("ordering", "code")
+    serializer_class = CargoBodyTypeDictSerializer
+
+
+class CargoLoadTypeDictViewSet(BaseDictViewSet):
+    queryset = CargoLoadTypeDict.objects.filter(is_active=True).order_by("ordering", "code")
+    serializer_class = CargoLoadTypeDictSerializer
+
+
+class CargoRateTypeDictViewSet(BaseDictViewSet):
+    queryset = CargoRateTypeDict.objects.filter(is_active=True).order_by("ordering", "code")
+    serializer_class = CargoRateTypeDictSerializer
+
+
+class CargoPaymentMethodDictViewSet(BaseDictViewSet):
+    queryset = CargoPaymentMethodDict.objects.filter(is_active=True).order_by("ordering", "code")
+    serializer_class = CargoPaymentMethodDictSerializer
+
+
+class CompanyTypeDictViewSet(BaseDictViewSet):
+    queryset = CompanyTypeDict.objects.filter(is_active=True).order_by("ordering", "code")
+    serializer_class = CompanyTypeDictSerializer
+
+
+class CargoStatusDictViewSet(BaseDictViewSet):
+    queryset = CargoStatusDict.objects.filter(is_active=True).order_by("ordering", "code")
+    serializer_class = CargoStatusDictSerializer
 

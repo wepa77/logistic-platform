@@ -11,7 +11,12 @@ from .views import (
     ShipmentViewSet, ReviewViewSet,
     RegisterView, MeView,
     WalletTransactionViewSet, TopUpRequestViewSet,
-    stripe_webhook, SetUserTypeView
+    stripe_webhook, SetUserTypeView,
+    UserTypeDictViewSet, ShipmentPaymentTypeDictViewSet, ShipmentPaymentStatusDictViewSet,
+    WalletTransactionTypeDictViewSet, VehicleBodyTypeDictViewSet, VehicleLoadTypeDictViewSet,
+    VehicleTruckCategoryDictViewSet, VehicleRateTypeDictViewSet, CurrencyDictViewSet,
+    CargoBodyTypeDictViewSet, CargoLoadTypeDictViewSet, CargoRateTypeDictViewSet,
+    CargoPaymentMethodDictViewSet, CompanyTypeDictViewSet, CargoStatusDictViewSet
 )
 
 # DRF Router
@@ -24,6 +29,23 @@ router.register('shipments', ShipmentViewSet)
 router.register('reviews', ReviewViewSet)
 router.register('wallet', WalletTransactionViewSet, basename='wallet')
 router.register('topups', TopUpRequestViewSet, basename='topups')
+
+# Dictionary routes (read-only)
+router.register('dicts/user-types', UserTypeDictViewSet, basename='dict-user-types')
+router.register('dicts/shipment-payment-types', ShipmentPaymentTypeDictViewSet, basename='dict-shipment-payment-types')
+router.register('dicts/shipment-payment-statuses', ShipmentPaymentStatusDictViewSet, basename='dict-shipment-payment-statuses')
+router.register('dicts/wallet-transaction-types', WalletTransactionTypeDictViewSet, basename='dict-wallet-transaction-types')
+router.register('dicts/vehicle-body-types', VehicleBodyTypeDictViewSet, basename='dict-vehicle-body-types')
+router.register('dicts/vehicle-load-types', VehicleLoadTypeDictViewSet, basename='dict-vehicle-load-types')
+router.register('dicts/vehicle-truck-categories', VehicleTruckCategoryDictViewSet, basename='dict-vehicle-truck-categories')
+router.register('dicts/vehicle-rate-types', VehicleRateTypeDictViewSet, basename='dict-vehicle-rate-types')
+router.register('dicts/currencies', CurrencyDictViewSet, basename='dict-currencies')
+router.register('dicts/cargo-body-types', CargoBodyTypeDictViewSet, basename='dict-cargo-body-types')
+router.register('dicts/cargo-load-types', CargoLoadTypeDictViewSet, basename='dict-cargo-load-types')
+router.register('dicts/cargo-rate-types', CargoRateTypeDictViewSet, basename='dict-cargo-rate-types')
+router.register('dicts/cargo-payment-methods', CargoPaymentMethodDictViewSet, basename='dict-cargo-payment-methods')
+router.register('dicts/company-types', CompanyTypeDictViewSet, basename='dict-company-types')
+router.register('dicts/cargo-statuses', CargoStatusDictViewSet, basename='dict-cargo-statuses')
 
 urlpatterns = [
     # API routers

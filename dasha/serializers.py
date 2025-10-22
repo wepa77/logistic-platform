@@ -1,6 +1,10 @@
 from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
-from .models import User, Vehicle, Cargo, Offer, Shipment, Review, WalletTransaction, TopUpRequest
+from .models import User, Vehicle, Cargo, Offer, Shipment, Review, WalletTransaction, TopUpRequest, \
+    UserTypeDict, ShipmentPaymentTypeDict, ShipmentPaymentStatusDict, WalletTransactionTypeDict, \
+    VehicleBodyTypeDict, VehicleLoadTypeDict, VehicleTruckCategoryDict, VehicleRateTypeDict, \
+    CurrencyDict, CargoBodyTypeDict, CargoLoadTypeDict, CargoRateTypeDict, CargoPaymentMethodDict, \
+    CompanyTypeDict, CargoStatusDict
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -202,3 +206,86 @@ class UserTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['user_type']
+
+
+# --- Dictionary serializers (read-only) ---
+class DictionaryBaseSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ["id", "code", "name_tk", "name_ru", "name_en", "is_active", "ordering"]
+        read_only_fields = fields
+        extra_kwargs = {f: {"read_only": True} for f in fields}
+
+
+class UserTypeDictSerializer(DictionaryBaseSerializer):
+    class Meta(DictionaryBaseSerializer.Meta):
+        model = UserTypeDict
+
+
+class ShipmentPaymentTypeDictSerializer(DictionaryBaseSerializer):
+    class Meta(DictionaryBaseSerializer.Meta):
+        model = ShipmentPaymentTypeDict
+
+
+class ShipmentPaymentStatusDictSerializer(DictionaryBaseSerializer):
+    class Meta(DictionaryBaseSerializer.Meta):
+        model = ShipmentPaymentStatusDict
+
+
+class WalletTransactionTypeDictSerializer(DictionaryBaseSerializer):
+    class Meta(DictionaryBaseSerializer.Meta):
+        model = WalletTransactionTypeDict
+
+
+class VehicleBodyTypeDictSerializer(DictionaryBaseSerializer):
+    class Meta(DictionaryBaseSerializer.Meta):
+        model = VehicleBodyTypeDict
+
+
+class VehicleLoadTypeDictSerializer(DictionaryBaseSerializer):
+    class Meta(DictionaryBaseSerializer.Meta):
+        model = VehicleLoadTypeDict
+
+
+class VehicleTruckCategoryDictSerializer(DictionaryBaseSerializer):
+    class Meta(DictionaryBaseSerializer.Meta):
+        model = VehicleTruckCategoryDict
+
+
+class VehicleRateTypeDictSerializer(DictionaryBaseSerializer):
+    class Meta(DictionaryBaseSerializer.Meta):
+        model = VehicleRateTypeDict
+
+
+class CurrencyDictSerializer(DictionaryBaseSerializer):
+    class Meta(DictionaryBaseSerializer.Meta):
+        model = CurrencyDict
+
+
+class CargoBodyTypeDictSerializer(DictionaryBaseSerializer):
+    class Meta(DictionaryBaseSerializer.Meta):
+        model = CargoBodyTypeDict
+
+
+class CargoLoadTypeDictSerializer(DictionaryBaseSerializer):
+    class Meta(DictionaryBaseSerializer.Meta):
+        model = CargoLoadTypeDict
+
+
+class CargoRateTypeDictSerializer(DictionaryBaseSerializer):
+    class Meta(DictionaryBaseSerializer.Meta):
+        model = CargoRateTypeDict
+
+
+class CargoPaymentMethodDictSerializer(DictionaryBaseSerializer):
+    class Meta(DictionaryBaseSerializer.Meta):
+        model = CargoPaymentMethodDict
+
+
+class CompanyTypeDictSerializer(DictionaryBaseSerializer):
+    class Meta(DictionaryBaseSerializer.Meta):
+        model = CompanyTypeDict
+
+
+class CargoStatusDictSerializer(DictionaryBaseSerializer):
+    class Meta(DictionaryBaseSerializer.Meta):
+        model = CargoStatusDict

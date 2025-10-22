@@ -36,10 +36,10 @@
         <h3>{{ $t('forms.requirements') }}</h3>
         <div class="grid-2">
           <el-select v-model="form.body_type" :placeholder="$t('forms.bodyType') as string">
-            <el-option v-for="(label, value) in bodyTypes" :key="value" :label="label" :value="value" />
+            <el-option v-for="item in cargoBodyTypes" :key="item.code" :label="dictLabel(item)" :value="item.code" />
           </el-select>
           <el-checkbox-group v-model="form.load_types">
-            <el-checkbox v-for="(label, value) in loadTypes" :key="value" :label="value">{{ label }}</el-checkbox>
+            <el-checkbox v-for="item in cargoLoadTypes" :key="item.code" :label="item.code">{{ dictLabel(item) }}</el-checkbox>
           </el-checkbox-group>
         </div>
       </section>
@@ -94,10 +94,10 @@
         <!-- Load/unload types -->
         <div class="grid-2">
           <el-select v-model="form.load_type" :placeholder="$t('forms.loadTypes') as string">
-            <el-option v-for="(label, value) in loadTypes" :key="value" :label="label" :value="value" />
+            <el-option v-for="item in cargoLoadTypes" :key="item.code" :label="dictLabel(item)" :value="item.code" />
           </el-select>
           <el-select v-model="form.unload_type" :placeholder="$t('forms.unloadType') as string">
-            <el-option v-for="(label, value) in loadTypes" :key="value" :label="label" :value="value" />
+            <el-option v-for="item in cargoLoadTypes" :key="item.code" :label="dictLabel(item)" :value="item.code" />
           </el-select>
         </div>
 
@@ -128,10 +128,7 @@
 
         <div class="grid-2">
           <el-select v-model="form.rate_currency" :placeholder="$t('forms.currency') as string">
-            <el-option label="TMT" value="tmt" />
-            <el-option label="RUB" value="rub" />
-            <el-option label="USD" value="usd" />
-            <el-option label="EUR" value="eur" />
+            <el-option v-for="item in currencies" :key="item.code" :label="dictLabel(item)" :value="item.code" />
           </el-select>
 
           <div>
@@ -148,9 +145,7 @@
         <div class="grid-3">
           <el-input-number v-model="form.prepayment_percent" :min="0" :max="100" :placeholder="$t('forms.prepaymentPercent') as string" />
           <el-select v-model="form.payment_method" :placeholder="$t('forms.paymentMethod') as string">
-            <el-option label="Cash" value="cash" />
-            <el-option label="Bank" value="bank" />
-            <el-option label="Online" value="stripe" />
+            <el-option v-for="item in cargoPaymentMethods" :key="item.code" :label="dictLabel(item)" :value="item.code" />
           </el-select>
           <el-input-number v-model="form.payment_days" :min="0" :placeholder="$t('forms.paymentDays') as string" />
         </div>
@@ -167,10 +162,7 @@
 
         <div class="grid-2">
           <el-select v-model="form.company_type" :placeholder="$t('forms.companyType') as string">
-            <el-option label="ООО" value="ooo" />
-            <el-option label="ИП" value="ip" />
-            <el-option label="Физлицо" value="fl" />
-            <el-option label="Самозанятый" value="self" />
+            <el-option v-for="item in companyTypes" :key="item.code" :label="dictLabel(item)" :value="item.code" />
           </el-select>
           <el-input v-model="form.company_name" :placeholder="$t('forms.companyName') as string" />
         </div>
@@ -202,9 +194,11 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, computed } from 'vue'
+import { reactive, computed, ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { useI18n } from 'vue-i18n'
+import { getCargoBodyTypes, getCargoLoadTypes, getCurrencies, getCargoPaymentMethods, getCompanyTypes } from '@/api/dicts'
 
 interface CargoForm {
   // Cargo basics
@@ -356,25 +350,41 @@ const cargoTypes: Record<string, string> = {
   liquid: 'Жидкий',
 }
 
-const bodyTypes: Record<string, string> = {
-  tent: 'Тентованный',
-  refrigerator: 'Рефрижератор',
-  open: 'Открытый',
-  isotherm: 'Изотерм',
-  tank: 'Цистерна',
-  container: 'Контейнеровоз',
-  car_transporter: 'Автовоз',
-  other: 'Другое',
+// Dictionaries from backend
+import type { DictItem } from '@/api/dicts'
+const { locale } = useI18n()
+const cargoBodyTypes = ref<DictItem[]>([])
+const cargoLoadTypes = ref<DictItem[]>([])
+const currencies = ref<DictItem[]>([])
+const cargoPaymentMethods = ref<DictItem[]>([])
+const companyTypes = ref<DictItem[]>([])
+
+function dictLabel(item: DictItem) {
+  const loc = String(locale.value)
+  if (loc.startsWith('ru') && item.name_ru) return item.name_ru
+  if ((loc.startsWith('en') || loc.startsWith('us')) && item.name_en) return item.name_en
+  return item.name_tk
 }
 
-const loadTypes: Record<string, string> = {
-  top: 'Верхняя',
-  side: 'Боковая',
-  rear: 'Задняя',
-  full_open: 'Полное открытие',
-  crossbar_remove: 'Съём перекладин',
-  stand_remove: 'Съём стоек',
-}
+onMounted(async () => {
+  try {
+    const [bt, lt, cur, pm, ct] = await Promise.all([
+      getCargoBodyTypes(),
+      getCargoLoadTypes(),
+      getCurrencies(),
+      getCargoPaymentMethods(),
+      getCompanyTypes(),
+    ])
+    cargoBodyTypes.value = bt
+    cargoLoadTypes.value = lt
+    currencies.value = cur
+    cargoPaymentMethods.value = pm
+    companyTypes.value = ct
+  } catch (e) {
+    // Non-blocking: keep selects empty on failure
+    console.error('Failed to load dictionaries', e)
+  }
+})
 
 // Prefill from marketplace
 const route = useRoute()
@@ -417,8 +427,8 @@ function resetForm() {
 }
 
 function submitForm() {
-  if (!form.cargo_name || !form.pickup_address || !form.delivery_address || !form.pickup_date) {
-    ElMessage.error('Заполните обязательные поля: Наименование, адреса и дата погрузки')
+  if (!form.cargo_name || !form.pickup_address || !form.delivery_address) {
+    ElMessage.error('Заполните обязательные поля: Наименование и адреса')
     return
   }
   // Here you would call backend API to create cargo

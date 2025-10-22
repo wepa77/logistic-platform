@@ -433,3 +433,114 @@ class TopUpRequest(models.Model):
 
     def __str__(self):
         return f"Top-up {self.amount} TMT for {self.user}"
+
+
+# ============================
+# Dictionary models (3-language)
+# ============================
+class DictionaryBase(models.Model):
+    code = models.SlugField(max_length=50, unique=True)
+    name_tk = models.CharField(max_length=255)
+    name_ru = models.CharField(max_length=255, blank=True, null=True)
+    name_en = models.CharField(max_length=255, blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    ordering = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+        ordering = ("ordering", "code")
+
+    def __str__(self):
+        return f"{self.code} — {self.name_tk}"
+
+
+class UserTypeDict(DictionaryBase):
+    class Meta:
+        verbose_name = "Ulanyjy görnüşi sözlügi"
+        verbose_name_plural = "Ulanyjy görnüşleri sözlügi"
+
+
+class ShipmentPaymentTypeDict(DictionaryBase):
+    class Meta:
+        verbose_name = "Töleg görnüşi (Sargyt)"
+        verbose_name_plural = "Töleg görnüşleri (Sargyt)"
+
+
+class ShipmentPaymentStatusDict(DictionaryBase):
+    class Meta:
+        verbose_name = "Töleg ýagdaýy (Sargyt)"
+        verbose_name_plural = "Töleg ýagdaýlary (Sargyt)"
+
+
+class WalletTransactionTypeDict(DictionaryBase):
+    class Meta:
+        verbose_name = "Hasap-tranzaksiýa görnüşi"
+        verbose_name_plural = "Hasap-tranzaksiýa görnüşleri"
+
+
+class VehicleBodyTypeDict(DictionaryBase):
+    class Meta:
+        verbose_name = "Ulag kuzow görnüşi"
+        verbose_name_plural = "Ulag kuzow görnüşleri"
+
+
+class VehicleLoadTypeDict(DictionaryBase):
+    class Meta:
+        verbose_name = "Ulag ýükleme/düşürme görnüşi"
+        verbose_name_plural = "Ulag ýükleme/düşürme görnüşleri"
+
+
+class VehicleTruckCategoryDict(DictionaryBase):
+    class Meta:
+        verbose_name = "Ulag kategoriýasy"
+        verbose_name_plural = "Ulag kategoriýalary"
+
+
+class VehicleRateTypeDict(DictionaryBase):
+    class Meta:
+        verbose_name = "Ulag stawka görnüşi"
+        verbose_name_plural = "Ulag stawka görnüşleri"
+
+
+class CurrencyDict(DictionaryBase):
+    class Meta:
+        verbose_name = "Walýuta"
+        verbose_name_plural = "Walýutalar"
+
+
+class CargoBodyTypeDict(DictionaryBase):
+    class Meta:
+        verbose_name = "Ýük üçin kuzow görnüşi"
+        verbose_name_plural = "Ýük üçin kuzow görnüşleri"
+
+
+class CargoLoadTypeDict(DictionaryBase):
+    class Meta:
+        verbose_name = "Ýükleme / düşürme görnüşi"
+        verbose_name_plural = "Ýükleme / düşürme görnüşleri"
+
+
+class CargoRateTypeDict(DictionaryBase):
+    class Meta:
+        verbose_name = "Ýük stawka görnüşi"
+        verbose_name_plural = "Ýük stawka görnüşleri"
+
+
+class CargoPaymentMethodDict(DictionaryBase):
+    class Meta:
+        verbose_name = "Ýük töleg usuly"
+        verbose_name_plural = "Ýük töleg usullary"
+
+
+class CompanyTypeDict(DictionaryBase):
+    class Meta:
+        verbose_name = "Firma görnüşi"
+        verbose_name_plural = "Firma görnüşleri"
+
+
+class CargoStatusDict(DictionaryBase):
+    class Meta:
+        verbose_name = "Ýük ýagdaýy"
+        verbose_name_plural = "Ýük ýagdaýlary"

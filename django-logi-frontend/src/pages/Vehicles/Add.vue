@@ -21,10 +21,10 @@
         <h2>{{ $t('forms.requirements') }}</h2>
         <div class="grid-2">
           <el-select v-model="form.body_type" :placeholder="$t('forms.bodyType') as string">
-            <el-option v-for="(label, value) in bodyTypes" :key="value" :label="label" :value="value" />
+            <el-option v-for="item in vehicleBodyTypes" :key="item.code" :label="dictLabel(item)" :value="item.code" />
           </el-select>
           <el-checkbox-group v-model="form.load_types">
-            <el-checkbox v-for="(label, value) in loadTypes" :key="value" :label="value">{{ label }}</el-checkbox>
+            <el-checkbox v-for="item in vehicleLoadTypes" :key="item.code" :label="item.code">{{ dictLabel(item) }}</el-checkbox>
           </el-checkbox-group>
         </div>
 
@@ -67,7 +67,7 @@
           <el-input-number v-model="form.available_days" :min="1" placeholder="Сколько дней" />
         </div>
         <div class="grid-2">
-          <el-input v-model="form.location_from" placeholder="Откуда (населённый пункт)" />
+          <el-input v-model="form.location_from" :placeholder="$t('forms.locationFrom') as string" />
           <el-input v-model="form.possible_unload" placeholder="Возможная разгрузка" />
         </div>
         <div class="grid-2">
@@ -90,10 +90,7 @@
         </div>
         <div class="grid-2">
           <el-select v-model="form.rate_currency" placeholder="Валюта">
-            <el-option label="TMT" value="tmt" />
-            <el-option label="RUB" value="rub" />
-            <el-option label="USD" value="usd" />
-            <el-option label="EUR" value="eur" />
+            <el-option v-for="item in currencies" :key="item.code" :label="dictLabel(item)" :value="item.code" />
           </el-select>
           <div>
             <el-checkbox v-model="form.pay_to_card">на карту</el-checkbox>
@@ -108,10 +105,7 @@
         <el-checkbox v-model="form.is_private">Я — частное лицо</el-checkbox>
         <div class="grid-2">
           <el-select v-model="form.company_type" placeholder="Тип фирмы">
-            <el-option label="ООО" value="ooo" />
-            <el-option label="ИП" value="ip" />
-            <el-option label="Физлицо" value="fl" />
-            <el-option label="Самозанятый" value="self" />
+            <el-option v-for="item in companyTypes" :key="item.code" :label="dictLabel(item)" :value="item.code" />
           </el-select>
           <el-input v-model="form.company_name" placeholder="Название фирмы" />
         </div>
@@ -134,7 +128,7 @@
       <div class="submit-wrapper">
         <el-button type="primary" size="large" @click="submitForm">
           <i class="mdi mdi-truck-check"></i>
-          Опубликовать машину
+          {{ $t('forms.publishVehicle') }}
         </el-button>
       </div>
     </el-card>
@@ -142,9 +136,12 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, computed } from 'vue'
+import { reactive, computed, ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { useI18n } from 'vue-i18n'
+import { getVehicleBodyTypes, getVehicleLoadTypes, getCurrencies, getCompanyTypes } from '@/api/dicts'
+import type { DictItem } from '@/api/dicts'
 
 const form = reactive({
   // Body + loading
@@ -193,25 +190,35 @@ const form = reactive({
   stealth_mode: false,
 })
 
-const bodyTypes: Record<string, string> = {
-  tent: 'Тентованный',
-  refrigerator: 'Рефрижератор',
-  open: 'Открытый',
-  isotherm: 'Изотерм',
-  tank: 'Цистерна',
-  container: 'Контейнеровоз',
-  car_transporter: 'Автовоз',
-  other: 'Другое',
+const { locale } = useI18n()
+const vehicleBodyTypes = ref<DictItem[]>([])
+const vehicleLoadTypes = ref<DictItem[]>([])
+const currencies = ref<DictItem[]>([])
+const companyTypes = ref<DictItem[]>([])
+
+function dictLabel(item: DictItem) {
+  const loc = String(locale.value)
+  if (loc.startsWith('ru') && item.name_ru) return item.name_ru
+  if ((loc.startsWith('en') || loc.startsWith('us')) && item.name_en) return item.name_en
+  return item.name_tk
 }
 
-const loadTypes: Record<string, string> = {
-  back: 'задняя',
-  side: 'боковая',
-  top: 'верхняя',
-  removable_racks: 'со съемными стойками',
-  removable_crossbars: 'со снятием поперечных перекладин',
-  removable_racks_and_crossbars: 'со снятием стоек',
-}
+onMounted(async () => {
+  try {
+    const [bt, lt, cur, ct] = await Promise.all([
+      getVehicleBodyTypes(),
+      getVehicleLoadTypes(),
+      getCurrencies(),
+      getCompanyTypes(),
+    ])
+    vehicleBodyTypes.value = bt
+    vehicleLoadTypes.value = lt
+    currencies.value = cur
+    companyTypes.value = ct
+  } catch (e) {
+    console.error('Failed to load vehicle dictionaries', e)
+  }
+})
 
 // Prefill from marketplace
 const route = useRoute()
@@ -248,8 +255,8 @@ function resetForm() {
 
 function submitForm() {
   // Minimal validation
-  if (!form.body_type || !form.location_from) {
-    ElMessage.error('Заполните обязательные поля: Тип кузова и Откуда')
+  if (!form.location_from) {
+    ElMessage.error('Заполните обязательные поля: Откуда')
     return
   }
   // Here you can call your API to create vehicle offer

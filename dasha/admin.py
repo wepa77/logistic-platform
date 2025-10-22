@@ -1,6 +1,13 @@
 from django.contrib import admin
 from django.utils import timezone
-from .models import User, Vehicle, Cargo, Offer, Shipment, Review, WalletTransaction, TopUpRequest
+from .models import (
+    User, Vehicle, Cargo, Offer, Shipment, Review, WalletTransaction, TopUpRequest,
+    UserTypeDict, ShipmentPaymentTypeDict, ShipmentPaymentStatusDict,
+    WalletTransactionTypeDict, VehicleBodyTypeDict, VehicleLoadTypeDict,
+    VehicleTruckCategoryDict, VehicleRateTypeDict, CurrencyDict,
+    CargoBodyTypeDict, CargoLoadTypeDict, CargoRateTypeDict,
+    CargoPaymentMethodDict, CompanyTypeDict, CargoStatusDict,
+)
 
 
 @admin.register(User)
@@ -202,3 +209,28 @@ class TopUpRequestAdmin(admin.ModelAdmin):
     list_display = ("user", "amount", "stripe_session_id", "paid", "created_at")
     list_filter = ("paid",)
     search_fields = ("user__username", "stripe_session_id")
+
+
+# --- Dictionary Admins ---
+class DictionaryAdmin(admin.ModelAdmin):
+    list_display = ("code", "name_tk", "name_ru", "name_en", "is_active", "ordering")
+    list_filter = ("is_active",)
+    search_fields = ("code", "name_tk", "name_ru", "name_en")
+    ordering = ("ordering", "code")
+
+
+admin.site.register(UserTypeDict, DictionaryAdmin)
+admin.site.register(ShipmentPaymentTypeDict, DictionaryAdmin)
+admin.site.register(ShipmentPaymentStatusDict, DictionaryAdmin)
+admin.site.register(WalletTransactionTypeDict, DictionaryAdmin)
+admin.site.register(VehicleBodyTypeDict, DictionaryAdmin)
+admin.site.register(VehicleLoadTypeDict, DictionaryAdmin)
+admin.site.register(VehicleTruckCategoryDict, DictionaryAdmin)
+admin.site.register(VehicleRateTypeDict, DictionaryAdmin)
+admin.site.register(CurrencyDict, DictionaryAdmin)
+admin.site.register(CargoBodyTypeDict, DictionaryAdmin)
+admin.site.register(CargoLoadTypeDict, DictionaryAdmin)
+admin.site.register(CargoRateTypeDict, DictionaryAdmin)
+admin.site.register(CargoPaymentMethodDict, DictionaryAdmin)
+admin.site.register(CompanyTypeDict, DictionaryAdmin)
+admin.site.register(CargoStatusDict, DictionaryAdmin)
