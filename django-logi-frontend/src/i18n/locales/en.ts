@@ -435,7 +435,6 @@ export default {
     withoutBargain: 'no bargaining',
     mutualOffersOnly: 'Mutual offers only',
 
-    paymentTerms: 'Payment terms',
     prepaymentPercent: 'Prepayment (%)',
     paymentMethod: 'Payment method',
     paymentDays: 'Payment delay (days)',

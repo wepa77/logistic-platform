@@ -23,10 +23,12 @@ export const getUsers = (params?: any) => api.get("/users/", { params });
 
 /* ---------------- VEHICLES ---------------- */
 export const getVehicles = (params?: any) => api.get("/vehicles/", { params });
+export const getVehicle = (id: number) => api.get(`/vehicles/${id}/`);
 export const createVehicle = (data: FormData) => api.post("/vehicles/", data);
 export const updateVehicle = (id: number, data: FormData) =>
     api.put(`/vehicles/${id}/`, data);
 export const deleteVehicleApi = (id: number) => api.delete(`/vehicles/${id}/`);
+export const bulkCreateVehicles = (data: any) => api.post(`/vehicles/bulk/`, data);
 
 /* ---------------- CARGOS ---------------- */
 export const getCargos = (params?: any) => api.get("/cargos/", { params });

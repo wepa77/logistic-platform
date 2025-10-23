@@ -478,18 +478,18 @@ function generateMockCargos(): CargoItem[] {
     items.push({
       // legacy form props (unused in table)
       cargo_type: 'general',
-      cargo_name: cargoName || `Mock Cargo ${i + 1}`,
-      location_from: pickup,
+      cargo_name: String(cargoName || `Mock Cargo ${i + 1}`),
+      location_from: String(pickup),
       location_from_radius_km: fromRadius || 0,
-      possible_unload: delivery,
+      possible_unload: String(delivery),
       unload_radius_km: toRadius || 0,
       available_from: d1.toISOString(),
       available_days: 2,
 
       // table/API aligned
-      title: cargoName || `Mock Cargo ${i + 1}`,
-      pickup_address: pickup,
-      delivery_address: delivery,
+      title: String(cargoName || `Mock Cargo ${i + 1}`),
+      pickup_address: String(pickup),
+      delivery_address: String(delivery),
       pickup_date: d1.toISOString(),
       delivery_date: d2.toISOString(),
 
@@ -497,7 +497,7 @@ function generateMockCargos(): CargoItem[] {
       weight_kg: weight,
       volume_m3: volume,
       quantity: 1 + (i % 4),
-      body_type: bodyType || bodyKeys[i % bodyKeys.length],
+      body_type: String(bodyType || bodyKeys[i % bodyKeys.length]),
       load_types: [loadType || 'top'].filter(Boolean) as string[],
       length_m: null,
       width_m: null,
@@ -522,7 +522,7 @@ function generateMockCargos(): CargoItem[] {
       is_private: false,
       company_type: 'ooo',
       company_name: 'Demo LLC',
-      city: pickup,
+      city: String(pickup),
       contact_name: 'Dispatcher',
       contact_phone: '+99365000000',
       note: '',

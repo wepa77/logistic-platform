@@ -7,6 +7,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
+from django.db import transaction
 import stripe
 
 from .models import (
@@ -175,6 +176,62 @@ class VehicleViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+    @action(detail=False, methods=["post"], url_path="bulk")
+    def bulk_create(self, request):
+        """
+        Create multiple Vehicle records in one request.
+        Accepts either:
+        - {"base": {...}, "variations": [{...}, {...}]}
+        - {"items": [{...}, {...}]}
+        - or a raw list: [{...}, {...}]
+
+        For non-admin users, owner is forced to request.user even if owner_id is provided.
+        Admin/staff can assign owner via owner_id.
+        """
+        user = request.user
+        data = request.data
+        # Normalize input to a list of item dicts
+        if isinstance(data, list):
+            items = data
+        elif isinstance(data, dict) and "items" in data:
+            items = data.get("items") or []
+        elif isinstance(data, dict) and "variations" in data:
+            base = data.get("base") or {}
+            items = [
+                {**base, **(v or {})}
+                for v in (data.get("variations") or [])
+            ]
+        else:
+            return Response({"detail": "Invalid payload. Provide items[], or base+variations, or a list."}, status=400)
+
+        if not isinstance(items, list) or not items:
+            return Response({"detail": "No items to create."}, status=400)
+
+        created = []
+        errors = []
+        with transaction.atomic():
+            for idx, item in enumerate(items, start=1):
+                # Non-admin cannot set owner_id
+                can_assign_owner = bool(getattr(user, 'is_staff', False) or getattr(user, 'is_superuser', False) or getattr(user, 'user_type', None) == 'admin')
+                item_data = dict(item or {})
+                serializer = VehicleSerializer(data=item_data, context={"request": request})
+                if serializer.is_valid():
+                    if can_assign_owner and serializer.validated_data.get("owner"):
+                        instance = serializer.save()
+                    else:
+                        instance = serializer.save(owner=user)
+                    created.append(instance)
+                else:
+                    errors.append({"index": idx, "errors": serializer.errors})
+            if errors:
+                # Rollback all if any errors
+                transaction.set_rollback(True)
+                return Response({"errors": errors}, status=400)
+
+        # Serialize created
+        out = VehicleSerializer(created, many=True, context={"request": request}).data
+        return Response(out, status=201)
 
 
 # --- Cargo ---

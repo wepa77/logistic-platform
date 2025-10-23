@@ -106,8 +106,59 @@
     </div>
 
     <!-- Vehicles Table -->
-    <el-card class="table-card" shadow="never">
-      <el-table :data="filteredVehicles" style="width: 100%" class="modern-table">
+    <el-card v-if="!embedded" class="table-card" shadow="never">
+      <el-table :data="filteredVehicles" :loading="loading" style="width: 100%" class="modern-table" @row-click="tryOpenDetails">
+        <!-- New requested columns -->
+        <el-table-column label="Направл." min-width="220">
+          <template #default="{ row }">
+            <div class="route">
+              <span class="city">{{ fromCity(row) }}</span>
+              <span class="arrow">→</span>
+              <span class="city">{{ toCity(row) }}</span>
+            </div>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="Транспорт" min-width="200">
+          <template #default="{ row }">
+            <div class="transport">
+              <strong>{{ transportLabel(row) }}</strong>
+              <span v-if="row.capacity_kg">, {{ row.capacity_kg }} кг</span>
+              <span v-if="row.volume_m3">, {{ row.volume_m3 }} м³</span>
+            </div>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="Откуда" min-width="160">
+          <template #default="{ row }">
+            <div class="from">
+              <div class="city">{{ fromCity(row) }}</div>
+              <div class="note" v-if="availableFrom(row)">с {{ availableFrom(row) }}</div>
+            </div>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="Куда" min-width="160">
+          <template #default="{ row }">
+            <div class="to">
+              <div class="city">{{ toCity(row) }}</div>
+              <div class="note" v-if="availableDays(row)">до {{ availableDays(row) }} дн</div>
+            </div>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="Ставка" min-width="200">
+          <template #default="{ row }">
+            <div class="rate" v-if="hasAnyRate(row)">
+              <div v-if="row.rate_with_vat"><b>{{ row.rate_with_vat }}</b> {{ currencyCode(row) }} с НДС</div>
+              <div v-if="row.rate_without_vat"><b>{{ row.rate_without_vat }}</b> {{ currencyCode(row) }} без НДС</div>
+              <div v-if="row.rate_cash"><b>{{ row.rate_cash }}</b> {{ currencyCode(row) }} нал</div>
+              <div v-if="!row.rate_with_vat && !row.rate_without_vat && !row.rate_cash && genericRate(row) != null"><b>{{ genericRate(row) }}</b> {{ currencyCode(row) }}</div>
+            </div>
+            <div class="rate request" v-else>торг</div>
+          </template>
+        </el-table-column>
+
         <el-table-column prop="plate_number" label="Plate Number" width="140">
           <template #default="scope">
             <div class="plate-number">
@@ -213,6 +264,149 @@
           </template>
         </el-table-column>
       </el-table>
+      <div class="pagination-bar">
+        <el-pagination
+          v-model:current-page="page"
+          v-model:page-size="pageSize"
+          :page-sizes="[10, 20, 50]"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="total"
+          @current-change="onPageChange"
+          @size-change="onPageSizeChange"
+        />
+      </div>
+    </el-card>
+
+    <!-- Embedded search list redesigned to match screenshot -->
+    <el-card v-else class="table-card" shadow="never">
+      <div class="list-header">
+        <div class="lh-left"></div>
+        <div class="lh-col">Направл.</div>
+        <div class="lh-col">Транспорт</div>
+        <div class="lh-col">Откуда</div>
+        <div class="lh-col">Куда</div>
+        <div class="lh-col">Ставка</div>
+        <div class="lh-right"></div>
+      </div>
+      <div class="results-list">
+        <div
+          v-for="item in filteredVehicles"
+          :key="item.id || item.plate_number"
+          class="result-row"
+        >
+          <div class="row-h">
+            <!-- Left: checkbox + country badge -->
+            <div class="col-left">
+              <el-checkbox v-model="rowSelection[rowKey(item)]" @click.stop />
+            </div>
+
+            <!-- 5 columns content on gray background -->
+            <div class="col-main" @click="tryOpenDetails(item)">
+              <div class="cell dir">
+                <span class="city">{{ fromCity(item) }}</span>
+                <span class="arrow">→</span>
+                <span class="city">{{ toCity(item) }}</span>
+              </div>
+              <div class="cell transport">
+                <strong>{{ transportLabel(item) || 'Транспорт' }}</strong>
+                <span v-if="item.capacity_kg">, {{ item.capacity_kg }} т</span>
+                <span v-if="item.volume_m3">, {{ item.volume_m3 }} м³</span>
+                <span v-if="item.length_m || item.width_m || item.height_m" class="dims">
+                  • {{ item.length_m || '—' }}×{{ item.width_m || '—' }}×{{ item.height_m || '—' }} м
+                </span>
+              </div>
+              <div class="cell from">
+                <div class="city">{{ fromCity(item) }}</div>
+                <div class="note" v-if="availableFrom(item)">постоянно ежедневно</div>
+              </div>
+              <div class="cell to">
+                <div class="city">{{ toCity(item) }}</div>
+                <div class="variants" v-if="getUnloadVariants(item).length">
+                  <div class="variants-title">Возможные варианты разгрузки</div>
+                  <div class="variants-list">
+                    <template v-for="city in visibleUnloadVariants(item)" :key="city">
+                      <div class="variant">{{ city }}</div>
+                    </template>
+                    <el-link
+                      v-if="getUnloadVariants(item).length > maxVisibleUnloads"
+                      type="primary"
+                      :underline="false"
+                      @click.stop="toggleUnloads(item)"
+                      class="more-link-inline"
+                    >{{ isUnloadsExpanded(item) ? 'Скрыть' : 'Еще' }}</el-link>
+                  </div>
+                </div>
+              </div>
+              <div class="cell rate">
+                <div v-if="hasAnyRate(item)">
+                  <div v-if="item.rate_with_vat"><b>{{ item.rate_with_vat }}</b> {{ currencyCode(item) }} с НДС</div>
+                  <div v-if="item.rate_without_vat"><b>{{ item.rate_without_vat }}</b> {{ currencyCode(item) }} без НДС</div>
+                  <div v-if="item.rate_cash"><b>{{ item.rate_cash }}</b> {{ currencyCode(item) }} нал</div>
+                  <div v-if="!item.rate_with_vat && !item.rate_without_vat && !item.rate_cash && genericRate(item) != null"><b>{{ genericRate(item) }}</b> {{ currencyCode(item) }}</div>
+                </div>
+                <div v-else class="rate request">торг</div>
+                <div class="rate-extra">
+                  <el-link type="primary" :underline="false" @click.stop>Отправить предложение</el-link>
+                  <div v-if="item.verified_ts || item.has_verified_ts" class="verified-badge">
+                    <i class="mdi mdi-truck-check-outline"></i>
+                    есть подтвержденные ТС
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right action icons -->
+            <div class="col-right">
+              <div class="col-right-inner">
+                <div class="right-top">
+                  <el-button circle size="small" type="primary" plain @click.stop="tryOpenDetails(item)">
+                    <i class="mdi mdi-message-text-outline"></i>
+                  </el-button>
+                  <el-button circle size="small" type="warning" plain @click.stop>
+                    <i class="mdi mdi-close"></i>
+                  </el-button>
+                </div>
+                <el-link class="complaint-link" :underline="false" type="info" @click.stop>Жалоба</el-link>
+              </div>
+            </div>
+
+            <!-- Side meta: timestamps like on screenshot -->
+            <div class="col-meta">
+              <div class="meta-time">
+                <div class="time-line">изм <span class="time-strong">{{ formatTimeHM(item.updated_at) || '—' }}</span></div>
+                <div class="time-line">доб <span class="time-strong">{{ formatDateDM(item.created_at) || '—' }}</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom line with button and contact -->
+          <div class="row-bottom">
+            <div class="left-actions">
+              <el-button size="small" type="primary" plain @click.stop="tryOpenDetails(item)">
+                <i class="mdi mdi-phone"></i>
+                ОТКРЫТЬ ПОЛНУЮ ИНФОРМАЦИЮ
+              </el-button>
+              <span class="hint">Доступно бесплатно после полной регистрации</span>
+            </div>
+            <div class="company" v-if="item.company_name || item.contact_phone">
+              <div class="name">{{ item.company_name || '—' }}</div>
+              <div class="contact" v-if="item.contact_phone"><i class="mdi mdi-phone"></i> {{ item.contact_phone }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pagination-bar">
+          <el-pagination
+            v-model:current-page="page"
+            v-model:page-size="pageSize"
+            :page-sizes="[10, 20, 50]"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="total"
+            @current-change="onPageChange"
+            @size-change="onPageSizeChange"
+          />
+        </div>
+      </div>
     </el-card>
 
     <!-- Modern Dialog for create/update -->
@@ -311,14 +505,144 @@
         </div>
       </template>
     </el-dialog>
+
+    <!-- Access Guard Dialog (profile info) -->
+    <el-dialog v-model="guardVisible" title="Укажите данные, чтобы продолжить" width="640px">
+      <el-form label-position="top" class="guard-form">
+        <div class="guard-grid">
+          <el-form-item label="Город*">
+            <el-input v-model="guardForm.city" placeholder="Например: Ашхабад" />
+          </el-form-item>
+          <el-form-item label="Вы">
+            <el-radio-group v-model="guardForm.orgType" class="org-type">
+              <el-radio-button label="ooo">ООО</el-radio-button>
+              <el-radio-button label="ip">ИП</el-radio-button>
+              <el-radio-button label="fl">Физлицо</el-radio-button>
+              <el-radio-button label="self">Самозанятый</el-radio-button>
+              <el-radio-button label="other">Другое</el-radio-button>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="Название фирмы">
+            <el-input v-model="guardForm.companyName" placeholder="ООО Пример" />
+          </el-form-item>
+          <el-form-item label="Ф.И.О.*">
+            <el-input v-model="guardForm.fullName" placeholder="Ваше имя и фамилия" />
+          </el-form-item>
+          <el-form-item label="Email">
+            <el-input v-model="guardForm.email" placeholder="you@example.com" />
+          </el-form-item>
+          <el-form-item label="Моб. телефон*">
+            <el-input v-model="guardForm.phone" placeholder="+993 6x xxx-xx-xx" />
+          </el-form-item>
+          <div class="guard-hint">Данные будут сохранены локально и использованы для связи по объявлениям.</div>
+        </div>
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="guardVisible = false">Отмена</el-button>
+          <el-button type="primary" @click="submitGuard">Продолжить</el-button>
+        </div>
+      </template>
+    </el-dialog>
+
+    <!-- Vehicle Details Drawer -->
+    <el-drawer v-model="detailVisible" :with-header="true" title="Vehicle Details" size="40%">
+      <div class="details" v-loading="detailLoading">
+        <div class="details-row">
+          <div class="details-label">Plate Number</div>
+          <div class="details-value">{{ detailData?.plate_number || '—' }}</div>
+        </div>
+        <div class="details-row">
+          <div class="details-label">Vehicle Info</div>
+          <div class="details-value">{{ (detailData?.brand || '') + ' ' + (detailData?.model || '') }}<span v-if="detailData?.year"> • {{ detailData?.year }}</span><span v-if="detailData?.truck_type"> • {{ detailData?.truck_type }}</span></div>
+        </div>
+        <div class="details-row">
+          <div class="details-label">Specifications</div>
+          <div class="details-value">
+            <div class="spec-line"><i class="mdi mdi-weight-kilogram"></i> {{ detailData?.capacity_kg ?? '—' }} kg</div>
+            <div class="spec-line"><i class="mdi mdi-cube-outline"></i> {{ detailData?.volume_m3 ?? '—' }} m³</div>
+            <div class="spec-line" v-if="detailData && (detailData.length_m || detailData.width_m || detailData.height_m)">
+              <i class="mdi mdi-ruler"></i>
+              {{ detailData.length_m ?? '—' }} × {{ detailData.width_m ?? '—' }} × {{ detailData.height_m ?? '—' }} m
+            </div>
+          </div>
+        </div>
+        <div class="details-row">
+          <div class="details-label">GPS</div>
+          <div class="details-value">
+            <el-tag :type="detailData?.gps_enabled ? 'success' : 'info'">
+              <i :class="detailData?.gps_enabled ? 'mdi mdi-map-marker-check' : 'mdi mdi-map-marker-off'"></i>
+              {{ detailData?.gps_enabled ? 'Enabled' : 'Disabled' }}
+            </el-tag>
+          </div>
+        </div>
+        <div class="details-row">
+          <div class="details-label">Photo</div>
+          <div class="details-value">
+            <el-image v-if="detailData?.photo" :src="detailData.photo" :preview-src-list="[detailData.photo]" style="width: 320px; height: 200px; object-fit: cover; border-radius: 8px" />
+            <div v-else class="image-placeholder"><i class="mdi mdi-truck"></i></div>
+          </div>
+        </div>
+        <div class="details-row" v-if="detailData?.location_from || detailData?.possible_unload">
+          <div class="details-label">Route</div>
+          <div class="details-value">
+            <div class="spec-line"><i class="mdi mdi-map-marker"></i> {{ detailData?.location_from || '—' }} → {{ detailData?.possible_unload || '—' }}</div>
+            <div class="spec-line" v-if="detailData?.location_from_radius_km || detailData?.unload_radius_km">
+              <i class="mdi mdi-radar"></i>
+              Radius: {{ detailData?.location_from_radius_km ?? '—' }} km / {{ detailData?.unload_radius_km ?? '—' }} km
+            </div>
+          </div>
+        </div>
+        <div class="details-row" v-if="detailData?.available_from || detailData?.available_days">
+          <div class="details-label">Availability</div>
+          <div class="details-value">
+            <div class="spec-line"><i class="mdi mdi-calendar-clock"></i> From: {{ detailData?.available_from || '—' }}<span v-if="detailData?.available_days"> • Days: {{ detailData?.available_days }}</span></div>
+          </div>
+        </div>
+        <div class="details-row" v-if="detailData?.rate_with_vat || detailData?.rate_without_vat || detailData?.rate_cash || detailData?.rate_currency">
+          <div class="details-label">Rates & Payment</div>
+          <div class="details-value">
+            <div class="spec-line" v-if="detailData?.rate_with_vat"><i class="mdi mdi-cash-multiple"></i> With VAT: <b>{{ detailData.rate_with_vat }}</b> {{ (detailData.rate_currency && detailData.rate_currency.toUpperCase) ? detailData.rate_currency.toUpperCase() : (detailData.rate_currency || '') }}</div>
+            <div class="spec-line" v-if="detailData?.rate_without_vat"><i class="mdi mdi-cash"></i> Without VAT: <b>{{ detailData.rate_without_vat }}</b> {{ (detailData.rate_currency && detailData.rate_currency.toUpperCase) ? detailData.rate_currency.toUpperCase() : (detailData.rate_currency || '') }}</div>
+            <div class="spec-line" v-if="detailData?.rate_cash"><i class="mdi mdi-cash-fast"></i> Cash: <b>{{ detailData.rate_cash }}</b> {{ (detailData.rate_currency && detailData.rate_currency.toUpperCase) ? detailData.rate_currency.toUpperCase() : (detailData.rate_currency || '') }}</div>
+            <div class="spec-line" v-if="detailData?.pay_to_card"><i class="mdi mdi-credit-card"></i> Pay to card</div>
+            <div class="spec-line" v-if="detailData?.without_bargain"><i class="mdi mdi-lock"></i> Without bargain</div>
+          </div>
+        </div>
+        <div class="details-row" v-if="detailData?.has_adr || detailData?.has_lift || detailData?.has_horses || detailData?.partial_load">
+          <div class="details-label">Features</div>
+          <div class="details-value">
+            <el-tag v-if="detailData?.has_adr" type="warning" effect="plain"><i class="mdi mdi-biohazard"></i> ADR</el-tag>
+            <el-tag v-if="detailData?.has_lift" type="info" effect="plain" style="margin-left:6px"><i class="mdi mdi-elevator-passenger-outline"></i> Lift</el-tag>
+            <el-tag v-if="detailData?.has_horses" type="info" effect="plain" style="margin-left:6px"><i class="mdi mdi-fence"></i> Stakes</el-tag>
+            <el-tag v-if="detailData?.partial_load" type="success" effect="plain" style="margin-left:6px"><i class="mdi mdi-truck-outline"></i> Partial load</el-tag>
+          </div>
+        </div>
+        <div class="details-row" v-if="detailData?.company_name || detailData?.contact_phone || detailData?.city">
+          <div class="details-label">Company</div>
+          <div class="details-value">
+            <div class="spec-line" v-if="detailData?.company_name"><i class="mdi mdi-domain"></i> {{ detailData.company_name }}</div>
+            <div class="spec-line" v-if="detailData?.city"><i class="mdi mdi-city"></i> {{ detailData.city }}</div>
+            <div class="spec-line" v-if="detailData?.contact_phone"><i class="mdi mdi-phone"></i> {{ detailData.contact_phone }}</div>
+          </div>
+        </div>
+        <div class="details-row" v-if="detailData?.updated_at || detailData?.created_at">
+          <div class="details-label">Meta</div>
+          <div class="details-value">
+            <div class="spec-line" v-if="detailData?.updated_at"><i class="mdi mdi-update"></i> Updated: {{ detailData.updated_at }}</div>
+            <div class="spec-line" v-if="detailData?.created_at"><i class="mdi mdi-calendar-plus"></i> Created: {{ detailData.created_at }}</div>
+          </div>
+        </div>
+      </div>
+    </el-drawer>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, onMounted, computed, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { getVehicles, createVehicle, updateVehicle, deleteVehicleApi } from '@/api/api'
+import { getVehicles, getVehicle, createVehicle, updateVehicle, deleteVehicleApi } from '@/api/api'
 
 const { embedded = false } = defineProps<{ embedded?: boolean }>()
 
@@ -333,13 +657,54 @@ interface Vehicle {
   truck_type: string
   gps_enabled: boolean
   photo?: string
-}
+  // Additional optional fields that may come from backend
+  length_m?: number | null
+  width_m?: number | null
+  height_m?: number | null
+  location_from?: string | null
+  possible_unload?: string | null
+  location_from_radius_km?: number | null
+  unload_radius_km?: number | null
+  available_from?: string | null
+  available_days?: number | null
+  rate_with_vat?: number | null
+  rate_without_vat?: number | null
+  rate_cash?: number | null
+  rate_currency?: string | null
+  pay_to_card?: boolean | null
+  without_bargain?: boolean | null
+  partial_load?: boolean | null
+  has_adr?: boolean | null
+  has_lift?: boolean | null
+  has_horses?: boolean | null
+  company_name?: string | null
+  contact_phone?: string | null
+  city?: string | null
+  updated_at?: string | null
+  created_at?: string | null
+  // Optional enhanced destination variants
+  unload_variants?: string[] | null
+  possible_unload_variants?: string[] | null
+  unload_variants_text?: string | null
+  // UI badges/labels
+  country_code?: string | null
+  priority?: string | number | null
+  // Verification
+  verified_ts?: boolean | null
+  has_verified_ts?: boolean | null
+ }
 
 const vehicles = ref<Vehicle[]>([])
 const dialogVisible = ref(false)
 const searchQuery = ref('')
 const typeFilter = ref('')
 const gpsFilter = ref('')
+
+// Pagination & loading
+const loading = ref(false)
+const page = ref(Number((useRoute().query.page as string) || 1))
+const pageSize = ref(Number((useRoute().query.page_size as string) || 10))
+const total = ref(0)
 
 // Prefilter summary from marketplace route query
 const route = useRoute()
@@ -407,9 +772,131 @@ const filteredVehicles = computed(() => {
   return filtered
 })
 
+// ---- Unload variants helpers (embedded list) ----
+const maxVisibleUnloads = 2
+const expandedUnloads = ref<Record<string, boolean>>({})
+const rowSelection = ref<Record<string, boolean>>({})
+
+function rowKey(item: any): string {
+  return String(item?.id ?? item?.plate_number ?? Math.random())
+}
+
+function getUnloadVariants(item: any): string[] {
+  if (!item) return []
+  const arr = (item.unload_variants || item.possible_unload_variants) as any
+  if (Array.isArray(arr)) return arr.filter(Boolean)
+  const text = (item.unload_variants_text || '') as string
+  if (typeof text === 'string' && text.trim()) {
+    return text.split(/[,;\n]/).map(s => s.trim()).filter(Boolean)
+  }
+  return []
+}
+
+function isUnloadsExpanded(item: any): boolean {
+  return !!expandedUnloads.value[rowKey(item)]
+}
+
+function visibleUnloadVariants(item: any): string[] {
+  const list = getUnloadVariants(item)
+  if (!list.length) return []
+  return isUnloadsExpanded(item) ? list : list.slice(0, maxVisibleUnloads)
+}
+
+function toggleUnloads(item: any) {
+  const key = rowKey(item)
+  expandedUnloads.value[key] = !expandedUnloads.value[key]
+}
+
+// ---- Display helpers to normalize backend field names ----
+function pick(row: any, keys: string[], fallback: string = '—'): any {
+  if (!row) return fallback
+  for (const k of keys) {
+    const v = row[k]
+    if (v !== undefined && v !== null && String(v).toString().trim() !== '') return v
+  }
+  return fallback
+}
+
+function fromCity(row: any): string {
+  return String(pick(row, ['location_from','from','from_city','pickup_address','load_city','city']))
+}
+function toCity(row: any): string {
+  return String(pick(row, ['possible_unload','to','to_city','delivery_address','unload_city','unload']))
+}
+function transportLabel(row: any): string {
+  const val = pick(row, ['truck_type','truck_category','body_type','vehicle_type','type'], '—')
+  return String(val)
+}
+function availableFrom(row: any): string | '' {
+  const v = pick(row, ['available_from','ready_from','ready_date','availableDate','available'], '')
+  return String(v || '')
+}
+function availableDays(row: any): number | '' {
+  const v = pick(row, ['available_days','days_available','available_for_days'], '')
+  return v === '' ? '' : Number(v)
+}
+function currencyCode(row: any): string {
+  const c = pick(row, ['rate_currency','currency'], '')
+  return c ? String(c).toUpperCase() : ''
+}
+function hasAnyRate(row: any): boolean {
+  return !!(row?.rate_with_vat || row?.rate_without_vat || row?.rate_cash || row?.rate || row?.price)
+}
+function genericRate(row: any): number | null {
+  const v = row?.rate ?? row?.price ?? null
+  return v != null ? Number(v) : null
+}
+
+function formatTimeHM(v?: any): string {
+  if (!v) return ''
+  try {
+    const d = new Date(v)
+    return d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
+  } catch {
+    return ''
+  }
+}
+function formatDateDM(v?: any): string {
+  if (!v) return ''
+  try {
+    const d = new Date(v)
+    // e.g., "11 авг"
+    const day = d.toLocaleDateString('ru-RU', { day: '2-digit' })
+    const mon = d.toLocaleDateString('ru-RU', { month: 'short' }).replace('.', '')
+    return `${day} ${mon}`
+  } catch {
+    return ''
+  }
+}
+
 async function fetchVehicles() {
-  const { data } = await getVehicles()
-  vehicles.value = data
+  loading.value = true
+  try {
+    // Build params from route.query + pagination
+    const q = route.query as Record<string, any>
+    const params: Record<string, any> = { ...q }
+    params.page = page.value
+    params.page_size = pageSize.value
+
+    // Normalize booleans that may come as '1' from Search page
+    ;['has_adr','has_lift','has_horses','has_gps','partial_load','without_bargain','pay_to_card'].forEach(k => {
+      if (params[k] === '1' || params[k] === 'true') params[k] = 1
+    })
+
+    const { data } = await getVehicles(params)
+    if (Array.isArray(data)) {
+      vehicles.value = data as any
+      total.value = data.length
+    } else if (data && typeof data === 'object' && 'results' in data) {
+      vehicles.value = (data as any).results
+      total.value = Number((data as any).count || 0)
+    } else {
+      vehicles.value = []
+      total.value = 0
+    }
+  } finally {
+    loading.value = false
+  }
 }
 
 function openDialog(vehicle?: Vehicle) {
@@ -459,7 +946,98 @@ async function deleteVehicle(id: number) {
   await fetchVehicles()
 }
 
+// Details drawer state and handler
+const detailVisible = ref(false)
+const detailLoading = ref(false)
+const detailData = ref<any | null>(null)
+
+async function onRowClick(row: any) {
+  detailVisible.value = true
+  detailData.value = row
+  if (row && row.id) {
+    detailLoading.value = true
+    try {
+      const { data } = await getVehicle(row.id)
+      // Merge to preserve any client-only fields
+      detailData.value = { ...row, ...data }
+    } catch (e) {
+      // Non-blocking: show what we have
+    } finally {
+      detailLoading.value = false
+    }
+  }
+}
+
+const router = useRouter()
+
+// Sync when route.query changes (filters or page)
+watch(() => route.query, () => {
+  page.value = Number((route.query.page as string) || 1)
+  pageSize.value = Number((route.query.page_size as string) || pageSize.value)
+  fetchVehicles()
+})
+
+function onPageChange(p: number) {
+  router.push({ query: { ...route.query, page: String(p) } })
+}
+function onPageSizeChange(ps: number) {
+  router.push({ query: { ...route.query, page: '1', page_size: String(ps) } })
+}
+
 onMounted(fetchVehicles)
+
+// -------- Guard dialog logic --------
+const guardVisible = ref(false)
+const guardForm = ref({
+  city: '',
+  orgType: 'ooo',
+  companyName: '',
+  fullName: '',
+  email: '',
+  phone: ''
+})
+const pendingRow = ref<any | null>(null)
+
+function isProfileCompleted(): boolean {
+  return localStorage.getItem('profileCompleted') === '1'
+}
+
+async function tryOpenDetails(row: any) {
+  if (!isProfileCompleted()) {
+    pendingRow.value = row
+    guardVisible.value = true
+  } else {
+    await onRowClick(row)
+  }
+}
+
+function submitGuard() {
+  // minimal validation
+  if (!guardForm.value.city || !guardForm.value.fullName || !guardForm.value.phone) {
+    ElMessage.error('Заполните обязательные поля: Город, Ф.И.О. и телефон')
+    return
+  }
+  try {
+    const data = {
+      city: guardForm.value.city,
+      orgType: guardForm.value.orgType,
+      companyName: guardForm.value.companyName,
+      fullName: guardForm.value.fullName,
+      email: guardForm.value.email,
+      phone: guardForm.value.phone,
+    }
+    localStorage.setItem('profileData', JSON.stringify(data))
+    localStorage.setItem('profileCompleted', '1')
+  } catch (e) {
+    // ignore storage errors
+  }
+  guardVisible.value = false
+  if (pendingRow.value) {
+    const row = pendingRow.value
+    pendingRow.value = null
+    tryOpenDetails(row) // now it will pass
+  }
+}
 </script>
 
 <style scoped>
@@ -921,4 +1499,79 @@ onMounted(fetchVehicles)
     grid-template-columns: 1fr;
   }
 }
+/* Embedded results list styles */
+.list-header {
+  display: grid;
+  grid-template-columns: 80px repeat(5, 1fr) 80px 160px;
+  gap: 8px;
+  padding: 6px 12px;
+  color: #6b7280;
+  font-size: 12px;
+  border: 1px solid #e5e7eb;
+  border-bottom: none;
+  border-radius: 10px 10px 0 0;
+  background: #fff;
+}
+.lh-col { text-transform: none; }
+.results-list { display: flex; flex-direction: column; gap: 10px; }
+.result-row { border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; background: #fff; }
+.result-row:hover { box-shadow: 0 4px 12px rgba(0,0,0,.06); }
+
+/* Horizontal row layout to match screenshot */
+.row-h { display: grid; grid-template-columns: 80px 1fr 100px 160px; align-items: stretch; gap: 0; }
+.col-left { display: flex; align-items: center; gap: 8px; padding: 12px; }
+.country-badge { font-size: 12px; background: #f3f4f6; border: 1px solid #e5e7eb; color: #111827; padding: 2px 6px; border-radius: 4px; }
+.col-main { background: #f6f7f9; display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; padding: 10px 12px; }
+.col-right { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px; }
+.col-meta { display: flex; flex-direction: column; justify-content: center; align-items: flex-end; padding: 10px 12px; color: #6b7280; font-size: 12px; }
+.meta-title { margin-bottom: 4px; }
+.meta-value { color: #64748b; }
+.meta-time { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.meta-time .time-line { color: #6b7280; }
+.meta-time .time-strong { color: #111827; font-weight: 600; }
+
+.cell { color: #111827; font-size: 14px; }
+.cell .city { font-weight: 600; }
+.cell .note { font-size: 12px; color: #64748b; }
+.transport strong { font-weight: 700; }
+.transport .dims { color: #64748b; margin-left: 6px; }
+.features { display: inline-flex; gap: 6px; margin-left: 8px; color: #94a3b8; }
+.feature.success { color: #10b981; }
+.arrow { text-align: center; color: #64748b; margin: 0 6px; }
+.rate { font-size: 14px; color: #111827; }
+.rate.request { color: #f59e0b; font-weight: 700; }
+.rate-extra { margin-top: 6px; display: flex; flex-direction: column; gap: 4px; }
+.verified-badge { display: inline-flex; align-items: center; gap: 6px; color: #10b981; font-size: 12px; }
+.verified-badge i { font-size: 16px; }
+.col-right-inner { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.right-top { display: flex; gap: 8px; }
+.complaint-link { font-size: 12px; color: #6b7280; }
+
+.row-bottom { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; }
+.left-actions { display: flex; align-items: center; gap: 10px; }
+.left-actions .hint { color: #9ca3af; font-size: 12px; }
+.company .name { font-weight: 600; }
+.company .contact { color: #64748b; font-size: 13px; }
+.time { font-size: 12px; color: #64748b; }
+
+/* Unload variants block */
+.variants { margin-top: 6px; }
+.variants-title { color: #6b7280; font-size: 12px; }
+.variants-list { display: flex; flex-direction: column; gap: 2px; }
+.variant { color: #111827; font-size: 13px; }
+.more-link-inline { padding-left: 0; }
+
+/* Details Drawer tweaks */
+.details { display: flex; flex-direction: column; gap: 12px; }
+.details-row { display: flex; gap: 16px; align-items: flex-start; }
+.details-label { width: 140px; font-weight: 600; color: #334155; }
+.details-value { flex: 1; color: #0f172a; }
+.spec-line { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; color: #475569; }
+
+@media (max-width: 1024px) {
+  .row-h { grid-template-columns: 60px 1fr; }
+  .col-right, .col-meta { display: none; }
+  .col-main { grid-template-columns: 1fr; }
+}
+
 </style>
