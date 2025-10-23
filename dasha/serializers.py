@@ -4,7 +4,7 @@ from .models import User, Vehicle, Cargo, Offer, Shipment, Review, WalletTransac
     UserTypeDict, ShipmentPaymentTypeDict, ShipmentPaymentStatusDict, WalletTransactionTypeDict, \
     VehicleBodyTypeDict, VehicleLoadTypeDict, VehicleTruckCategoryDict, VehicleRateTypeDict, \
     CurrencyDict, CargoBodyTypeDict, CargoLoadTypeDict, CargoRateTypeDict, CargoPaymentMethodDict, \
-    CompanyTypeDict, CargoStatusDict
+    CompanyTypeDict, CargoStatusDict, CargoTypeDict, ReadyStatusDict, VehicleTruckTypeDict
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -289,3 +289,18 @@ class CompanyTypeDictSerializer(DictionaryBaseSerializer):
 class CargoStatusDictSerializer(DictionaryBaseSerializer):
     class Meta(DictionaryBaseSerializer.Meta):
         model = CargoStatusDict
+
+
+class CargoTypeDictSerializer(DictionaryBaseSerializer):
+    class Meta(DictionaryBaseSerializer.Meta):
+        model = CargoTypeDict
+
+
+class ReadyStatusDictSerializer(DictionaryBaseSerializer):
+    class Meta(DictionaryBaseSerializer.Meta):
+        model = ReadyStatusDict
+
+
+class VehicleTruckTypeDictSerializer(DictionaryBaseSerializer):
+    class Meta(DictionaryBaseSerializer.Meta):
+        model = VehicleTruckTypeDict

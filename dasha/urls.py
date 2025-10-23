@@ -16,7 +16,8 @@ from .views import (
     WalletTransactionTypeDictViewSet, VehicleBodyTypeDictViewSet, VehicleLoadTypeDictViewSet,
     VehicleTruckCategoryDictViewSet, VehicleRateTypeDictViewSet, CurrencyDictViewSet,
     CargoBodyTypeDictViewSet, CargoLoadTypeDictViewSet, CargoRateTypeDictViewSet,
-    CargoPaymentMethodDictViewSet, CompanyTypeDictViewSet, CargoStatusDictViewSet
+    CargoPaymentMethodDictViewSet, CompanyTypeDictViewSet, CargoStatusDictViewSet,
+    CargoTypeDictViewSet, ReadyStatusDictViewSet, VehicleTruckTypeDictViewSet
 )
 
 # DRF Router
@@ -46,6 +47,9 @@ router.register('dicts/cargo-rate-types', CargoRateTypeDictViewSet, basename='di
 router.register('dicts/cargo-payment-methods', CargoPaymentMethodDictViewSet, basename='dict-cargo-payment-methods')
 router.register('dicts/company-types', CompanyTypeDictViewSet, basename='dict-company-types')
 router.register('dicts/cargo-statuses', CargoStatusDictViewSet, basename='dict-cargo-statuses')
+router.register('dicts/cargo-types', CargoTypeDictViewSet, basename='dict-cargo-types')
+router.register('dicts/ready-statuses', ReadyStatusDictViewSet, basename='dict-ready-statuses')
+router.register('dicts/vehicle-truck-types', VehicleTruckTypeDictViewSet, basename='dict-vehicle-truck-types')
 
 urlpatterns = [
     # API routers

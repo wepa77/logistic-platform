@@ -28,11 +28,9 @@
           </el-checkbox-group>
         </div>
 
-        <div class="extras">
-          <el-checkbox v-model="form.half_trailer">Полуприцеп</el-checkbox>
-          <el-checkbox v-model="form.is_truck">Грузовик</el-checkbox>
-          <el-checkbox v-model="form.is_scene">Сцепка</el-checkbox>
-        </div>
+        <el-select v-model="form.truck_category" placeholder="Тип транспорта">
+            <el-option v-for="item in vehicleTruckCategories" :key="item.code" :label="dictLabel(item)" :value="item.code" />
+          </el-select>
 
         <div class="extras">
           <el-checkbox v-model="form.has_lift">{{ $t('forms.hydrolift') }}</el-checkbox>
@@ -140,16 +138,14 @@ import { reactive, computed, ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useI18n } from 'vue-i18n'
-import { getVehicleBodyTypes, getVehicleLoadTypes, getCurrencies, getCompanyTypes } from '@/api/dicts'
+import { getVehicleBodyTypes, getVehicleLoadTypes, getCurrencies, getCompanyTypes, getVehicleTruckCategories } from '@/api/dicts'
 import type { DictItem } from '@/api/dicts'
 
 const form = reactive({
   // Body + loading
   body_type: '',
   load_types: [] as string[],
-  half_trailer: true,
-  is_truck: false,
-  is_scene: false,
+  truck_category: 'truck',
   has_lift: false,
   has_gps: false,
   has_adr: false,
@@ -193,6 +189,7 @@ const form = reactive({
 const { locale } = useI18n()
 const vehicleBodyTypes = ref<DictItem[]>([])
 const vehicleLoadTypes = ref<DictItem[]>([])
+const vehicleTruckCategories = ref<DictItem[]>([])
 const currencies = ref<DictItem[]>([])
 const companyTypes = ref<DictItem[]>([])
 
@@ -205,14 +202,16 @@ function dictLabel(item: DictItem) {
 
 onMounted(async () => {
   try {
-    const [bt, lt, cur, ct] = await Promise.all([
+    const [bt, lt, cats, cur, ct] = await Promise.all([
       getVehicleBodyTypes(),
       getVehicleLoadTypes(),
+      getVehicleTruckCategories(),
       getCurrencies(),
       getCompanyTypes(),
     ])
     vehicleBodyTypes.value = bt
     vehicleLoadTypes.value = lt
+    vehicleTruckCategories.value = cats
     currencies.value = cur
     companyTypes.value = ct
   } catch (e) {
@@ -242,7 +241,7 @@ const prefilterSummary = computed(() => {
 
 function resetForm() {
   Object.assign(form, {
-    body_type: '', load_types: [], half_trailer: true, is_truck: false, is_scene: false,
+    body_type: '', load_types: [], truck_category: 'truck',
     has_lift: false, has_gps: false, has_adr: false, has_tir: false, has_horses: false, partial_load: false,
     capacity_kg: null, volume_m3: null, length_m: null, width_m: null, height_m: null,
     available_from: '', available_days: null,

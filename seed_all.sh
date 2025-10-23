@@ -11,6 +11,9 @@ cd "$HERE"
 echo "==> Applying migrations"
 python manage.py migrate --noinput
 
+echo "==> Seeding dictionaries (3 languages)"
+python manage.py seed_dicts
+
 echo "==> Seeding demo data (10 records per model)"
 python manage.py seed_ten
 

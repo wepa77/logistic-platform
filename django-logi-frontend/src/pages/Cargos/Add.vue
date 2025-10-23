@@ -21,7 +21,7 @@
         <h2>{{ $t('forms.cargo') }}</h2>
         <div class="grid-2">
           <el-select v-model="form.cargo_type" :placeholder="$t('forms.cargoType') as string">
-            <el-option v-for="(label, value) in cargoTypes" :key="value" :label="label" :value="value" />
+            <el-option v-for="item in cargoTypes" :key="item.code" :label="dictLabel(item)" :value="item.code" />
           </el-select>
           <el-input v-model="form.cargo_name" :placeholder="$t('forms.cargoName') as string" />
         </div>
@@ -71,9 +71,7 @@
         <!-- Ready status and dates -->
         <div class="grid-3">
           <el-select v-model="form.ready_status" :placeholder="$t('forms.readyStatus') as string">
-            <el-option :label="$t('filters.today') as string" value="ready" />
-            <el-option :label="$t('filters.last3Days') as string" value="in_3_days" />
-            <el-option :label="$t('filters.last7Days') as string" value="in_7_days" />
+            <el-option v-for="item in readyStatuses" :key="item.code" :label="dictLabel(item)" :value="item.code" />
           </el-select>
           <el-date-picker v-model="form.pickup_date" type="date" :placeholder="$t('cargos.pickupDate') as string" />
           <el-date-picker v-model="form.delivery_date" type="date" :placeholder="$t('cargos.deliveryDate') as string" />
@@ -198,7 +196,7 @@ import { reactive, computed, ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useI18n } from 'vue-i18n'
-import { getCargoBodyTypes, getCargoLoadTypes, getCurrencies, getCargoPaymentMethods, getCompanyTypes } from '@/api/dicts'
+import { getCargoBodyTypes, getCargoLoadTypes, getCurrencies, getCargoPaymentMethods, getCompanyTypes, getCargoTypes, getReadyStatuses } from '@/api/dicts'
 
 interface CargoForm {
   // Cargo basics
@@ -340,15 +338,8 @@ const form = reactive<CargoForm>({
   stealth_mode: false,
 })
 
-const cargoTypes: Record<string, string> = {
-  general: 'Общий груз',
-  fragile: 'Хрупкий',
-  hazardous: 'Опасный',
-  refrigerated: 'Температурный',
-  oversized: 'Негабарит',
-  bulk: 'Навалочный',
-  liquid: 'Жидкий',
-}
+const cargoTypes = ref<DictItem[]>([])
+const readyStatuses = ref<DictItem[]>([])
 
 // Dictionaries from backend
 import type { DictItem } from '@/api/dicts'
@@ -368,18 +359,22 @@ function dictLabel(item: DictItem) {
 
 onMounted(async () => {
   try {
-    const [bt, lt, cur, pm, ct] = await Promise.all([
+    const [bt, lt, cur, pm, ct, cTypes, rStatuses] = await Promise.all([
       getCargoBodyTypes(),
       getCargoLoadTypes(),
       getCurrencies(),
       getCargoPaymentMethods(),
       getCompanyTypes(),
+      getCargoTypes(),
+      getReadyStatuses(),
     ])
     cargoBodyTypes.value = bt
     cargoLoadTypes.value = lt
     currencies.value = cur
     cargoPaymentMethods.value = pm
     companyTypes.value = ct
+    cargoTypes.value = cTypes
+    readyStatuses.value = rStatuses
   } catch (e) {
     // Non-blocking: keep selects empty on failure
     console.error('Failed to load dictionaries', e)

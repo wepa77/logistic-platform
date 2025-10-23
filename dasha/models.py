@@ -7,6 +7,16 @@ from django.db import models
 
 
 class User(AbstractUser):
+    """Application user model extending Django's AbstractUser.
+    Fields:
+    - user_type: role of the user (shipper, carrier, both, expeditor, guest, admin, operator, merchant)
+    - phone, company_name, address: contact and company details
+    - verified: whether the profile is verified
+    - balance, deposit_balance: wallet and deposit balances used for platform operations
+    - avatar: profile image
+    Relationships:
+    - Related to vehicles, cargos, offers, shipments, wallet transactions, reviews, and top-ups in other models.
+    """
     USER_TYPES = [
         ('shipper', 'Ýük ugradýan'),              # Shipper / Sender
         ('carrier', 'Ýük gatnadýan'),             # Carrier / Driver
@@ -81,6 +91,13 @@ class User(AbstractUser):
         verbose_name_plural = "Ulanyjylar"
 
 class Shipment(models.Model):
+    """Shipment execution record that links a posted Cargo to a carrier (User) and optionally a Vehicle.
+    Tracks lifecycle times, distance, total price and payment information.
+    Key relations:
+    - cargo: One-to-one with Cargo (each cargo may have at most one shipment)
+    - carrier: ForeignKey to User (typically a carrier)
+    - vehicle: optional Vehicle used for this shipment
+    """
     PAYMENT_TYPES = [
         ('stripe', 'Stripe onlaýn'),
         ('cash', 'Nagt / offline'),
@@ -117,6 +134,9 @@ class Shipment(models.Model):
 
 
 class WalletTransaction(models.Model):
+    """Immutable record of balance-related actions for a User.
+    Includes top-ups, commissions, refunds, and deposit-related operations.
+    """
     TRANSACTION_TYPES = [
         ("top_up", "Balans doldurmak"),
         ("commission", "Komissiýa tutuldy"),
@@ -145,6 +165,10 @@ from django.conf import settings
 
 
 class Vehicle(models.Model):
+    """Vehicle offered by a carrier for transporting cargo.
+    Captures body/load types, capacities, availability, locations, rate options,
+    company/contact info, and promotional flags. Owned by a User (carrier).
+    """
     # --- Görnüş sanawlary ---
     BODY_TYPES = [
         ('tent', 'Tent (çadyrly)'),
@@ -260,6 +284,11 @@ from django.conf import settings
 
 
 class Cargo(models.Model):
+    """Cargo posting created by a shipper with requirements and route details.
+    Includes weight/volume/quantity, body/load types, schedule and addresses,
+    special requirements (ADR, TIR, lift), rate/payment terms, and company contacts.
+    A Shipment may be created later to execute this cargo.
+    """
     # --- Sanaw görnüşleri ---
     BODY_TYPES = [
         ('tent', 'Tent (çadyrly)'),
@@ -394,6 +423,9 @@ class Cargo(models.Model):
 
 # --- Teklipler ---
 class Offer(models.Model):
+    """Offer from a carrier to transport a specific Cargo, with proposed price and optional vehicle.
+    Links Cargo, carrier (User) and optionally Vehicle. Status reflects negotiation outcome.
+    """
     cargo = models.ForeignKey(Cargo, on_delete=models.CASCADE, related_name='offers')
     carrier = models.ForeignKey(User, on_delete=models.CASCADE, related_name='offers')
     vehicle = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True, blank=True)
@@ -413,6 +445,9 @@ class Offer(models.Model):
 
 # --- Reýting & teswirler ---
 class Review(models.Model):
+    """Feedback left by a user after a Shipment is completed.
+    One review per shipment; includes rating (1-5) and optional comment.
+    """
     shipment = models.OneToOneField(Shipment, on_delete=models.CASCADE, related_name='review')
     reviewer = models.ForeignKey(User, on_delete=models.CASCADE)
     rating = models.PositiveSmallIntegerField()  # 1-5
@@ -425,6 +460,9 @@ class Review(models.Model):
 
 # --- Balans doldurma haýyşlary (Stripe ýa-da beýleki gateway üçin) ---
 class TopUpRequest(models.Model):
+    """Request to add funds to a user's balance. In this project, can be used for
+    offline/manual top-ups as well as storing provider session IDs when applicable.
+    """
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="topups")
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     stripe_session_id = models.CharField(max_length=200, blank=True, null=True)
@@ -439,6 +477,14 @@ class TopUpRequest(models.Model):
 # Dictionary models (3-language)
 # ============================
 class DictionaryBase(models.Model):
+    """Abstract base for 3-language dictionaries used to populate select fields in the UI.
+    Fields:
+    - code: stable programmatic code (slug)
+    - name_tk/name_ru/name_en: localized display names
+    - is_active: whether option is visible
+    - ordering: display order
+    Also provides created/updated timestamps. Subclasses are concrete dictionaries.
+    """
     code = models.SlugField(max_length=50, unique=True)
     name_tk = models.CharField(max_length=255)
     name_ru = models.CharField(max_length=255, blank=True, null=True)
@@ -457,90 +503,127 @@ class DictionaryBase(models.Model):
 
 
 class UserTypeDict(DictionaryBase):
+    """Dictionary of user roles (shipper, carrier, etc.)."""
     class Meta:
         verbose_name = "Ulanyjy görnüşi sözlügi"
         verbose_name_plural = "Ulanyjy görnüşleri sözlügi"
 
 
 class ShipmentPaymentTypeDict(DictionaryBase):
+    """Dictionary of available payment types for shipments."""
     class Meta:
         verbose_name = "Töleg görnüşi (Sargyt)"
         verbose_name_plural = "Töleg görnüşleri (Sargyt)"
 
 
 class ShipmentPaymentStatusDict(DictionaryBase):
+    """Dictionary of payment status values for shipments (pending/paid/failed etc.)."""
     class Meta:
         verbose_name = "Töleg ýagdaýy (Sargyt)"
         verbose_name_plural = "Töleg ýagdaýlary (Sargyt)"
 
 
 class WalletTransactionTypeDict(DictionaryBase):
+    """Dictionary of wallet transaction type codes."""
     class Meta:
         verbose_name = "Hasap-tranzaksiýa görnüşi"
         verbose_name_plural = "Hasap-tranzaksiýa görnüşleri"
 
 
 class VehicleBodyTypeDict(DictionaryBase):
+    """Dictionary of vehicle body types (e.g., tent, refrigerator, open)."""
     class Meta:
         verbose_name = "Ulag kuzow görnüşi"
         verbose_name_plural = "Ulag kuzow görnüşleri"
 
 
 class VehicleLoadTypeDict(DictionaryBase):
+    """Dictionary of vehicle load/unload methods (top, side, rear, etc.)."""
     class Meta:
         verbose_name = "Ulag ýükleme/düşürme görnüşi"
         verbose_name_plural = "Ulag ýükleme/düşürme görnüşleri"
 
 
 class VehicleTruckCategoryDict(DictionaryBase):
+    """Dictionary of vehicle categories (semi-trailer, truck, coupling)."""
     class Meta:
         verbose_name = "Ulag kategoriýasy"
         verbose_name_plural = "Ulag kategoriýalary"
 
 
 class VehicleRateTypeDict(DictionaryBase):
+    """Dictionary of pricing modes for vehicles (has rate / request rate)."""
     class Meta:
         verbose_name = "Ulag stawka görnüşi"
         verbose_name_plural = "Ulag stawka görnüşleri"
 
 
 class CurrencyDict(DictionaryBase):
+    """Dictionary of currencies used for pricing (TMT, RUB, USD, EUR)."""
     class Meta:
         verbose_name = "Walýuta"
         verbose_name_plural = "Walýutalar"
 
 
 class CargoBodyTypeDict(DictionaryBase):
+    """Dictionary of cargo-required body types."""
     class Meta:
         verbose_name = "Ýük üçin kuzow görnüşi"
         verbose_name_plural = "Ýük üçin kuzow görnüşleri"
 
 
 class CargoLoadTypeDict(DictionaryBase):
+    """Dictionary of cargo load/unload methods."""
     class Meta:
         verbose_name = "Ýükleme / düşürme görnüşi"
         verbose_name_plural = "Ýükleme / düşürme görnüşleri"
 
 
 class CargoRateTypeDict(DictionaryBase):
+    """Dictionary of cargo pricing modes (has rate / request rate)."""
     class Meta:
         verbose_name = "Ýük stawka görnüşi"
         verbose_name_plural = "Ýük stawka görnüşleri"
 
 
 class CargoPaymentMethodDict(DictionaryBase):
+    """Dictionary of payment methods for cargo (cash, bank, online)."""
     class Meta:
         verbose_name = "Ýük töleg usuly"
         verbose_name_plural = "Ýük töleg usullary"
 
 
 class CompanyTypeDict(DictionaryBase):
+    """Dictionary of company/legal entity types (e.g., ООО, IP, individual)."""
     class Meta:
         verbose_name = "Firma görnüşi"
         verbose_name_plural = "Firma görnüşleri"
 
 
 class CargoStatusDict(DictionaryBase):
+    """Dictionary of cargo lifecycle statuses (open, in_progress, delivered, cancelled)."""
     class Meta:
         verbose_name = "Ýük ýagdaýy"
         verbose_name_plural = "Ýük ýagdaýlary"
+
+
+# --- Additional dictionary models based on selects.txt ---
+class CargoTypeDict(DictionaryBase):
+    """Dictionary of cargo types (general, fragile, hazardous, etc.)."""
+    class Meta:
+        verbose_name = "Ýük görnüşi"
+        verbose_name_plural = "Ýük görnüşleri"
+
+
+class ReadyStatusDict(DictionaryBase):
+    """Dictionary of cargo readiness statuses (ready, in_3_days, in_7_days)."""
+    class Meta:
+        verbose_name = "Taýýarlyk ýagdaýy"
+        verbose_name_plural = "Taýýarlyk ýagdaýlary"
+
+
+class VehicleTruckTypeDict(DictionaryBase):
+    """Dictionary of truck types (box, flatbed, refrigerated, tanker, other)."""
+    class Meta:
+        verbose_name = "Ulag (truck) görnüşi"
+        verbose_name_plural = "Ulag (truck) görnüşleri"

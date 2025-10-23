@@ -1,0 +1,29 @@
+Cargo Selects:
+- cargo_type (static):
+  - general: Общий груз
+  - fragile: Хрупкий
+  - hazardous: Опасный
+  - refrigerated: Температурный
+  - oversized: Негабарит
+  - bulk: Навалочный
+  - liquid: Жидкий
+- body_type (dictionary): /dicts/cargo-body-types/
+- load_types (dictionary): /dicts/cargo-load-types/
+- ready_status (static values): ready, in_3_days, in_7_days
+- load_type (dictionary): /dicts/cargo-load-types/
+- unload_type (dictionary): /dicts/cargo-load-types/
+- rate_currency (dictionary): /dicts/currencies/
+- payment_method (dictionary): /dicts/cargo-payment-methods/
+- company_type (dictionary): /dicts/company-types/
+
+Vehicle Selects:
+- body_type (dictionary): /dicts/vehicle-body-types/
+- load_types (dictionary): /dicts/vehicle-load-types/
+- rate_currency (dictionary): /dicts/currencies/
+- company_type (dictionary): /dicts/company-types/
+- truck_type (static):
+  - box: Box Truck
+  - flatbed: Flatbed
+  - refrigerated: Refrigerated
+  - tanker: Tanker
+  - other: Other

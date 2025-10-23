@@ -15,7 +15,7 @@ from .models import (
     UserTypeDict, ShipmentPaymentTypeDict, ShipmentPaymentStatusDict, WalletTransactionTypeDict,
     VehicleBodyTypeDict, VehicleLoadTypeDict, VehicleTruckCategoryDict, VehicleRateTypeDict,
     CurrencyDict, CargoBodyTypeDict, CargoLoadTypeDict, CargoRateTypeDict, CargoPaymentMethodDict,
-    CompanyTypeDict, CargoStatusDict
+    CompanyTypeDict, CargoStatusDict, CargoTypeDict, ReadyStatusDict, VehicleTruckTypeDict
 )
 from .serializers import (
     UserSerializer, VehicleSerializer, CargoSerializer,
@@ -26,7 +26,8 @@ from .serializers import (
     WalletTransactionTypeDictSerializer, VehicleBodyTypeDictSerializer, VehicleLoadTypeDictSerializer,
     VehicleTruckCategoryDictSerializer, VehicleRateTypeDictSerializer, CurrencyDictSerializer,
     CargoBodyTypeDictSerializer, CargoLoadTypeDictSerializer, CargoRateTypeDictSerializer,
-    CargoPaymentMethodDictSerializer, CompanyTypeDictSerializer, CargoStatusDictSerializer
+    CargoPaymentMethodDictSerializer, CompanyTypeDictSerializer, CargoStatusDictSerializer,
+    CargoTypeDictSerializer, ReadyStatusDictSerializer, VehicleTruckTypeDictSerializer
 )
 from .permissions import IsOwnerOrReadOnly
 from .filters import (
@@ -322,4 +323,19 @@ class CompanyTypeDictViewSet(BaseDictViewSet):
 class CargoStatusDictViewSet(BaseDictViewSet):
     queryset = CargoStatusDict.objects.filter(is_active=True).order_by("ordering", "code")
     serializer_class = CargoStatusDictSerializer
+
+
+class CargoTypeDictViewSet(BaseDictViewSet):
+    queryset = CargoTypeDict.objects.filter(is_active=True).order_by("ordering", "code")
+    serializer_class = CargoTypeDictSerializer
+
+
+class ReadyStatusDictViewSet(BaseDictViewSet):
+    queryset = ReadyStatusDict.objects.filter(is_active=True).order_by("ordering", "code")
+    serializer_class = ReadyStatusDictSerializer
+
+
+class VehicleTruckTypeDictViewSet(BaseDictViewSet):
+    queryset = VehicleTruckTypeDict.objects.filter(is_active=True).order_by("ordering", "code")
+    serializer_class = VehicleTruckTypeDictSerializer
 
