@@ -100,6 +100,7 @@
             <el-menu-item index="/driver-request"><i class="mdi mdi-clipboard-text-outline"></i> {{ $t('nav.driverRequest') }}</el-menu-item>
             <el-menu-item index="/reviews"><i class="mdi mdi-star-outline"></i> {{ $t('nav.reviews') }}</el-menu-item>
             <el-menu-item index="/wallet"><i class="mdi mdi-wallet-outline"></i> {{ $t('nav.wallet') }}</el-menu-item>
+            <el-menu-item index="/profile"><i class="mdi mdi-account-circle-outline"></i> {{ $t('nav.profile') }}</el-menu-item>
           </el-menu>
         </div>
 
@@ -118,7 +119,7 @@
             </div>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item>
+                <el-dropdown-item @click="$router.push('/profile')">
                   <i class="mdi mdi-account-outline"></i> {{ $t('nav.profile') }}
                 </el-dropdown-item>
                 <el-dropdown-item>
@@ -134,21 +135,28 @@
       </el-header>
 
       <el-main class="main">
-        <div class="ad-banner">
+        <div v-if="!hideAds" class="ad-banner">
           <el-card class="ad-card" shadow="never">
             <div class="ad-placeholder">{{ $t('common.advertisement') }}</div>
           </el-card>
         </div>
-        <div class="content-with-ads">
-          <aside class="ad-rail">
-            <el-card class="ad-rail-card" shadow="never">
-              <div class="ad-rail-placeholder">{{ $t('common.adShort') }}</div>
-            </el-card>
-          </aside>
+        <template v-if="!hideAds">
+          <div class="content-with-ads">
+            <aside class="ad-rail">
+              <el-card class="ad-rail-card" shadow="never">
+                <div class="ad-rail-placeholder">{{ $t('common.adShort') }}</div>
+              </el-card>
+            </aside>
+            <div class="page-content">
+              <router-view />
+            </div>
+          </div>
+        </template>
+        <template v-else>
           <div class="page-content">
             <router-view />
           </div>
-        </div>
+        </template>
       </el-main>
     </el-container>
   </el-container>
@@ -186,6 +194,9 @@ const pageTitle = computed(() => {
   return (route.meta.title as string) || t('nav.home')
 })
 const notifications = ref(0)
+
+// Hide ads in personal cabinet
+const hideAds = computed(() => route.name === 'profile')
 
 // Fetch notifications when component mounts
 onMounted(async () => {

@@ -26,69 +26,134 @@
             <el-form-item>
               <el-button type="primary" @click="applyFilters"><i class="mdi mdi-magnify"></i> {{ $t('home.findVehicles') }}</el-button>
             </el-form-item>
-          </div>
-
-          <!-- Row 2: Body/load types and dimensions -->
-          <div class="row">
-            <el-form-item :label="$t('forms.bodyType') as string">
-              <el-select v-model="form.bodyType" clearable filterable style="min-width: 180px">
-                <el-option v-for="(label, value) in bodyTypes" :key="value" :label="label" :value="value" />
-              </el-select>
-            </el-form-item>
-            <el-form-item :label="$t('forms.loadTypes') as string">
-              <el-select v-model="form.loadType" clearable filterable style="min-width: 180px">
-                <el-option v-for="(label, value) in loadTypes" :key="value" :label="label" :value="value" />
-              </el-select>
-            </el-form-item>
-            <el-form-item :label="$t('vehicles.capacity') as string">
-              <div class="range">
-                <el-input-number v-model="form.capacityMin" :min="0" :step="500" />
-                <span class="dash">—</span>
-                <el-input-number v-model="form.capacityMax" :min="0" :step="500" />
-              </div>
-            </el-form-item>
-            <el-form-item :label="$t('vehicles.volume') as string">
-              <div class="range">
-                <el-input-number v-model="form.volumeMin" :min="0" :step="0.5" />
-                <span class="dash">—</span>
-                <el-input-number v-model="form.volumeMax" :min="0" :step="0.5" />
-              </div>
-            </el-form-item>
-          </div>
-
-          <!-- Row 3: Rates and toggles -->
-          <div class="row">
-            <el-form-item :label="$t('offers.price') as string">
-              <el-input-number v-model="form.rateMin" :min="0" :step="50" placeholder="min" />
-              <span class="dash">—</span>
-              <el-input-number v-model="form.rateMax" :min="0" :step="50" placeholder="max" />
-            </el-form-item>
-            <el-form-item :label="$t('forms.currency') as string">
-              <el-select v-model="form.currency" clearable style="width: 120px">
-                <el-option label="TMT" value="tmt" />
-                <el-option label="RUB" value="rub" />
-                <el-option label="USD" value="usd" />
-                <el-option label="EUR" value="eur" />
-              </el-select>
-            </el-form-item>
             <el-form-item>
-              <el-checkbox v-model="form.hasADR">{{ $t('forms.adr') }}</el-checkbox>
-              <el-checkbox v-model="form.hasLift">{{ $t('forms.hydrolift') }}</el-checkbox>
-              <el-checkbox v-model="form.hasHorses">{{ $t('forms.stakes') }}</el-checkbox>
-              <el-checkbox v-model="form.hasGPS">{{ $t('forms.gpsMonitoring') }}</el-checkbox>
-              <el-checkbox v-model="form.partialLoad">{{ $t('forms.partialLoad') }}</el-checkbox>
-              <el-checkbox v-model="form.withoutBargain">{{ $t('forms.withoutBargain') }}</el-checkbox>
-              <el-checkbox v-model="form.payToCard">{{ $t('forms.payToCard') }}</el-checkbox>
-            </el-form-item>
-            <el-form-item :label="$t('common.date') as string">
-              <el-select v-model="form.addedWhen" style="min-width: 180px">
-                <el-option :label="$t('filters.anytime') as string" value="any" />
-                <el-option :label="$t('filters.today') as string" value="today" />
-                <el-option :label="$t('filters.last3Days') as string" value="3d" />
-                <el-option :label="$t('filters.last7Days') as string" value="7d" />
-              </el-select>
+              <el-button text type="primary" class="toggle-adv" @click="showAdvanced = !showAdvanced">
+                <i :class="showAdvanced ? 'mdi mdi-chevron-up' : 'mdi mdi-chevron-down'"></i>
+                <span>Фильтры</span>
+              </el-button>
             </el-form-item>
           </div>
+
+          <el-collapse-transition>
+            <div v-show="showAdvanced" class="adv-grid">
+              <!-- Col: Дата погрузки -->
+              <div class="section">
+                <div class="sect-title">Дата погрузки</div>
+                <el-select v-model="form.addedWhen" size="small" style="width: 180px">
+                  <el-option :label="$t('filters.anytime') as string" value="any" />
+                  <el-option :label="$t('filters.today') as string" value="today" />
+                  <el-option :label="$t('filters.last3Days') as string" value="3d" />
+                  <el-option :label="$t('filters.last7Days') as string" value="7d" />
+                </el-select>
+                <el-link type="primary" :underline="false" class="mt6">Указать точные даты</el-link>
+              </div>
+
+              <!-- Col: Тип кузова -->
+              <div class="section">
+                <div class="sect-title">Тип кузова</div>
+                <el-checkbox-group v-model="bodyTypeGroup" class="checklist">
+                  <el-checkbox v-for="(label, value) in bodyTypes" :key="value" :label="value">{{ label }}</el-checkbox>
+                </el-checkbox-group>
+                <el-link type="primary" :underline="false" class="mt6">Все типы</el-link>
+              </div>
+
+              <!-- Col: Тип загрузки -->
+              <div class="section">
+                <div class="sect-title">Тип загрузки</div>
+                <el-checkbox-group v-model="loadTypeGroup" class="checklist">
+                  <el-checkbox v-for="(label, value) in loadTypes" :key="value" :label="value">{{ label }}</el-checkbox>
+                </el-checkbox-group>
+                <el-link type="primary" :underline="false" class="mt6">Все типы</el-link>
+              </div>
+
+              <!-- Col: Оплата -->
+              <div class="section">
+                <div class="sect-title">Оплата</div>
+                <div class="row mini">
+                  <el-form-item>
+                    <el-input-number v-model="form.rateMin" :min="0" :step="50" placeholder="от" />
+                    <span class="dash">—</span>
+                    <el-input-number v-model="form.rateMax" :min="0" :step="50" placeholder="до" />
+                  </el-form-item>
+                </div>
+                <el-select v-model="form.currency" size="small" style="width: 120px">
+                  <el-option label="TMT" value="tmt" />
+                  <el-option label="RUB" value="rub" />
+                  <el-option label="USD" value="usd" />
+                  <el-option label="EUR" value="eur" />
+                </el-select>
+                <div class="checklist mt6">
+                  <el-checkbox v-model="form.payToCard">{{ $t('forms.payToCard') }}</el-checkbox>
+                  <el-checkbox v-model="form.withoutBargain">{{ $t('forms.withoutBargain') }}</el-checkbox>
+                </div>
+              </div>
+
+              <!-- Col: Доп. параметры -->
+              <div class="section">
+                <div class="sect-title">Доп. параметры</div>
+                <div class="checklist">
+                  <el-checkbox v-model="form.hasLift">{{ $t('forms.hydrolift') }}</el-checkbox>
+                  <el-checkbox v-model="form.hasHorses">{{ $t('forms.stakes') }}</el-checkbox>
+                  <el-checkbox v-model="form.hasGPS">{{ $t('forms.gpsMonitoring') }}</el-checkbox>
+                  <el-checkbox v-model="form.partialLoad">{{ $t('forms.partialLoad') }}</el-checkbox>
+                  <el-checkbox v-model="form.hasADR">Опасные грузы (ADR)</el-checkbox>
+                </div>
+              </div>
+
+              <!-- Col: Габариты и догруз -->
+              <div class="section">
+                <div class="sect-title">Габариты и догруз</div>
+                <div class="dims-grid">
+                  <el-form-item :label="$t('forms.lengthM') as string">
+                    <div class="range">
+                      <el-input-number v-model="form.lengthMin" :min="0" :step="0.1" />
+                      <span class="dash">—</span>
+                      <el-input-number v-model="form.lengthMax" :min="0" :step="0.1" />
+                    </div>
+                  </el-form-item>
+                  <el-form-item :label="$t('forms.widthM') as string">
+                    <div class="range">
+                      <el-input-number v-model="form.widthMin" :min="0" :step="0.1" />
+                      <span class="dash">—</span>
+                      <el-input-number v-model="form.widthMax" :min="0" :step="0.1" />
+                    </div>
+                  </el-form-item>
+                  <el-form-item :label="$t('forms.heightM') as string">
+                    <div class="range">
+                      <el-input-number v-model="form.heightMin" :min="0" :step="0.1" />
+                      <span class="dash">—</span>
+                      <el-input-number v-model="form.heightMax" :min="0" :step="0.1" />
+                    </div>
+                  </el-form-item>
+                </div>
+              </div>
+
+              <!-- Col: ADR level -->
+              <div class="section">
+                <div class="sect-title">Опасные грузы, ADR</div>
+                <el-select size="small" disabled style="width: 180px">
+                  <el-option label="неважно" value="any" />
+                </el-select>
+              </div>
+
+              <!-- Col: Добавлены -->
+              <div class="section">
+                <div class="sect-title">Добавлены</div>
+                <el-select v-model="form.addedWhen" size="small" style="width: 180px">
+                  <el-option :label="$t('filters.anytime') as string" value="any" />
+                  <el-option :label="$t('filters.today') as string" value="today" />
+                  <el-option :label="$t('filters.last3Days') as string" value="3d" />
+                  <el-option :label="$t('filters.last7Days') as string" value="7d" />
+                </el-select>
+              </div>
+
+              <!-- Col: Поиск по фирмам (инфо) -->
+              <div class="section">
+                <div class="sect-title">Поиск по фирмам</div>
+                <div class="muted small">Доступно только платным участникам ATI</div>
+              </div>
+            </div>
+          </el-collapse-transition>
         </el-form>
       </div>
     </el-card>
@@ -105,6 +170,8 @@ import VehiclesPage from '@/pages/Vehicles/index.vue'
 const router = useRouter()
 const route = useRoute()
 
+const showAdvanced = ref(false)
+
 const form = reactive({
   from: (route.query.from as string) || '',
   to: (route.query.to as string) || '',
@@ -119,6 +186,14 @@ const form = reactive({
   capacityMax: route.query.capacity_max ? Number(route.query.capacity_max) : undefined as number | undefined,
   volumeMin: route.query.volume_min ? Number(route.query.volume_min) : undefined as number | undefined,
   volumeMax: route.query.volume_max ? Number(route.query.volume_max) : undefined as number | undefined,
+
+  // Dimensions (UI only for now)
+  lengthMin: undefined as number | undefined,
+  lengthMax: undefined as number | undefined,
+  widthMin: undefined as number | undefined,
+  widthMax: undefined as number | undefined,
+  heightMin: undefined as number | undefined,
+  heightMax: undefined as number | undefined,
 
   rateMin: route.query.rate_min ? Number(route.query.rate_min) : undefined as number | undefined,
   rateMax: route.query.rate_max ? Number(route.query.rate_max) : undefined as number | undefined,
@@ -154,6 +229,12 @@ const loadTypes: Record<string, string> = {
   crossbar_remove: 'Съём перекладин',
   stand_remove: 'Съём стоек'
 }
+
+// Checklist sync (как на грузах): чек-листы управляют одиночными полями
+const bodyTypeGroup = ref<string[]>(form.bodyType ? [form.bodyType] : [])
+const loadTypeGroup = ref<string[]>(form.loadType ? [form.loadType] : [])
+watch(bodyTypeGroup, v => { form.bodyType = v[0] || '' })
+watch(loadTypeGroup, v => { form.loadType = v[0] || '' })
 
 const listKey = ref(0)
 
@@ -203,4 +284,17 @@ watch(() => route.query, () => { listKey.value += 1 })
 .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
 .range{display:flex;align-items:center;gap:6px}
 .dash{color:#94a3b8}
+
+/* Advanced filters grid to mimic ATI expanded panel (like Cargos) */
+.adv-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:8px}
+.section{border:1px solid #e5e7eb;border-radius:8px;padding:10px;background:#fff}
+.sect-title{font-weight:600;color:#111827;margin-bottom:8px}
+.checklist{display:flex;flex-direction:column;gap:6px}
+.dims-grid{display:grid;grid-template-columns:1fr;gap:6px;margin-top:6px}
+.mt6{margin-top:6px}
+.small{font-size:12px}
+.muted{color:#6b7280}
+.row.mini{gap:6px}
 </style>
+
+

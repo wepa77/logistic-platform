@@ -277,6 +277,29 @@ export default {
     submitReview: 'Submit Review'
   },
   
+  profile: {
+    title: 'Member cabinet',
+    subtitle: 'Manage your account information and balances',
+    topUp: 'Top up',
+    verifyHeader: 'Confirm your account',
+    verifyText: 'Get more trust and features by confirming your data.',
+    goVerify: 'Verify now',
+    passport: 'Participant passport',
+    company: 'Company',
+    country: 'Address / Country',
+    userType: 'Activity',
+    balance: 'Overall balance',
+    contactInfo: 'Your contact information',
+    contactPerson: 'Contact person',
+    mobile: 'Mobile phone',
+    department: 'Subdivision',
+    position: 'Position',
+    relatedCompanies: 'Related companies',
+    companyInfo: 'Company information',
+    companyName: 'Company name',
+    address: 'Address'
+  },
+
   wallet: {
     title: 'Wallet Management',
     subtitle: 'Manage your balance and view transaction history',

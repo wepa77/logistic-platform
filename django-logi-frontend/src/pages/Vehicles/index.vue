@@ -279,6 +279,29 @@
 
     <!-- Embedded search list redesigned to match screenshot -->
     <el-card v-else class="table-card" shadow="never">
+      <!-- Results header (count, pager, page-size) -->
+      <div class="v-results-header">
+        <div class="left">
+          <h2 class="found">Найдено {{ total }} машин</h2>
+        </div>
+        <div class="right">
+          <el-pagination
+            background
+            layout="prev, pager, next"
+            :page-size="pageSize"
+            :current-page="page"
+            :total="total"
+            @current-change="onPageChange"
+          />
+          <span class="ml12 mr8">Выводить машин</span>
+          <el-select v-model="pageSize" size="small" style="width: 80px" @change="onPageSizeChange">
+            <el-option label="10" :value="10" />
+            <el-option label="20" :value="20" />
+            <el-option label="50" :value="50" />
+          </el-select>
+        </div>
+      </div>
+
       <div class="list-header">
         <div class="lh-left"></div>
         <div class="lh-col">Направл.</div>
@@ -314,6 +337,21 @@
                 <span v-if="item.length_m || item.width_m || item.height_m" class="dims">
                   • {{ item.length_m || '—' }}×{{ item.width_m || '—' }}×{{ item.height_m || '—' }} м
                 </span>
+                <div class="flags">
+                  <el-tag v-if="item.has_adr" size="small" type="warning" effect="plain">ADR</el-tag>
+                  <el-tag v-if="item.has_tir || item.has_ekmt" size="small" type="info" effect="plain">TIR/EKMT</el-tag>
+                  <el-tag v-if="item.has_gps || item.gps_enabled" size="small" type="success" effect="plain">GPS</el-tag>
+                  <el-tag v-if="item.has_lift" size="small" effect="plain">Lift</el-tag>
+                  <el-tag v-if="item.has_horses" size="small" effect="plain">Stakes</el-tag>
+                  <el-tag v-if="item.partial_load" size="small" type="success" effect="plain">Догруз</el-tag>
+                  <el-tag v-if="item.pay_to_card" size="small" type="success" effect="plain">Карта</el-tag>
+                  <el-tag v-if="item.without_bargain" size="small" type="danger" effect="plain">Без торга</el-tag>
+                </div>
+                <div class="extra">
+                  <span v-if="item.plate_number" class="plate"># {{ item.plate_number }}</span>
+                  <span v-if="companyName(item)" class="company">• {{ companyName(item) }}</span>
+                  <span v-if="contactPhone(item)" class="phone">• {{ contactPhone(item) }}</span>
+                </div>
               </div>
               <div class="cell from">
                 <div class="city">{{ fromCity(item) }}</div>
@@ -677,6 +715,9 @@ interface Vehicle {
   has_adr?: boolean | null
   has_lift?: boolean | null
   has_horses?: boolean | null
+  has_tir?: boolean | null
+  has_ekmt?: boolean | null
+  has_gps?: boolean | null
   company_name?: string | null
   contact_phone?: string | null
   city?: string | null
@@ -834,6 +875,18 @@ function availableFrom(row: any): string | '' {
 function availableDays(row: any): number | '' {
   const v = pick(row, ['available_days','days_available','available_for_days'], '')
   return v === '' ? '' : Number(v)
+}
+function companyName(row: any): string {
+  const v = pick(row, ['company_name', 'owner_company', 'owner?.company_name', 'owner_company_name'], '')
+  if (v && typeof v === 'string') return v
+  if (row && row.owner && row.owner.company_name) return row.owner.company_name
+  return ''
+}
+function contactPhone(row: any): string {
+  const v = pick(row, ['contact_phone', 'phone', 'owner?.phone', 'owner_phone'], '')
+  if (v && typeof v === 'string') return v
+  if (row && row.owner && row.owner.phone) return row.owner.phone
+  return ''
 }
 function currencyCode(row: any): string {
   const c = pick(row, ['rate_currency','currency'], '')
@@ -1500,6 +1553,12 @@ function submitGuard() {
   }
 }
 /* Embedded results list styles */
+.v-results-header{display:flex;align-items:center;justify-content:space-between;margin:8px 0 8px}
+.v-results-header .right{display:flex;align-items:center;gap:10px}
+.mr8{margin-right:8px}
+.ml12{margin-left:12px}
+.found{font-size:18px;margin:0}
+
 .list-header {
   display: grid;
   grid-template-columns: 80px repeat(5, 1fr) 80px 160px;

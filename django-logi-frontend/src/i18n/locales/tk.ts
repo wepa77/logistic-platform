@@ -277,6 +277,29 @@ export default {
     submitReview: 'Syn iber'
   },
   
+  profile: {
+    title: 'Ulanyjynyň kabineti',
+    subtitle: 'Hasap maglumatlaryňyzy we balanslary dolandyryň',
+    topUp: 'Doldur',
+    verifyHeader: 'Hasaby tassyklaň',
+    verifyText: 'Maglumatlary tassyklaň we has köp mümkinçilik alyň.',
+    goVerify: 'Häzir tassykla',
+    passport: 'Gatnaşyjynyň pasporty',
+    company: 'Kompaniýa',
+    country: 'Salgy / Ýurt',
+    userType: 'Iş ugry',
+    balance: 'Umumy hasap',
+    contactInfo: 'Habarlaşmak maglumatlary',
+    contactPerson: 'Kontakt adam',
+    mobile: 'Ykjam telefon',
+    department: 'Bölümçe',
+    position: 'Wezipe',
+    relatedCompanies: 'Baglanyşykly firmalar',
+    companyInfo: 'Kompaniýa baradaky maglumat',
+    companyName: 'Kompaniýanyň ady',
+    address: 'Salgy'
+  },
+
   wallet: {
     title: 'Gapjyk dolandyryşy',
     subtitle: 'Balansyňyzy dolandyryň we amallaryň taryhyny görüň',
@@ -324,7 +347,7 @@ export default {
     signIn: 'Gir',
     signUp: 'Hasaba al',
     signOut: 'Çyk',
-    registrationTitle: 'APL.SU-da hasaba alyş',
+    registrationTitle: 'Dashada hasaba alyş',
     selectProfile: 'Işiňiziň profilini görkeziň',
     profileDescription: 'Biz ony beýleki gatnaşyjylara görkezeris, şonuň üçin hyzmatdaşlary tapmak aňsat bolar. Hasaba alynandan soň islän wagtyňyz saýlawyňyzy üýtgedip bilersiňiz.',
     carrier: 'Daşaýjy',

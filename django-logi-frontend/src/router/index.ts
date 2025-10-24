@@ -36,6 +36,7 @@ const routes = [
             { path: 'search/vehicles', name: 'search-vehicles', component: SearchVehiclesPage, meta: { title: 'Search Vehicles', public: true } },
             { path: 'search/cargos', name: 'search-cargos', component: SearchCargosPage, meta: { title: 'Search Cargos', public: true } },
             // Personal sections
+            { path: 'profile', name: 'profile', component: defineAsyncComponent(() => import('@/pages/Profile/index.vue')), meta: { title: 'Profile' } },
             { path: 'vehicles', name: 'vehicles', component: VehiclesPage, meta: { title: 'Vehicles', public: true } },
             { path: 'vehicles/add', name: 'vehicle-add', component: VehiclesAddPage, meta: { title: 'Add Vehicle' } },
             { path: 'cargos', name: 'cargos', component: CargosPage, meta: { title: 'Cargos', public: true } },
