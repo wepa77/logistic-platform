@@ -27,7 +27,9 @@ export default {
     warning: 'Duýduryş',
     advertisement: 'Mahabat',
     adShort: 'AD',
-    info: 'Maglumat'
+    info: 'Maglumat',
+    darkMode: 'Garaňky tertip',
+    lightMode: 'Ýagty tertip'
   },
   
   nav: {
@@ -39,6 +41,9 @@ export default {
     // Şahsy bölümler
     myVehicles: 'Meniň ulaglarym',
     myCargos: 'Meniň ýüklerim',
+    addVehicle: 'Ulag goş',
+    addCargo: 'Ýük goş',
+    orders: 'Sargytlar',
     // Yzygiderlilik üçin köne açarlar
     vehicles: 'Ulaglar',
     cargos: 'Ýükler',

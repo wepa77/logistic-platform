@@ -27,7 +27,9 @@ export default {
     warning: 'Предупреждение',
     advertisement: 'Реклама',
     adShort: 'AD',
-    info: 'Информация'
+    info: 'Информация',
+    darkMode: 'Тёмная тема',
+    lightMode: 'Светлая тема'
   },
   
   nav: {
@@ -39,6 +41,9 @@ export default {
     // Личные разделы
     myVehicles: 'Мои машины',
     myCargos: 'Мои грузы',
+    addVehicle: 'Добавить машину',
+    addCargo: 'Добавить груз',
+    orders: 'Заказы',
     // Совместимость со старыми ключами
     vehicles: 'Транспорт',
     cargos: 'Грузы',

@@ -38,9 +38,9 @@ const routes = [
             // Personal sections
             { path: 'profile', name: 'profile', component: defineAsyncComponent(() => import('@/pages/Profile/index.vue')), meta: { title: 'Profile' } },
             { path: 'vehicles', name: 'vehicles', component: VehiclesPage, meta: { title: 'Vehicles', public: true } },
-            { path: 'vehicles/add', name: 'vehicle-add', component: VehiclesAddPage, meta: { title: 'Add Vehicle' } },
+            { path: 'vehicles/add', name: 'vehicle-add', component: VehiclesAddPage, meta: { title: 'Add Vehicle', public: true } },
             { path: 'cargos', name: 'cargos', component: CargosPage, meta: { title: 'Cargos', public: true } },
-            { path: 'cargos/add', name: 'cargo-add', component: CargosAddPage, meta: { title: 'Add Cargo' } },
+            { path: 'cargos/add', name: 'cargo-add', component: CargosAddPage, meta: { title: 'Add Cargo', public: true } },
             { path: 'offers', name: 'offers', component: OffersPage, meta: { title: 'Offers', public: true } },
             { path: 'shipments', name: 'shipments', component: ShipmentsPage, meta: { title: 'Shipments', public: true } },
             { path: 'reviews', name: 'reviews', component: ReviewsPage, meta: { title: 'Reviews', public: true } },

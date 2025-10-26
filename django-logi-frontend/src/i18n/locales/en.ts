@@ -27,7 +27,9 @@ export default {
     warning: 'Warning',
     advertisement: 'Advertisement',
     adShort: 'AD',
-    info: 'Information'
+    info: 'Information',
+    darkMode: 'Dark mode',
+    lightMode: 'Light mode'
   },
   
   nav: {
@@ -39,6 +41,9 @@ export default {
     // Personal sections
     myVehicles: 'My vehicles',
     myCargos: 'My cargos',
+    addVehicle: 'Add vehicle',
+    addCargo: 'Add cargo',
+    orders: 'Orders',
     // Backward compat fallbacks (used in some pages)
     vehicles: 'Vehicles',
     cargos: 'Cargos',

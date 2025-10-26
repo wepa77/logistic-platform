@@ -87,8 +87,8 @@
             :default-active="$route.path"
             class="top-menu"
             background-color="transparent"
-            text-color="#334155"
-            active-text-color="#111827"
+            text-color="var(--el-text-color-primary)"
+            active-text-color="var(--el-color-primary)"
           >
             <el-menu-item index="/"><i class="mdi mdi-home-outline"></i> {{ $t('nav.home') }}</el-menu-item>
             <el-menu-item index="/search/cargos"><i class="mdi mdi-magnify"></i> {{ $t('nav.searchCargos') }}</el-menu-item>
@@ -106,6 +106,9 @@
 
         <div class="header-right">
           <LanguageSwitcher />
+          <el-button text class="header-action" :title="isDark ? ($t('common.lightMode') as string) : ($t('common.darkMode') as string)" @click="toggleTheme">
+            <i :class="isDark ? 'mdi mdi-white-balance-sunny' : 'mdi mdi-weather-night'"></i>
+          </el-button>
           <el-button text class="header-action">
             <i class="mdi mdi-bell-outline"></i>
             <span v-if="notifications>0" class="notification-badge">{{ notifications }}</span>
@@ -133,6 +136,39 @@
           </el-dropdown>
         </div>
       </el-header>
+
+      <!-- Secondary sub-navigation (ATI-like) -->
+      <div class="subnav">
+        <router-link to="/cargos" class="subnav-item green">
+          <i class="mdi mdi-clipboard-text"></i>
+          <span>{{ $t('nav.myCargos') }}</span>
+        </router-link>
+        <router-link to="/cargos/add" class="subnav-item light-green">
+          <i class="mdi mdi-plus-circle-outline"></i>
+          <span>{{ $t('nav.addCargo') }}</span>
+        </router-link>
+        <router-link to="/vehicles" class="subnav-item amber">
+          <i class="mdi mdi-truck"></i>
+          <span>{{ $t('nav.myVehicles') }}</span>
+        </router-link>
+        <router-link to="/vehicles/add" class="subnav-item yellow">
+          <i class="mdi mdi-plus-circle-outline"></i>
+          <span>{{ $t('nav.addVehicle') }}</span>
+        </router-link>
+        <el-dropdown class="subnav-item orders" trigger="click">
+          <span class="el-dropdown-link">
+            <i class="mdi mdi-clipboard-check-outline"></i>
+            <span>{{ $t('nav.orders') }}</span>
+            <i class="mdi mdi-chevron-down small-caret"></i>
+          </span>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item @click="$router.push('/offers')">{{ $t('nav.offers') }}</el-dropdown-item>
+              <el-dropdown-item @click="$router.push('/shipments')">{{ $t('nav.shipments') }}</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </div>
 
       <el-main class="main">
         <div v-if="!hideAds" class="ad-banner">
@@ -198,6 +234,24 @@ const notifications = ref(0)
 // Hide ads in personal cabinet
 const hideAds = computed(() => route.name === 'profile')
 
+// THEME: initialize from localStorage or prefers-color-scheme
+const THEME_KEY = 'theme'
+const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+const isDark = ref((localStorage.getItem(THEME_KEY) || (prefersDark ? 'dark' : 'light')) === 'dark')
+applyTheme(isDark.value)
+
+function toggleTheme() {
+  isDark.value = !isDark.value
+  applyTheme(isDark.value)
+  localStorage.setItem(THEME_KEY, isDark.value ? 'dark' : 'light')
+}
+
+function applyTheme(dark: boolean) {
+  const root = document.documentElement
+  if (dark) root.classList.add('dark')
+  else root.classList.remove('dark')
+}
+
 // Fetch notifications when component mounts
 onMounted(async () => {
   try {
@@ -214,8 +268,36 @@ async function logout() {
 }
 </script>
 
-
 <style scoped>
+.subnav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: var(--el-bg-color);
+  border-top: 1px solid var(--el-border-color);
+  border-bottom: 1px solid var(--el-border-color);
+}
+.subnav-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 4px;
+  color: var(--el-text-color-primary);
+  text-decoration: none;
+  font-size: 13px;
+}
+.subnav-item i { font-size: 16px; }
+/* keep subtle colored accents; they work in both themes */
+.subnav-item.green { background: #d9f99d; color: #111827; }
+.subnav-item.light-green { background: #fef08a; color: #111827; }
+.subnav-item.amber { background: #e9fac8; color: #111827; }
+.subnav-item.yellow { background: #fde68a; color: #111827; }
+.subnav-item.orders { padding: 6px 8px; }
+.small-caret { font-size: 14px; }
+
+/* existing styles */
 .app-layout {
   height: 100vh;
   overflow: hidden;
@@ -343,10 +425,10 @@ async function logout() {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #ffffff;
+  background: var(--el-bg-color);
   padding: 0 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-  border-bottom: 1px solid #f1f5f9;
+  box-shadow: var(--el-box-shadow-light, 0 1px 3px rgba(0,0,0,0.06));
+  border-bottom: 1px solid var(--el-border-color);
   height: 64px;
 }
 
