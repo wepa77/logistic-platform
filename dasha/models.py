@@ -627,3 +627,10 @@ class VehicleTruckTypeDict(DictionaryBase):
     class Meta:
         verbose_name = "Ulag (truck) görnüşi"
         verbose_name_plural = "Ulag (truck) görnüşleri"
+
+
+class BodyLoadRequirementDict(DictionaryBase):
+    """Dictionary of body and loading requirements."""
+    class Meta:
+        verbose_name = "Kuzow we ýükleme talaby"
+        verbose_name_plural = "Kuzow we ýükleme talaplary"

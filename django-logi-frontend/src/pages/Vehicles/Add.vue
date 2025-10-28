@@ -32,6 +32,10 @@
             <el-option v-for="item in vehicleTruckCategories" :key="item.code" :label="dictLabel(item)" :value="item.code" />
           </el-select>
 
+        <el-select v-model="form.body_load_requirements" multiple placeholder="Требования к кузову и загрузке" style="margin-top: 12px;">
+          <el-option v-for="item in bodyLoadRequirements" :key="item.code" :label="dictLabel(item)" :value="item.code" />
+        </el-select>
+
         <div class="extras">
           <el-checkbox v-model="form.has_lift">{{ $t('forms.hydrolift') }}</el-checkbox>
           <el-checkbox v-model="form.has_gps">{{ $t('forms.gpsMonitoring') }}</el-checkbox>
@@ -138,7 +142,7 @@ import { reactive, computed, ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useI18n } from 'vue-i18n'
-import { getVehicleBodyTypes, getVehicleLoadTypes, getCurrencies, getCompanyTypes, getVehicleTruckCategories } from '@/api/dicts'
+import { getVehicleBodyTypes, getVehicleLoadTypes, getCurrencies, getCompanyTypes, getVehicleTruckCategories, getBodyLoadRequirements } from '@/api/dicts'
 import type { DictItem } from '@/api/dicts'
 
 const form = reactive({
@@ -146,6 +150,7 @@ const form = reactive({
   body_type: '',
   load_types: [] as string[],
   truck_category: 'truck',
+  body_load_requirements: [] as string[],
   has_lift: false,
   has_gps: false,
   has_adr: false,
@@ -192,6 +197,7 @@ const vehicleLoadTypes = ref<DictItem[]>([])
 const vehicleTruckCategories = ref<DictItem[]>([])
 const currencies = ref<DictItem[]>([])
 const companyTypes = ref<DictItem[]>([])
+const bodyLoadRequirements = ref<DictItem[]>([])
 
 function dictLabel(item: DictItem) {
   const loc = String(locale.value)
@@ -202,18 +208,20 @@ function dictLabel(item: DictItem) {
 
 onMounted(async () => {
   try {
-    const [bt, lt, cats, cur, ct] = await Promise.all([
+    const [bt, lt, cats, cur, ct, blr] = await Promise.all([
       getVehicleBodyTypes(),
       getVehicleLoadTypes(),
       getVehicleTruckCategories(),
       getCurrencies(),
       getCompanyTypes(),
+      getBodyLoadRequirements(),
     ])
     vehicleBodyTypes.value = bt
     vehicleLoadTypes.value = lt
     vehicleTruckCategories.value = cats
     currencies.value = cur
     companyTypes.value = ct
+    bodyLoadRequirements.value = blr
   } catch (e) {
     console.error('Failed to load vehicle dictionaries', e)
   }
@@ -241,7 +249,7 @@ const prefilterSummary = computed(() => {
 
 function resetForm() {
   Object.assign(form, {
-    body_type: '', load_types: [], truck_category: 'truck',
+    body_type: '', load_types: [], truck_category: 'truck', body_load_requirements: [],
     has_lift: false, has_gps: false, has_adr: false, has_tir: false, has_horses: false, partial_load: false,
     capacity_kg: null, volume_m3: null, length_m: null, width_m: null, height_m: null,
     available_from: '', available_days: null,

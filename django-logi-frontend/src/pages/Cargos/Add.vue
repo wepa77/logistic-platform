@@ -193,10 +193,11 @@
 
 <script lang="ts" setup>
 import { reactive, computed, ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useI18n } from 'vue-i18n'
 import { getCargoBodyTypes, getCargoLoadTypes, getCurrencies, getCargoPaymentMethods, getCompanyTypes, getCargoTypes, getReadyStatuses } from '@/api/dicts'
+import { create as createCargo } from '@/api/cargos'
 
 interface CargoForm {
   // Cargo basics
@@ -344,6 +345,7 @@ const readyStatuses = ref<DictItem[]>([])
 // Dictionaries from backend
 import type { DictItem } from '@/api/dicts'
 const { locale } = useI18n()
+const router = useRouter()
 const cargoBodyTypes = ref<DictItem[]>([])
 const cargoLoadTypes = ref<DictItem[]>([])
 const currencies = ref<DictItem[]>([])
@@ -421,14 +423,36 @@ function resetForm() {
   })
 }
 
-function submitForm() {
+async function submitForm() {
   if (!form.cargo_name || !form.pickup_address || !form.delivery_address) {
     ElMessage.error('Заполните обязательные поля: Наименование и адреса')
     return
   }
-  // Here you would call backend API to create cargo
-  ElMessage.success('Груз опубликован (демо)')
-  resetForm()
+  
+  try {
+    // Map form data to ICargo structure
+    const payload = {
+      title: form.cargo_name,
+      description: form.note || `${form.cargo_type} - ${form.packing_type}`,
+      weight_kg: form.weight_kg || 0,
+      volume_m3: form.volume_m3?.toString() || '0',
+      pickup_address: form.pickup_address,
+      delivery_address: form.delivery_address,
+      pickup_date: form.pickup_date || new Date().toISOString().split('T')[0],
+      delivery_date: form.delivery_date || undefined,
+      price_offer: form.rate_with_vat?.toString() || form.rate_without_vat?.toString() || form.rate_cash?.toString() || undefined,
+      status: 'open' as const
+    }
+    
+    const result = await createCargo(payload)
+    ElMessage.success(`Груз "${result.title}" успешно опубликован!`)
+    resetForm()
+    // Optionally redirect to cargo list
+    setTimeout(() => router.push('/cargos'), 1500)
+  } catch (error: any) {
+    console.error('Failed to create cargo:', error)
+    ElMessage.error(error?.response?.data?.detail || 'Ошибка при публикации груза. Проверьте подключение к API.')
+  }
 }
 </script>
 

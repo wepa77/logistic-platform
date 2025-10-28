@@ -8,7 +8,12 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from django.db import transaction
-import stripe
+try:
+    import stripe
+    STRIPE_AVAILABLE = True
+except ImportError:
+    STRIPE_AVAILABLE = False
+    stripe = None
 
 from .models import (
     User, Vehicle, Cargo, Offer, Shipment, Review,
@@ -16,7 +21,8 @@ from .models import (
     UserTypeDict, ShipmentPaymentTypeDict, ShipmentPaymentStatusDict, WalletTransactionTypeDict,
     VehicleBodyTypeDict, VehicleLoadTypeDict, VehicleTruckCategoryDict, VehicleRateTypeDict,
     CurrencyDict, CargoBodyTypeDict, CargoLoadTypeDict, CargoRateTypeDict, CargoPaymentMethodDict,
-    CompanyTypeDict, CargoStatusDict, CargoTypeDict, ReadyStatusDict, VehicleTruckTypeDict
+    CompanyTypeDict, CargoStatusDict, CargoTypeDict, ReadyStatusDict, VehicleTruckTypeDict,
+    BodyLoadRequirementDict
 )
 from .serializers import (
     UserSerializer, VehicleSerializer, CargoSerializer,
@@ -28,7 +34,8 @@ from .serializers import (
     VehicleTruckCategoryDictSerializer, VehicleRateTypeDictSerializer, CurrencyDictSerializer,
     CargoBodyTypeDictSerializer, CargoLoadTypeDictSerializer, CargoRateTypeDictSerializer,
     CargoPaymentMethodDictSerializer, CompanyTypeDictSerializer, CargoStatusDictSerializer,
-    CargoTypeDictSerializer, ReadyStatusDictSerializer, VehicleTruckTypeDictSerializer
+    CargoTypeDictSerializer, ReadyStatusDictSerializer, VehicleTruckTypeDictSerializer,
+    BodyLoadRequirementDictSerializer
 )
 from .permissions import IsOwnerOrReadOnly
 from .filters import (
@@ -37,7 +44,8 @@ from .filters import (
     WalletTransactionFilter, TopUpRequestFilter,
 )
 
-stripe.api_key = settings.STRIPE_SECRET_KEY
+if STRIPE_AVAILABLE:
+    stripe.api_key = settings.STRIPE_SECRET_KEY
 
 # dasha/views.py
 from rest_framework import permissions, generics
@@ -55,6 +63,8 @@ class SetUserTypeView(generics.UpdateAPIView):
 # --- Stripe webhook ---
 @csrf_exempt
 def stripe_webhook(request):
+    if not STRIPE_AVAILABLE:
+        return HttpResponse(status=503)
     payload = request.body
     sig_header = request.META.get("HTTP_STRIPE_SIGNATURE")
     try:
@@ -395,4 +405,9 @@ class ReadyStatusDictViewSet(BaseDictViewSet):
 class VehicleTruckTypeDictViewSet(BaseDictViewSet):
     queryset = VehicleTruckTypeDict.objects.filter(is_active=True).order_by("ordering", "code")
     serializer_class = VehicleTruckTypeDictSerializer
+
+
+class BodyLoadRequirementDictViewSet(BaseDictViewSet):
+    queryset = BodyLoadRequirementDict.objects.filter(is_active=True).order_by("ordering", "code")
+    serializer_class = BodyLoadRequirementDictSerializer
 

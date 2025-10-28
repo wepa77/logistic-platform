@@ -33,3 +33,4 @@ export const getCargoPaymentMethods = () => list('/dicts/cargo-payment-methods/'
 export const getCargoTypes = () => list('/dicts/cargo-types/')
 export const getReadyStatuses = () => list('/dicts/ready-statuses/')
 export const getVehicleTruckTypes = () => list('/dicts/vehicle-truck-types/')
+export const getBodyLoadRequirements = () => list('/dicts/body-load-requirements/')
