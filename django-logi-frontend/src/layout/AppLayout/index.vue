@@ -2,12 +2,9 @@
   <el-container class="app-layout">
     <!-- SIDEBAR (hidden after redesign) -->
     <el-aside v-if="false" width="260px" class="sidebar">
-      <div class="logo">
-        <div class="logo-icon">
-          <i class="mdi mdi-truck-fast"></i>
+        <div class="logo">
+          <img :src="logoSrc" alt="Daşa" class="logo-img" />
         </div>
-        <span class="brand">Logistic</span>
-      </div>
 
       <!-- MENU -->
       <el-menu
@@ -73,14 +70,21 @@
     <el-container>
       <el-header class="header">
         <div class="header-left">
+          <el-button
+            v-if="isMobile"
+            class="menu-toggle"
+            text
+            @click="mobileMenuOpen = !mobileMenuOpen"
+          >
+            <i :class="mobileMenuOpen ? 'mdi mdi-close' : 'mdi mdi-menu'" />
+          </el-button>
           <div class="logo-inline">
-            <div class="logo-icon small"><i class="mdi mdi-truck-fast"></i></div>
-            <span class="brand">Logistic</span>
+            <img :src="logoSrc" alt="Daşa" class="logo-img inline" />
           </div>
-          <span class="page-title">{{ pageTitle }}</span>
+<!--          <span class="page-title">{{ pageTitle }}</span>-->
         </div>
 
-        <div class="nav-wrap">
+        <div class="nav-wrap" v-if="!isMobile">
           <el-menu
             mode="horizontal"
             router
@@ -90,17 +94,14 @@
             text-color="var(--el-text-color-primary)"
             active-text-color="var(--el-color-primary)"
           >
-            <el-menu-item index="/"><i class="mdi mdi-home-outline"></i> {{ $t('nav.home') }}</el-menu-item>
-            <el-menu-item index="/search/cargos"><i class="mdi mdi-magnify"></i> {{ $t('nav.searchCargos') }}</el-menu-item>
-            <el-menu-item index="/search/vehicles"><i class="mdi mdi-magnify"></i> {{ $t('nav.searchVehicles') }}</el-menu-item>
-            <el-menu-item index="/vehicles"><i class="mdi mdi-truck"></i> {{ $t('nav.myVehicles') }}</el-menu-item>
-            <el-menu-item index="/shipments"><i class="mdi mdi-transit-connection-variant"></i> {{ $t('nav.shipments') }}</el-menu-item>
-            <el-menu-item index="/cargos"><i class="mdi mdi-package-variant-closed"></i> {{ $t('nav.myCargos') }}</el-menu-item>
-            <el-menu-item index="/offers"><i class="mdi mdi-handshake-outline"></i> {{ $t('nav.offers') }}</el-menu-item>
-            <el-menu-item index="/driver-request"><i class="mdi mdi-clipboard-text-outline"></i> {{ $t('nav.driverRequest') }}</el-menu-item>
-            <el-menu-item index="/reviews"><i class="mdi mdi-star-outline"></i> {{ $t('nav.reviews') }}</el-menu-item>
-            <el-menu-item index="/wallet"><i class="mdi mdi-wallet-outline"></i> {{ $t('nav.wallet') }}</el-menu-item>
-            <el-menu-item index="/profile"><i class="mdi mdi-account-circle-outline"></i> {{ $t('nav.profile') }}</el-menu-item>
+            <el-menu-item
+              v-for="link in navLinks"
+              :key="link.index"
+              :index="link.index"
+            >
+              <i :class="`mdi ${link.icon}`"></i>
+              {{ $t(link.labelKey) }}
+            </el-menu-item>
           </el-menu>
         </div>
 
@@ -137,37 +138,96 @@
         </div>
       </el-header>
 
+      <el-drawer
+        v-model="mobileMenuOpen"
+        direction="ltr"
+        size="75%"
+        class="mobile-drawer"
+        :with-header="false"
+      >
+        <div class="mobile-drawer-inner">
+          <div class="mobile-user">
+            <el-avatar :size="48" :src="user?.avatar">
+              <i class="mdi mdi-account"></i>
+            </el-avatar>
+            <div class="mobile-user-details">
+              <div class="name">{{ user?.username || 'User' }}</div>
+              <div class="role">{{ userRole }}</div>
+            </div>
+          </div>
+          <el-menu
+            router
+            :default-active="$route.path"
+            class="mobile-menu"
+            background-color="transparent"
+            text-color="var(--el-text-color-primary)"
+            active-text-color="var(--el-color-primary)"
+          >
+            <el-menu-item
+              v-for="link in navLinks"
+              :key="link.index"
+              :index="link.index"
+              @click="mobileMenuOpen = false"
+            >
+              <i :class="`mdi ${link.icon}`"></i>
+              {{ $t(link.labelKey) }}
+            </el-menu-item>
+          </el-menu>
+          <div class="mobile-actions">
+            <el-button type="primary" text @click="toggleTheme">
+              <i :class="isDark ? 'mdi mdi-white-balance-sunny' : 'mdi mdi-weather-night'"></i>
+              {{ isDark ? $t('common.lightMode') : $t('common.darkMode') }}
+            </el-button>
+            <el-button type="danger" text @click="logout">
+              <i class="mdi mdi-logout"></i>
+              {{ $t('nav.logout') }}
+            </el-button>
+          </div>
+        </div>
+      </el-drawer>
+
       <!-- Secondary sub-navigation (ATI-like) -->
       <div class="subnav">
-        <router-link to="/cargos" class="subnav-item green">
-          <i class="mdi mdi-clipboard-text"></i>
-          <span>{{ $t('nav.myCargos') }}</span>
-        </router-link>
-        <router-link to="/cargos/add" class="subnav-item light-green">
-          <i class="mdi mdi-plus-circle-outline"></i>
-          <span>{{ $t('nav.addCargo') }}</span>
-        </router-link>
-        <router-link to="/vehicles" class="subnav-item amber">
-          <i class="mdi mdi-truck"></i>
-          <span>{{ $t('nav.myVehicles') }}</span>
-        </router-link>
-        <router-link to="/vehicles/add" class="subnav-item yellow">
-          <i class="mdi mdi-plus-circle-outline"></i>
-          <span>{{ $t('nav.addVehicle') }}</span>
-        </router-link>
-        <el-dropdown class="subnav-item orders" trigger="click">
-          <span class="el-dropdown-link">
-            <i class="mdi mdi-clipboard-check-outline"></i>
-            <span>{{ $t('nav.orders') }}</span>
-            <i class="mdi mdi-chevron-down small-caret"></i>
-          </span>
-          <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item @click="$router.push('/offers')">{{ $t('nav.offers') }}</el-dropdown-item>
-              <el-dropdown-item @click="$router.push('/shipments')">{{ $t('nav.shipments') }}</el-dropdown-item>
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown>
+        <div class="subnav-inner" :class="{ 'is-collapsed': isMobile && !mobileSubnavOpen }">
+          <router-link to="/cargos" class="subnav-item green">
+            <i class="mdi mdi-clipboard-text"></i>
+            <span>{{ $t('nav.myCargos') }}</span>
+          </router-link>
+          <router-link to="/cargos/add" class="subnav-item light-green">
+            <i class="mdi mdi-plus-circle-outline"></i>
+            <span>{{ $t('nav.addCargo') }}</span>
+          </router-link>
+          <router-link to="/vehicles" class="subnav-item amber">
+            <i class="mdi mdi-truck"></i>
+            <span>{{ $t('nav.myVehicles') }}</span>
+          </router-link>
+          <router-link to="/vehicles/add" class="subnav-item yellow">
+            <i class="mdi mdi-plus-circle-outline"></i>
+            <span>{{ $t('nav.addVehicle') }}</span>
+          </router-link>
+          <el-dropdown class="subnav-item orders" trigger="click">
+            <span class="el-dropdown-link">
+              <i class="mdi mdi-clipboard-check-outline"></i>
+              <span>{{ $t('nav.orders') }}</span>
+              <i class="mdi mdi-chevron-down small-caret"></i>
+            </span>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item @click="$router.push('/offers')">{{ $t('nav.offers') }}</el-dropdown-item>
+                <el-dropdown-item @click="$router.push('/shipments')">{{ $t('nav.shipments') }}</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </div>
+        <el-button
+          v-if="isMobile"
+          text
+          class="subnav-toggle"
+          @click="mobileSubnavOpen = !mobileSubnavOpen"
+        >
+          <span>{{ mobileSubnavOpen ? $t('common.hide') : $t('common.showMore') }}</span>
+          <i :class="mobileSubnavOpen ? 'mdi mdi-chevron-up' : 'mdi mdi-chevron-down'"></i>
+        </el-button>
       </div>
 
       <el-main class="main">
@@ -199,9 +259,10 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useAuthStore } from '@/store/auth'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { http } from '@/api/http'
 import LanguageSwitcher from '@/components/LanguageSwitcher.vue'
 
@@ -209,9 +270,23 @@ const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
 
-const user = computed(() => auth.user)
-import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
+
+const user = computed(() => auth.user)
+const logoSrc = '/dasha2.png'
+const navLinks = [
+  { index: '/', icon: 'mdi-home-outline', labelKey: 'nav.home' },
+  { index: '/search/cargos', icon: 'mdi-magnify', labelKey: 'nav.searchCargos' },
+  { index: '/search/vehicles', icon: 'mdi-magnify', labelKey: 'nav.searchVehicles' },
+  { index: '/vehicles', icon: 'mdi-truck', labelKey: 'nav.myVehicles' },
+  { index: '/shipments', icon: 'mdi-transit-connection-variant', labelKey: 'nav.shipments' },
+  { index: '/cargos', icon: 'mdi-package-variant-closed', labelKey: 'nav.myCargos' },
+  { index: '/offers', icon: 'mdi-handshake-outline', labelKey: 'nav.offers' },
+  { index: '/driver-request', icon: 'mdi-clipboard-text-outline', labelKey: 'nav.driverRequest' },
+  { index: '/reviews', icon: 'mdi-star-outline', labelKey: 'nav.reviews' },
+  { index: '/wallet', icon: 'mdi-wallet-outline', labelKey: 'nav.wallet' },
+  { index: '/profile', icon: 'mdi-account-circle-outline', labelKey: 'nav.profile' }
+]
 
 const userRole = computed(() => {
   if (auth.isCarrier) return t('userTypes.carrier')
@@ -230,6 +305,8 @@ const pageTitle = computed(() => {
   return (route.meta.title as string) || t('nav.home')
 })
 const notifications = ref(0)
+const isMobile = ref(false)
+const mobileMenuOpen = ref(false)
 
 // Hide ads in personal cabinet
 const hideAds = computed(() => route.name === 'profile')
@@ -252,7 +329,19 @@ function applyTheme(dark: boolean) {
   else root.classList.remove('dark')
 }
 
+function updateIsMobile() {
+  isMobile.value = window.innerWidth <= 992
+  if (!isMobile.value) {
+    mobileMenuOpen.value = false
+  }
+}
+
 // Fetch notifications when component mounts
+onMounted(() => {
+  updateIsMobile()
+  window.addEventListener('resize', updateIsMobile)
+})
+
 onMounted(async () => {
   try {
     const { data } = await http.get('/notifications/unread-count/')
@@ -260,6 +349,14 @@ onMounted(async () => {
   } catch (error) {
     console.error('Failed to fetch notifications:', error)
   }
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateIsMobile)
+})
+
+watch(() => route.path, () => {
+  mobileMenuOpen.value = false
 })
 
 async function logout() {
@@ -277,6 +374,14 @@ async function logout() {
   background: var(--el-bg-color);
   border-top: 1px solid var(--el-border-color);
   border-bottom: 1px solid var(--el-border-color);
+  justify-content: space-between;
+}
+
+.subnav-inner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 .subnav-item {
   display: inline-flex;
@@ -296,6 +401,12 @@ async function logout() {
 .subnav-item.yellow { background: #fde68a; color: #111827; }
 .subnav-item.orders { padding: 6px 8px; }
 .small-caret { font-size: 14px; }
+.subnav-toggle {
+  display: none;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+}
 
 /* existing styles */
 .app-layout {
@@ -316,29 +427,19 @@ async function logout() {
 .logo {
   display: flex;
   align-items: center;
-  padding: 1.5rem 1.25rem;
-  color: #fff;
-  gap: 12px;
+  justify-content: center;
+  padding: 1.25rem 1.25rem 1rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.logo-icon {
-  width: 42px;
-  height: 42px;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  color: white;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+.logo-img {
+  max-width: 140px;
+  width: 100%;
+  height: auto;
 }
 
-.brand {
-  font-weight: 700;
-  font-size: 1.35rem;
-  letter-spacing: -0.5px;
+.logo-img.inline {
+  max-width: 120px;
 }
 
 .menu {
@@ -443,6 +544,7 @@ async function logout() {
   color: #64748b;
   padding: 8px;
   transition: all 0.3s ease;
+  margin-right: 8px;
 }
 
 .menu-toggle:hover {
@@ -574,6 +676,140 @@ async function logout() {
 @media (max-width: 1024px) {
   .content-with-ads { grid-template-columns: 1fr; }
   .ad-rail { display: none; }
+}
+
+@media (max-width: 992px) {
+  .header {
+    padding: 0 16px;
+  }
+
+  .nav-wrap {
+    display: none;
+  }
+
+  .header-left {
+    gap: 12px;
+  }
+
+  .page-title {
+    font-size: 18px;
+  }
+
+  .header-right {
+    gap: 4px;
+  }
+
+  .header-action {
+    font-size: 18px;
+    padding: 8px;
+  }
+
+  .user-dropdown {
+    margin-left: 4px;
+  }
+
+  .subnav {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+
+  .subnav-inner {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .subnav-inner::-webkit-scrollbar {
+    display: none;
+  }
+
+  .subnav-toggle {
+    display: inline-flex;
+    align-self: flex-end;
+  }
+
+  .subnav-inner.is-collapsed {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+
+  .subnav-inner.is-collapsed .subnav-item {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-wrap: wrap;
+    height: auto;
+    gap: 12px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+
+  .header-left {
+    width: 100%;
+  }
+
+  .header-right {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .main {
+    padding: 16px;
+    height: auto;
+    min-height: calc(100vh - 64px);
+  }
+
+  .ad-banner {
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .page-title {
+    font-size: 16px;
+  }
+
+  .logo-inline .brand {
+    font-size: 16px;
+  }
+
+  .header-right {
+    gap: 4px;
+  }
+
+  .mobile-drawer-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .mobile-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .mobile-user-details .name {
+    font-weight: 600;
+  }
+
+  .mobile-menu {
+    border-right: none;
+  }
+
+  .mobile-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: auto;
+  }
 }
 
 </style>

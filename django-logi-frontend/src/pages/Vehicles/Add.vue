@@ -272,17 +272,155 @@ function submitForm() {
 }
 </script>
 
-<style scoped>
-.vehicle-add-page { padding: 16px; }
-.vehicle-card { border-radius: 12px; }
-.page-title { display: flex; align-items: center; gap: 8px; margin: 0 0 12px; }
-.prefilter-banner { margin-bottom: 12px; }
-.form-section { margin-top: 18px; }
-.form-section h2 { font-size: 16px; margin: 0 0 12px; color: #334155; }
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
-.extras { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 10px; color: #334155; }
-.rate-mode { margin: 8px 0 12px; }
-.submit-wrapper { margin-top: 16px; display: flex; justify-content: flex-end; }
-@media (max-width: 1024px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+<style scoped>/* ============================================
+ ✅ Global Layout
+============================================ */
+.vehicle-add-page {
+  padding: 16px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.vehicle-card {
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.page-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 24px;
+  margin-bottom: 14px;
+}
+
+/* ============================================
+ ✅ Base Grids
+============================================ */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.extras {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+/* ============================================
+ ✅ Responsive Behavior
+============================================ */
+
+/* ---------- Large Tablets/Laptops: 1024px ↓ ---------- */
+@media (max-width: 1024px) {
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .grid-3 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ---------- Tablets: 768px ↓ ---------- */
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 20px;
+  }
+
+  .vehicle-card {
+    padding: 16px;
+  }
+
+  .grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .extras {
+    gap: 12px;
+  }
+
+  /* Input groups full-width */
+  .el-select,
+  .el-input,
+  .el-input-number,
+  .el-date-picker {
+    width: 100% !important;
+  }
+
+  .submit-wrapper {
+    justify-content: center;
+  }
+}
+
+/* ---------- Phones: 480px ↓ ---------- */
+@media (max-width: 480px) {
+
+  .page-title {
+    font-size: 18px;
+    gap: 6px;
+  }
+
+  .form-section h2 {
+    font-size: 14px;
+  }
+
+  .grid-2,
+  .grid-3 {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .rate-mode {
+    flex-direction: column;
+  }
+
+  .extras {
+    gap: 10px;
+  }
+
+  .submit-wrapper {
+    margin-top: 20px;
+  }
+
+  .submit-wrapper .el-button {
+    width: 100%;
+    padding: 14px 0;
+    font-size: 16px;
+  }
+}
+
+/* ---------- Smallest Phones: 360px ↓ ---------- */
+@media (max-width: 360px) {
+
+  .page-title {
+    font-size: 16px;
+  }
+
+  .vehicle-card {
+    padding: 12px;
+  }
+
+  .extras {
+    gap: 8px;
+  }
+
+  .form-section h2 {
+    font-size: 13px;
+  }
+
+  .submit-wrapper .el-button {
+    font-size: 15px;
+  }
+}
+
 </style>

@@ -203,7 +203,7 @@
 
         <el-table-column prop="gps_enabled" label="GPS" width="120">
           <template #default="scope">
-            <el-tag 
+            <el-tag
                 :type="scope.row.gps_enabled ? 'success' : 'info'"
                 :class="`gps-tag ${scope.row.gps_enabled ? 'enabled' : 'disabled'}`"
                 effect="plain"
@@ -448,10 +448,10 @@
     </el-card>
 
     <!-- Modern Dialog for create/update -->
-    <el-dialog 
+    <el-dialog
         v-if="!embedded"
-        v-model="dialogVisible" 
-        :title="form.id ? 'Edit Vehicle' : 'Add New Vehicle'" 
+        v-model="dialogVisible"
+        :title="form.id ? 'Edit Vehicle' : 'Add New Vehicle'"
         width="700px"
         class="modern-dialog"
     >
@@ -927,23 +927,45 @@ async function fetchVehicles() {
   try {
     // Build params from route.query + pagination
     const q = route.query as Record<string, any>
-    const params: Record<string, any> = { ...q }
-    params.page = page.value
-    params.page_size = pageSize.value
+    const params: Record<string, any> = { 
+      ...q,
+      page: page.value,
+      page_size: pageSize.value,
+      // Force include all vehicles for admin
+      all: true,
+      // Remove any filters that might be hiding vehicles
+      status: 'active',
+      is_active: true
+    }
 
     // Normalize booleans that may come as '1' from Search page
     ;['has_adr','has_lift','has_horses','has_gps','partial_load','without_bargain','pay_to_card'].forEach(k => {
       if (params[k] === '1' || params[k] === 'true') params[k] = 1
     })
 
-    const { data } = await getVehicles(params)
-    if (Array.isArray(data)) {
-      vehicles.value = data as any
-      total.value = data.length
-    } else if (data && typeof data === 'object' && 'results' in data) {
-      vehicles.value = (data as any).results
-      total.value = Number((data as any).count || 0)
-    } else {
+    console.log('Fetching vehicles with params:', params)
+    try {
+      const response = await getVehicles(params)
+      console.log('API Response:', response)
+      
+      const { data } = response
+      if (Array.isArray(data)) {
+        console.log('Received array of vehicles:', data.length)
+        vehicles.value = data as any
+        total.value = data.length
+      } else if (data && typeof data === 'object' && 'results' in data) {
+        console.log('Received paginated response with count:', data.count)
+        vehicles.value = (data as any).results
+        total.value = Number((data as any).count || 0)
+      } else {
+        console.warn('Unexpected API response format:', data)
+        ElMessage.warning('Received unexpected data format from server')
+        vehicles.value = []
+        total.value = 0
+      }
+    } catch (error: any) {
+      console.error('Error fetching vehicles:', error)
+      ElMessage.error(`Failed to load vehicles: ${error.message || 'Unknown error'}`)
       vehicles.value = []
       total.value = 0
     }
@@ -956,7 +978,7 @@ function openDialog(vehicle?: Vehicle) {
   if (vehicle) {
     form.value = { ...vehicle }
   } else {
-    form.value = { 
+    form.value = {
       plate_number: '',
       brand: '',
       model: '',
@@ -964,7 +986,7 @@ function openDialog(vehicle?: Vehicle) {
       capacity_kg: 0,
       volume_m3: 0,
       truck_type: '',
-      gps_enabled: false 
+      gps_enabled: false
     }
   }
   file = null

@@ -1,94 +1,123 @@
 <template>
   <div class="shipments-page">
-    <!-- Header Section -->
-    <div class="page-header">
-      <div class="header-content">
-        <div class="header-left">
-          <h1 class="page-title">
-            <i class="mdi mdi-transit-connection-variant"></i>
-            Shipments Management
-          </h1>
-          <p class="page-subtitle">Track and manage all shipment operations</p>
+    <div class="page-hero">
+      <div class="hero-info">
+        <div class="hero-icon">
+          <i class="mdi mdi-transit-connection-variant"></i>
         </div>
-        <div class="header-actions">
-          <el-button type="primary" size="large" @click="openDialog()" class="add-btn">
-            <i class="mdi mdi-plus"></i>
-            Create Shipment
-          </el-button>
+        <div class="hero-text">
+          <h1>Shipments Management</h1>
+          <p>Track logistics performance, commissions, and payment status in real time.</p>
         </div>
+      </div>
+      <div class="hero-actions">
+        <el-button type="primary" size="large" @click="openDialog()">
+          <i class="mdi mdi-plus"></i>
+          Create Shipment
+        </el-button>
+        <el-button size="large" text @click="fetchShipments">
+          <i class="mdi mdi-refresh"></i>
+          Refresh
+        </el-button>
       </div>
     </div>
 
-    <!-- Filters & Search Section -->
     <el-card class="filters-card" shadow="never">
-      <div class="filters-container">
+      <div class="filters-header">
+        <div class="filters-title">
+          <i class="mdi mdi-filter-variant"></i>
+          <span>Quick filters</span>
+        </div>
+        <el-button text size="small" @click="resetFilters">Reset</el-button>
+      </div>
+      <div class="filters-grid">
         <el-input
-            v-model="searchQuery"
-            placeholder="Search by cargo, carrier..."
-            class="search-input"
-            clearable
+          v-model="searchQuery"
+          placeholder="Search by cargo, carrier, or vehicle"
+          clearable
         >
           <template #prefix>
             <i class="mdi mdi-magnify"></i>
           </template>
         </el-input>
-
-        <el-select v-model="paymentFilter" placeholder="Payment Status" clearable class="payment-filter">
-          <el-option label="All Status" value="" />
+        <el-select v-model="paymentFilter" placeholder="Payment status" clearable>
+          <el-option label="All status" value="" />
           <el-option label="Paid" value="paid" />
           <el-option label="Pending" value="pending" />
           <el-option label="Failed" value="failed" />
         </el-select>
-
-        <el-button class="filter-btn" @click="fetchShipments">
-          <i class="mdi mdi-refresh"></i>
-        </el-button>
+        <el-date-picker
+          v-model="dateRange"
+          type="daterange"
+          range-separator="to"
+          start-placeholder="Start date"
+          end-placeholder="End date"
+          value-format="YYYY-MM-DD"
+          clearable
+        />
+        <div class="filters-stat">
+          <span>Total revenue</span>
+          <strong>{{ stats.totalRevenue.toFixed(2) }} TMT</strong>
+        </div>
       </div>
     </el-card>
 
-    <!-- Stats Cards -->
-    <div class="stats-grid">
-      <div class="stat-card">
+    <div class="stats-section">
+      <el-card class="stat-card" shadow="hover">
         <div class="stat-icon total">
-          <i class="mdi mdi-package-variant-closed"></i>
+          <i class="mdi mdi-chart-timeline-variant"></i>
         </div>
-        <div class="stat-content">
-          <div class="stat-value">{{ shipments.length }}</div>
-          <div class="stat-label">Total Shipments</div>
+        <div class="stat-body">
+          <span class="label">Total Shipments</span>
+          <span class="value">{{ shipments.length }}</span>
         </div>
-      </div>
-      <div class="stat-card">
+      </el-card>
+      <el-card class="stat-card" shadow="hover">
         <div class="stat-icon paid">
           <i class="mdi mdi-check-circle"></i>
         </div>
-        <div class="stat-content">
-          <div class="stat-value">{{ stats.paid }}</div>
-          <div class="stat-label">Paid</div>
+        <div class="stat-body">
+          <span class="label">Paid</span>
+          <span class="value">{{ stats.paid }}</span>
         </div>
-      </div>
-      <div class="stat-card">
+      </el-card>
+      <el-card class="stat-card" shadow="hover">
         <div class="stat-icon pending">
-          <i class="mdi mdi-clock-outline"></i>
+          <i class="mdi mdi-timer-sand"></i>
         </div>
-        <div class="stat-content">
-          <div class="stat-value">{{ stats.pending }}</div>
-          <div class="stat-label">Pending</div>
+        <div class="stat-body">
+          <span class="label">Pending</span>
+          <span class="value">{{ stats.pending }}</span>
         </div>
-      </div>
-      <div class="stat-card">
+      </el-card>
+      <el-card class="stat-card" shadow="hover">
         <div class="stat-icon revenue">
           <i class="mdi mdi-cash-multiple"></i>
         </div>
-        <div class="stat-content">
-          <div class="stat-value">{{ stats.totalRevenue.toFixed(2) }}</div>
-          <div class="stat-label">Total Revenue (TMT)</div>
+        <div class="stat-body">
+          <span class="label">Commission Earned</span>
+          <span class="value">{{ stats.totalRevenue.toFixed(2) }} TMT</span>
         </div>
-      </div>
+      </el-card>
     </div>
 
-    <!-- Shipments Table -->
     <el-card class="table-card" shadow="never">
-      <el-table :data="filteredShipments" style="width: 100%" class="modern-table">
+      <div class="table-header">
+        <div>
+          <h3>Shipments overview</h3>
+          <p>{{ filteredShipments.length }} results</p>
+        </div>
+        <el-button text @click="exportShipments">
+          <i class="mdi mdi-download"></i>
+          Export CSV
+        </el-button>
+      </div>
+      <el-table
+        :data="filteredShipments"
+        style="width: 100%"
+        class="modern-table"
+        border={false}
+      >
         <el-table-column label="Cargo" min-width="200">
           <template #default="{ row }">
             <div class="cargo-cell">
@@ -190,6 +219,17 @@
           </template>
         </el-table-column>
       </el-table>
+      <div v-if="!filteredShipments.length" class="empty-state">
+        <div class="empty-icon">
+          <i class="mdi mdi-truck-delivery"></i>
+        </div>
+        <h4>No shipments found</h4>
+        <p>Try adjusting filters or create your first shipment.</p>
+        <el-button type="primary" @click="openDialog()">
+          <i class="mdi mdi-plus"></i>
+          Create shipment
+        </el-button>
+      </div>
     </el-card>
 
     <!-- Modern Dialog for create/update -->
@@ -331,6 +371,7 @@ const vehicleOptions = ref<any[]>([])
 const dialogVisible = ref(false)
 const searchQuery = ref('')
 const paymentFilter = ref('')
+const dateRange = ref<[string, string] | null>(null)
 
 const form = ref<Shipment>({
   cargo: null,
@@ -370,8 +411,62 @@ const filteredShipments = computed(() => {
     filtered = filtered.filter(shipment => shipment.payment_status === paymentFilter.value)
   }
 
+  if (dateRange.value && dateRange.value.length === 2) {
+    const [start, end] = dateRange.value
+    const startDate = new Date(`${start}T00:00:00`)
+    const endDate = new Date(`${end}T23:59:59`)
+
+    filtered = filtered.filter(shipment => {
+      const reference = shipment.start_time || shipment.end_time
+      if (!reference) return false
+      const current = new Date(reference)
+      return current >= startDate && current <= endDate
+    })
+  }
+
   return filtered
 })
+
+function resetFilters() {
+  searchQuery.value = ''
+  paymentFilter.value = ''
+  dateRange.value = null
+}
+
+function exportShipments() {
+  const rows = filteredShipments.value
+  if (!rows.length) {
+    ElMessage.warning('No shipments to export')
+    return
+  }
+
+  const header = ['Cargo', 'Carrier', 'Distance (km)', 'Total price (TMT)', 'Payment status', 'Commission (TMT)', 'Start time', 'End time']
+  const body = rows.map(row => [
+    row.cargo?.title || '',
+    row.carrier?.username || '',
+    row.distance_km ?? '',
+    row.total_price ?? '',
+    formatPaymentStatus(row.payment_status || ''),
+    row.commission_amount ?? '',
+    row.start_time ? formatTime(row.start_time) : '',
+    row.end_time ? formatTime(row.end_time) : ''
+  ])
+
+  const csv = [header, ...body]
+    .map(line => line.map(value => `"${String(value).replaceAll('"', '""')}"`).join(','))
+    .join('\n')
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.setAttribute('download', `shipments-${Date.now()}.csv`)
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
+  ElMessage.success('Shipments exported')
+}
 
 async function fetchShipments() {
   const { data } = await apiGetShipments()
@@ -466,147 +561,387 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-/* ==========================================================
- ✅ Responsive Enhancements for Shipments Management Page
-========================================================== */
+.shipments-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+}
 
-/* ---------- 1280px ↓ ---------- */
-@media (max-width: 1280px) {
-  .form-grid {
-    grid-template-columns: 1fr 1fr;
+.page-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 24px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: #fff;
+  box-shadow: 0 20px 50px -20px rgba(15, 23, 42, 0.8);
+}
+
+.hero-info {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.hero-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 30px;
+}
+
+.hero-text h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 6px;
+}
+
+.hero-text p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.filters-card {
+  border-radius: 16px;
+  border: 1px solid rgba(15, 23, 42, 0.05);
+  padding: 20px 24px;
+}
+
+.filters-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.filters-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.filters-stat {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: #f1f5f9;
+  color: #0f172a;
+  font-size: 14px;
+}
+
+.filters-stat strong {
+  font-size: 18px;
+  margin-top: 4px;
+}
+
+.stats-section {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.stat-card {
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 20px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  border: none;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 45px -20px rgba(15, 23, 42, 0.35);
+}
+
+.stat-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  font-size: 26px;
+  color: #fff;
+}
+
+.stat-icon.total { background: linear-gradient(135deg, #6366f1, #4338ca); }
+.stat-icon.paid { background: linear-gradient(135deg, #22c55e, #16a34a); }
+.stat-icon.pending { background: linear-gradient(135deg, #f97316, #ea580c); }
+.stat-icon.revenue { background: linear-gradient(135deg, #14b8a6, #0d9488); }
+
+.stat-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-body .label {
+  font-size: 13px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.stat-body .value {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.table-card {
+  border-radius: 16px;
+  border: 1px solid rgba(15, 23, 42, 0.05);
+  padding: 0;
+}
+
+.table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.05);
+}
+
+.table-header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.table-header p {
+  margin: 2px 0 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.modern-table :deep(.el-table__header-wrapper) {
+  background: #f8fafc;
+}
+
+.modern-table :deep(th) {
+  background: transparent;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.modern-table :deep(.el-table__row) {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.modern-table :deep(.el-table__row:hover) {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px -12px rgba(15, 23, 42, 0.2);
+}
+
+.cargo-cell,
+.carrier-cell,
+.details-cell,
+.commission-cell,
+.timeline-cell,
+.action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.details-cell {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.detail-item,
+.time-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #475569;
+}
+
+.payment-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-transform: capitalize;
+  font-weight: 600;
+  border-radius: 20px;
+  padding: 2px 10px;
+}
+
+.payment-paid { background: rgba(34, 197, 94, 0.12); color: #16a34a; }
+.payment-pending { background: rgba(249, 115, 22, 0.12); color: #ea580c; }
+.payment-failed { background: rgba(239, 68, 68, 0.12); color: #dc2626; }
+
+.action-buttons {
+  gap: 6px;
+}
+
+.action-buttons .el-button {
+  font-size: 18px;
+}
+
+.empty-state {
+  display: grid;
+  place-items: center;
+  padding: 32px 24px 40px;
+  text-align: center;
+  color: #475569;
+  gap: 12px;
+}
+
+.empty-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #f1f5f9;
+  color: #0f172a;
+  font-size: 32px;
+}
+
+.shipment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.form-item-full {
+  grid-column: span 2;
+}
+
+.dialog-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 12px;
+}
+
+@media (max-width: 1200px) {
+  .filters-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stats-section {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-/* ---------- 1024px ↓ Tablets ---------- */
-@media (max-width: 1024px) {
-  .header-content {
+@media (max-width: 992px) {
+  .page-hero {
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
   }
 
-  .filters-container {
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
-  .search-input {
-    flex: 1 1 100%;
-    max-width: none;
-  }
-
-  .payment-filter {
+  .hero-actions {
     width: 100%;
+    justify-content: flex-start;
   }
 
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .form-grid {
-    grid-template-columns: 1fr 1fr;
+  .filters-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-/* ---------- 768px ↓ Mobile / Small tablets ---------- */
 @media (max-width: 768px) {
-
-  .page-title {
-    font-size: 22px;
+  .shipments-page {
+    padding: 16px;
   }
 
-  .page-subtitle {
-    font-size: 13px;
-  }
-
-  .filters-container {
+  .hero-info {
     flex-direction: column;
-    align-items: stretch;
+    align-items: flex-start;
   }
 
-  .search-input,
-  .payment-filter {
-    width: 100%;
+  .hero-icon {
+    width: 56px;
+    height: 56px;
   }
 
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+  .hero-text h1 {
+    font-size: 24px;
   }
 
-  /* ✅ Table must scroll horizontally */
+  .filters-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filters-card {
+    padding: 16px;
+  }
+
+  .stats-section {
+    grid-template-columns: 1fr;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-item-full {
+    grid-column: span 1;
+  }
+
   .table-card {
-    overflow-x: auto;
+    overflow: hidden;
   }
 
   .modern-table :deep(.el-table__body-wrapper) {
     overflow-x: auto;
   }
-
-  /* ✅ Form grid becomes 1 column */
-  .form-grid {
-    grid-template-columns: 1fr;
-    gap: 14px;
-  }
-
-  .add-btn {
-    width: 100%;
-  }
 }
 
-/* ---------- 600px ↓ Phones ---------- */
-@media (max-width: 600px) {
-  .shipments-page {
-    padding: 10px;
-  }
-
-  .page-title {
-    font-size: 20px;
-  }
-
-  .stat-card {
-    padding: 14px;
-  }
-
-  .stat-value {
-    font-size: 22px;
-  }
-
-  .filters-card {
-    padding: 12px;
-  }
-
-  .details-cell {
-    gap: 4px;
-  }
-}
-
-/* ---------- 480px ↓ Small phones ---------- */
 @media (max-width: 480px) {
-
-  .page-title {
-    font-size: 18px;
+  .page-hero {
+    padding: 18px;
   }
 
-  .add-btn {
-    padding: 10px 16px;
+  .hero-actions {
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .stat-card {
-    padding: 12px;
-  }
-
-  .filters-container {
+  .filters-header {
+    flex-direction: column;
+    align-items: flex-start;
     gap: 8px;
   }
 
   .dialog-footer {
     flex-direction: column;
-    gap: 8px;
   }
 
   .dialog-footer .el-button {
@@ -614,27 +949,13 @@ onMounted(async () => {
   }
 }
 
-/* ---------- 360px ↓ Ultra-small ---------- */
 @media (max-width: 360px) {
-
-  .page-title {
-    font-size: 16px;
-  }
-
-  .page-subtitle {
-    font-size: 12px;
+  .hero-text h1 {
+    font-size: 20px;
   }
 
   .filters-card {
-    padding: 8px;
-  }
-
-  .stat-card {
-    padding: 10px;
-  }
-
-  .form-grid {
-    gap: 10px;
+    padding: 12px;
   }
 }
 
