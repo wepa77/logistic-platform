@@ -292,51 +292,287 @@ function extractCity(address?: string){
 </script>
 
 <style scoped>
-.profile-page { padding: 12px; }
-.profile-layout { display: grid; grid-template-columns: 280px 1fr; gap: 16px; }
-.left-rail { position: sticky; top: 12px; height: fit-content; }
-.rail-card { margin-bottom: 12px; }
-.rail-pay-text { display:flex; align-items:center; justify-content:space-between; gap: 8px; }
-.muted { color:#6b7280; font-size:12px; }
-.ad .ad-placeholder { height: 120px; background: #f1f5f9; border: 1px dashed #cbd5e1; border-radius: 6px; display:flex; align-items:center; justify-content:center; color:#64748b; }
-.rail-menu ul { list-style:none; padding:0; margin:0; }
-.rail-menu li { border-bottom: 1px solid #e5e7eb; }
-.rail-menu li.divider { height: 10px; border: 0; }
-.rail-menu .item,
-.rail-menu a { display:flex; align-items:center; gap:10px; padding:12px 8px; color:#334155; text-decoration:none; }
-.rail-menu a:hover { background:#f8fafc; }
-.rail-menu .with-action { justify-content: space-between; }
-.icon-btn { padding: 0 6px; height: 24px; }
-.ml8 { margin-left: 8px; }
-.small { font-size: 14px; }
-.muted { color:#6b7280; }
-.mt12{ margin-top:12px; }
+/* ---- Base Layout ---- */
+.profile-page {
+  padding: 12px;
+}
 
-.main-content {}
-.page-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
-.title { margin:0; font-size:22px; }
-.subtitle { margin:2px 0 0; color:#64748b; font-size:13px; }
-.mb16{ margin-bottom:16px; }
-.grid{ display:grid; grid-template-columns: 1fr 300px; gap:12px; margin-bottom:12px; }
-.grid.two{ grid-template-columns: 1fr 1fr; }
-.card-header{ display:flex; align-items:center; justify-content:space-between; }
-.passport-row{ display:flex; padding:8px 0; border-bottom:1px solid #f1f5f9; }
-.passport-row .label{ width:40%; color:#64748b; }
-.passport-row .value{ flex:1; }
-.balance-value{ font-size:28px; font-weight:600; margin:8px 0 12px; }
-.kv .row{ display:flex; padding:6px 0; border-bottom:1px dashed #eef2f7; }
-.kv .k{ width:40%; color:#64748b; }
-.kv .v{ flex:1; }
-.contact-grid{ display:flex; gap:12px; align-items:flex-start; }
-.logo-uploader{ min-width:120px; }
-.avatar-uploader :deep(.el-upload--picture-card){ width: 100px; height: 100px; }
-.upload-placeholder{ display:flex; flex-direction:column; align-items:center; justify-content:center; color:#64748b; }
-@media (max-width: 1024px){
-  .profile-layout{ grid-template-columns: 1fr; }
+.profile-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 16px;
 }
-@media (max-width: 900px){
-  .grid{ grid-template-columns:1fr; }
-  .grid.two{ grid-template-columns:1fr; }
-  .contact-grid{ flex-direction:column; }
+
+.left-rail {
+  position: sticky;
+  top: 12px;
+  height: fit-content;
 }
+
+.rail-card {
+  margin-bottom: 12px;
+}
+
+.rail-pay-text {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.muted {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.rail-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.rail-menu li {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.rail-menu li.divider {
+  height: 10px;
+  border: 0;
+}
+
+.rail-menu .item,
+.rail-menu a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 8px;
+  color: #334155;
+  text-decoration: none;
+}
+
+.rail-menu a:hover {
+  background: #f8fafc;
+}
+
+.rail-menu .with-action {
+  justify-content: space-between;
+}
+
+.icon-btn {
+  padding: 0 6px;
+  height: 24px;
+}
+
+/* ---- Main ---- */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.title {
+  margin: 0;
+  font-size: 22px;
+}
+
+.subtitle {
+  margin: 2px 0 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+/* ---- Grids ---- */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.grid.two {
+  grid-template-columns: 1fr 1fr;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Passport */
+.passport-row {
+  display: flex;
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.passport-row .label {
+  width: 40%;
+  color: #64748b;
+}
+
+.passport-row .value {
+  flex: 1;
+}
+
+/* Balance */
+.balance-value {
+  font-size: 28px;
+  font-weight: 600;
+  margin: 8px 0 12px;
+}
+
+/* KV rows */
+.kv .row {
+  display: flex;
+  padding: 6px 0;
+  border-bottom: 1px dashed #eef2f7;
+}
+
+.kv .k {
+  width: 40%;
+  color: #64748b;
+}
+
+.kv .v {
+  flex: 1;
+}
+
+/* Contact Grid */
+.contact-grid {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.logo-uploader {
+  min-width: 120px;
+}
+
+.avatar-uploader :deep(.el-upload--picture-card) {
+  width: 100px;
+  height: 100px;
+}
+
+/* ------------------------- */
+/* ✅ FULL RESPONSIVE SYSTEM */
+/* ------------------------- */
+
+/* ✅ 1024px — Tablet, small laptop */
+@media (max-width: 1024px) {
+  .profile-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .left-rail {
+    position: relative;
+    top: 0;
+    order: 1;
+  }
+
+  .main-content {
+    order: 2;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .title {
+    font-size: 20px;
+  }
+}
+
+/* ✅ 900px — Collapse all grids */
+@media (max-width: 900px) {
+  .grid,
+  .grid.two {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-grid {
+    flex-direction: column;
+  }
+}
+
+/* ✅ 768px — Mobile landscape */
+@media (max-width: 768px) {
+  .profile-page {
+    padding: 8px;
+  }
+
+  .passport-row .label,
+  .kv .k {
+    width: 45%;
+  }
+}
+
+/* ✅ 600px — Phones */
+@media (max-width: 600px) {
+  .title {
+    font-size: 18px;
+  }
+
+  .subtitle {
+    font-size: 12px;
+  }
+
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .balance-value {
+    font-size: 24px;
+  }
+
+  .logo-uploader {
+    min-width: 100%;
+  }
+}
+
+/* ✅ 480px — Small phones */
+@media (max-width: 480px) {
+  .passport-row,
+  .kv .row {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .passport-row .label,
+  .kv .k {
+    width: 100%;
+  }
+
+  .left-rail .rail-card {
+    padding: 10px 8px;
+  }
+
+  .rail-menu .item,
+  .rail-menu a {
+    padding: 10px 6px;
+    font-size: 14px;
+  }
+}
+
+/* ✅ 360px — Mini devices */
+@media (max-width: 360px) {
+  .profile-page {
+    padding: 4px;
+  }
+
+  .rail-menu a {
+    font-size: 13px;
+  }
+
+  .passport-row,
+  .kv .row {
+    padding: 4px 0;
+  }
+}
+
 </style>

@@ -466,384 +466,37 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.shipments-page {
-  max-width: 1400px;
-  margin: 0 auto;
+/* ==========================================================
+ ✅ Responsive Enhancements for Shipments Management Page
+========================================================== */
+
+/* ---------- 1280px ↓ ---------- */
+@media (max-width: 1280px) {
+  .form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
-/* Page Header */
-.page-header {
-  margin-bottom: 24px;
-}
-
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 20px;
-}
-
-.header-left {
-  flex: 1;
-}
-
-.page-title {
-  font-size: 28px;
-  font-weight: 700;
-  color: #0f172a;
-  margin: 0 0 8px 0;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.page-title i {
-  color: #3b82f6;
-  font-size: 32px;
-}
-
-.page-subtitle {
-  font-size: 15px;
-  color: #64748b;
-  margin: 0;
-}
-
-.add-btn {
-  padding: 12px 24px;
-  font-weight: 600;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
-}
-
-.add-btn i {
-  margin-right: 6px;
-  font-size: 18px;
-}
-
-/* Filters Card */
-.filters-card {
-  margin-bottom: 20px;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-}
-
-.filters-container {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-.search-input {
-  flex: 1;
-  max-width: 400px;
-}
-
-.payment-filter {
-  width: 180px;
-}
-
-.filter-btn {
-  padding: 12px;
-  font-size: 20px;
-  border-radius: 8px;
-}
-
-/* Stats Grid */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.stat-card {
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  border: 1px solid #e2e8f0;
-  transition: all 0.3s ease;
-}
-
-.stat-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.stat-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
-  color: white;
-}
-
-.stat-icon.total {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-}
-
-.stat-icon.paid {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-}
-
-.stat-icon.pending {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-}
-
-.stat-icon.revenue {
-  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-}
-
-.stat-content {
-  flex: 1;
-}
-
-.stat-value {
-  font-size: 28px;
-  font-weight: 700;
-  color: #0f172a;
-  line-height: 1;
-  margin-bottom: 4px;
-}
-
-.stat-label {
-  font-size: 14px;
-  color: #64748b;
-  font-weight: 500;
-}
-
-/* Table Card */
-.table-card {
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-}
-
-.modern-table {
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.modern-table :deep(.el-table__header) {
-  background: #f8fafc;
-}
-
-.modern-table :deep(th) {
-  background: #f8fafc !important;
-  color: #475569;
-  font-weight: 600;
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.modern-table :deep(.el-table__row:hover) {
-  background: #f8fafc;
-}
-
-.cargo-cell {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 600;
-  color: #0f172a;
-}
-
-.cargo-cell i {
-  color: #3b82f6;
-  font-size: 18px;
-}
-
-.carrier-cell {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: #475569;
-}
-
-.carrier-avatar {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-}
-
-.details-cell {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.detail-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  color: #64748b;
-}
-
-.detail-item i {
-  color: #94a3b8;
-  font-size: 16px;
-}
-
-.commission-cell {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-weight: 600;
-  color: #8b5cf6;
-}
-
-.commission-cell i {
-  font-size: 16px;
-}
-
-.payment-tag {
-  font-weight: 600;
-  font-size: 12px;
-  padding: 6px 12px;
-  border-radius: 6px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.payment-tag i {
-  font-size: 14px;
-}
-
-.timeline-cell {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.time-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: #64748b;
-}
-
-.time-item i {
-  color: #94a3b8;
-  font-size: 14px;
-}
-
-.action-buttons {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-}
-
-.action-buttons :deep(.el-button) {
-  font-size: 18px;
-  padding: 8px;
-  transition: all 0.3s ease;
-}
-
-.action-buttons :deep(.el-button:hover) {
-  transform: scale(1.1);
-}
-
-/* Dialog Styles */
-.modern-dialog :deep(.el-dialog) {
-  border-radius: 16px;
-  overflow: hidden;
-}
-
-.modern-dialog :deep(.el-dialog__header) {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  color: white;
-  padding: 20px 24px;
-  margin: 0;
-}
-
-.modern-dialog :deep(.el-dialog__title) {
-  color: white;
-  font-weight: 600;
-  font-size: 18px;
-}
-
-.modern-dialog :deep(.el-dialog__headerbtn .el-dialog__close) {
-  color: white;
-  font-size: 20px;
-}
-
-.modern-dialog :deep(.el-dialog__body) {
-  padding: 24px;
-}
-
-.shipment-form {
-  margin-top: 8px;
-}
-
-.form-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-}
-
-.form-item-full {
-  grid-column: 1 / -1;
-}
-
-.shipment-form :deep(.el-form-item__label) {
-  font-weight: 600;
-  color: #334155;
-  margin-bottom: 8px;
-}
-
-.shipment-form :deep(.el-input__wrapper) {
-  border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.option-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.option-item i {
-  color: #3b82f6;
-  font-size: 16px;
-}
-
-.dialog-footer {
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-}
-
-.dialog-footer .el-button {
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-}
-
-.dialog-footer .el-button i {
-  margin-right: 6px;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
+/* ---------- 1024px ↓ Tablets ---------- */
+@media (max-width: 1024px) {
   .header-content {
     flex-direction: column;
     align-items: flex-start;
+    gap: 12px;
   }
 
   .filters-container {
-    flex-direction: column;
+    flex-wrap: wrap;
+    gap: 10px;
   }
 
-  .search-input,
+  .search-input {
+    flex: 1 1 100%;
+    max-width: none;
+  }
+
   .payment-filter {
     width: 100%;
-    max-width: none;
   }
 
   .stats-grid {
@@ -851,7 +504,138 @@ onMounted(async () => {
   }
 
   .form-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
   }
 }
+
+/* ---------- 768px ↓ Mobile / Small tablets ---------- */
+@media (max-width: 768px) {
+
+  .page-title {
+    font-size: 22px;
+  }
+
+  .page-subtitle {
+    font-size: 13px;
+  }
+
+  .filters-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-input,
+  .payment-filter {
+    width: 100%;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  /* ✅ Table must scroll horizontally */
+  .table-card {
+    overflow-x: auto;
+  }
+
+  .modern-table :deep(.el-table__body-wrapper) {
+    overflow-x: auto;
+  }
+
+  /* ✅ Form grid becomes 1 column */
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .add-btn {
+    width: 100%;
+  }
+}
+
+/* ---------- 600px ↓ Phones ---------- */
+@media (max-width: 600px) {
+  .shipments-page {
+    padding: 10px;
+  }
+
+  .page-title {
+    font-size: 20px;
+  }
+
+  .stat-card {
+    padding: 14px;
+  }
+
+  .stat-value {
+    font-size: 22px;
+  }
+
+  .filters-card {
+    padding: 12px;
+  }
+
+  .details-cell {
+    gap: 4px;
+  }
+}
+
+/* ---------- 480px ↓ Small phones ---------- */
+@media (max-width: 480px) {
+
+  .page-title {
+    font-size: 18px;
+  }
+
+  .add-btn {
+    padding: 10px 16px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-card {
+    padding: 12px;
+  }
+
+  .filters-container {
+    gap: 8px;
+  }
+
+  .dialog-footer {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .dialog-footer .el-button {
+    width: 100%;
+  }
+}
+
+/* ---------- 360px ↓ Ultra-small ---------- */
+@media (max-width: 360px) {
+
+  .page-title {
+    font-size: 16px;
+  }
+
+  .page-subtitle {
+    font-size: 12px;
+  }
+
+  .filters-card {
+    padding: 8px;
+  }
+
+  .stat-card {
+    padding: 10px;
+  }
+
+  .form-grid {
+    gap: 10px;
+  }
+}
+
 </style>

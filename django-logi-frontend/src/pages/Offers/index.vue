@@ -421,6 +421,7 @@ onMounted(async () => {
 .offers-page {
   max-width: 1400px;
   margin: 0 auto;
+  padding: 16px;
 }
 
 /* Page Header */
@@ -467,11 +468,6 @@ onMounted(async () => {
   box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
 }
 
-.add-btn i {
-  margin-right: 6px;
-  font-size: 18px;
-}
-
 /* Filters Card */
 .filters-card {
   margin-bottom: 20px;
@@ -508,281 +504,39 @@ onMounted(async () => {
   margin-bottom: 20px;
 }
 
-.stat-card {
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  border: 1px solid #e2e8f0;
-  transition: all 0.3s ease;
-}
-
-.stat-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.stat-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
-  color: white;
-}
-
-.stat-icon.total {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-}
-
-.stat-icon.pending {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-}
-
-.stat-icon.accepted {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-}
-
-.stat-icon.average {
-  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-}
-
-.stat-content {
-  flex: 1;
-}
-
-.stat-value {
-  font-size: 28px;
-  font-weight: 700;
-  color: #0f172a;
-  line-height: 1;
-  margin-bottom: 4px;
-}
-
-.stat-label {
-  font-size: 14px;
-  color: #64748b;
-  font-weight: 500;
-}
-
 /* Table Card */
 .table-card {
   border-radius: 12px;
   border: 1px solid #e2e8f0;
+  overflow-x: auto; /* ✅ Mobile horizontal scroll */
 }
 
 .modern-table {
   border-radius: 8px;
-  overflow: hidden;
+  min-width: 900px; /* ✅ Prevents table breaking on small screens */
 }
 
-.modern-table :deep(.el-table__header) {
-  background: #f8fafc;
-}
-
-.modern-table :deep(th) {
-  background: #f8fafc !important;
-  color: #475569;
-  font-weight: 600;
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.modern-table :deep(.el-table__row:hover) {
-  background: #f8fafc;
-}
-
-.cargo-cell {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 600;
-  color: #0f172a;
-}
-
-.cargo-cell i {
-  color: #3b82f6;
-  font-size: 18px;
-}
-
-.carrier-cell {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: #475569;
-}
-
-.carrier-avatar {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-}
-
-.price-cell {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-weight: 700;
-  color: #10b981;
-  font-size: 15px;
-}
-
-.price-cell i {
-  font-size: 18px;
-}
-
-.vehicle-cell {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #64748b;
-  font-size: 14px;
-}
-
-.vehicle-cell i {
-  color: #94a3b8;
-  font-size: 16px;
-}
-
-.no-vehicle {
-  color: #cbd5e1;
-  font-style: italic;
-  font-size: 13px;
-}
-
-.note-cell {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  color: #64748b;
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-.note-cell i {
-  color: #94a3b8;
-  font-size: 16px;
-  margin-top: 2px;
-  flex-shrink: 0;
-}
-
-.status-tag {
-  font-weight: 600;
-  font-size: 12px;
-  padding: 6px 12px;
-  border-radius: 6px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.status-tag i {
-  font-size: 14px;
-}
-
-.action-buttons {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-}
-
-.action-buttons :deep(.el-button) {
-  font-size: 18px;
-  padding: 8px;
-  transition: all 0.3s ease;
-}
-
-.action-buttons :deep(.el-button:hover) {
-  transform: scale(1.1);
-}
-
-/* Dialog Styles */
+/* Dialog */
 .modern-dialog :deep(.el-dialog) {
   border-radius: 16px;
   overflow: hidden;
 }
 
-.modern-dialog :deep(.el-dialog__header) {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  color: white;
-  padding: 20px 24px;
-  margin: 0;
-}
+/* RESPONSIVE */
 
-.modern-dialog :deep(.el-dialog__title) {
-  color: white;
-  font-weight: 600;
-  font-size: 18px;
-}
-
-.modern-dialog :deep(.el-dialog__headerbtn .el-dialog__close) {
-  color: white;
-  font-size: 20px;
-}
-
-.modern-dialog :deep(.el-dialog__body) {
-  padding: 24px;
-}
-
-.offer-form :deep(.el-form-item__label) {
-  font-weight: 600;
-  color: #334155;
-  margin-bottom: 8px;
-}
-
-.offer-form :deep(.el-input__wrapper) {
-  border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.offer-form :deep(.el-textarea__inner) {
-  border-radius: 8px;
-}
-
-.option-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.option-item i {
-  color: #3b82f6;
-  font-size: 16px;
-}
-
-.dialog-footer {
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-}
-
-.dialog-footer .el-button {
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-}
-
-.dialog-footer .el-button i {
-  margin-right: 6px;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
+/* ✅ TABLET (Under 1024px) */
+@media (max-width: 1024px) {
   .header-content {
     flex-direction: column;
     align-items: flex-start;
   }
 
-  .filters-container {
-    flex-direction: column;
+  .add-btn {
+    width: 100%;
+    justify-content: center;
   }
 
-  .search-input,
-  .status-filter {
-    width: 100%;
+  .search-input {
     max-width: none;
   }
 
@@ -790,4 +544,57 @@ onMounted(async () => {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* ✅ MOBILE (Under 768px) */
+@media (max-width: 768px) {
+  .filters-container {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .search-input,
+  .status-filter {
+    width: 100%;
+  }
+
+  .filter-btn {
+    width: 100%;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .add-btn {
+    width: 100%;
+  }
+}
+
+/* ✅ SMALL MOBILE (Under 480px) */
+@media (max-width: 480px) {
+  .page-title {
+    font-size: 22px;
+  }
+
+  .page-title i {
+    font-size: 28px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .add-btn {
+    padding: 10px 16px;
+  }
+
+  .dialog-footer {
+    flex-direction: column;
+  }
+
+  .dialog-footer .el-button {
+    width: 100%;
+  }
+}
+
 </style>

@@ -530,72 +530,234 @@ function contactPhone(row: any): string {
 }
 </script>
 <style scoped>
-.search-page{padding:12px}
-.title{display:flex;align-items:center;gap:8px;margin:0}
-.subtitle{color:#64748b;margin:4px 0 12px}
+/* ================================
+   ✅ RESPONSIVE BREAKPOINTS
+   ================================ */
 
-.filters-card{margin-bottom:12px}
-.filters-grid{display:flex;flex-direction:column;gap:10px}
-.row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
-.range{display:flex;align-items:center;gap:6px}
-.dash{color:#94a3b8}
+/* ✅ 1400px ↓ — Large screens */
+@media (max-width: 1400px) {
+  .row-h {
+    grid-template-columns: 60px 1fr 80px 140px;
+  }
+}
 
-/* Advanced filters grid to mimic ATI expanded panel */
-.adv-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:8px}
-.section{border:1px solid #e5e7eb;border-radius:8px;padding:10px;background:#fff}
-.sect-title{font-weight:600;color:#111827;margin-bottom:8px}
-.checklist{display:flex;flex-direction:column;gap:6px}
-.checklist.two-cols{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.dims-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:6px}
-.mt6{margin-top:6px}
-.small{font-size:12px}
-.muted{color:#6b7280}
-.row.mini{gap:6px}
+/* ✅ 1200px ↓ — Reduce main columns */
+@media (max-width: 1200px) {
+  .col-main {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .col-main .cell.rate {
+    grid-column: span 1;
+  }
 
-/* New results header + list styles (aligned with Vehicles list) */
-.c-results-header{display:flex;align-items:center;justify-content:space-between;margin:8px 0 8px}
-.c-results-header .right{display:flex;align-items:center}
-.mr8{margin-right:8px}
-.ml12{margin-left:12px}
-.found{font-size:18px;margin:0}
+  .adv-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
 
-.c-list-header{display:grid;grid-template-columns:80px repeat(5,1fr) 80px;gap:8px;padding:6px 12px;color:#6b7280;font-size:12px;border:1px solid #e5e7eb;border-bottom:none;border-radius:10px 10px 0 0;background:#fff}
-.lh-col{text-transform:none}
-.c-results-list{display:flex;flex-direction:column;gap:10px}
-.c-result-row{border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;background:#fff}
-.c-result-row:hover{box-shadow:0 4px 12px rgba(0,0,0,.06)}
-.row-h{display:grid;grid-template-columns:80px 1fr 100px 160px;align-items:stretch;gap:0}
-.col-left{display:flex;align-items:center;gap:8px;padding:12px}
-.col-main{background:#f6f7f9;display:grid;grid-template-columns:repeat(5,1fr);gap:12px;padding:10px 12px}
-.col-right{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px}
-.col-meta{display:flex;flex-direction:column;justify-content:center;align-items:flex-end;padding:10px 12px;color:#6b7280;font-size:12px}
-.meta-time{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
-.meta-time .time-strong{color:#111827;font-weight:600}
+/* ✅ 1024px ↓ — Tablet landscape */
+@media (max-width: 1024px) {
+  .c-list-header {
+    display: none; /* Hide desktop header */
+  }
 
-.cell{color:#111827;font-size:14px}
-.cell .city{font-weight:600}
-.cell .note{font-size:12px;color:#64748b}
-.cargo .dims{color:#64748b;margin-left:6px}
-.rate .value{font-size:16px}
-.rate .request{color:#f59e0b;font-weight:700}
-.rate-extra{margin-top:6px;display:flex;flex-direction:column;gap:4px}
-.col-right-inner{display:flex;flex-direction:column;align-items:center;gap:6px}
-.right-top{display:flex;gap:8px}
-.complaint-link{font-size:12px;color:#6b7280}
+  .row-h {
+    grid-template-columns: 50px 1fr 70px;
+  }
 
-.row-bottom{display:flex;justify-content:space-between;align-items:center;padding:10px 12px}
-.left-actions{display:flex;align-items:center;gap:10px}
-.left-actions .hint{color:#9ca3af;font-size:12px}
-.time{font-size:12px;color:#64748b}
+  .col-right,
+  .col-meta {
+    display: none; /* hide tiny side columns */
+  }
 
-/* Contacts expandable panel */
-.fade-enter-active,.fade-leave-active{transition:opacity .2s ease}
-.fade-enter-from,.fade-leave-to{opacity:0}
-.contacts-panel{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:10px 12px;border-top:1px dashed #e5e7eb;background:#fff}
-.cp-left{display:flex;flex-direction:column;gap:6px}
-.cp-row{display:flex;align-items:center;gap:8px;color:#111827}
-.cp-row i{color:#64748b}
-.cp-right{display:flex;flex-wrap:wrap;gap:6px}
+  .col-main {
+    grid-template-columns: repeat(3, 1fr);
+    padding: 12px;
+  }
 
-.pager{display:flex; justify-content:flex-end; margin-top:12px}
+  .adv-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ✅ 900px ↓ — Tablet portrait */
+@media (max-width: 900px) {
+
+  .filters-grid {
+    gap: 16px;
+  }
+
+  .row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .adv-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .c-results-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .col-main {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ✅ 768px ↓ — Mobile */
+@media (max-width: 768px) {
+  .title {
+    font-size: 20px;
+  }
+
+  .filters-card {
+    padding: 12px;
+  }
+
+  .adv-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .c-result-row {
+    border-radius: 12px;
+  }
+
+  /* ✅ Mobile cargo row layout (ATI mobile style) */
+  .row-h {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    gap: 12px;
+  }
+
+  .col-left {
+    order: 1;
+    padding: 0;
+  }
+
+  .col-main {
+    order: 2;
+    background: #f6f7f9;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .col-right,
+  .col-meta {
+    display: none;
+  }
+
+  .cell {
+    font-size: 14px;
+  }
+
+  .rate .value {
+    font-size: 15px;
+  }
+
+  .row-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+}
+
+/* ✅ 600px ↓ — Smaller mobile */
+@media (max-width: 600px) {
+
+  .title {
+    font-size: 18px;
+  }
+
+  .c-results-header {
+    gap: 6px;
+  }
+
+  .left-actions .hint {
+    font-size: 11px;
+  }
+
+  .contacts-panel {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .cp-right {
+    justify-content: flex-start;
+  }
+
+  .filters-card {
+    padding: 10px;
+  }
+
+  .row-h {
+    padding: 8px;
+  }
+
+  .cell .city {
+    font-size: 14px;
+  }
+}
+
+/* ✅ 480px ↓ — Compact phones */
+@media (max-width: 480px) {
+
+  .title i {
+    font-size: 20px;
+  }
+
+  .cell {
+    font-size: 13px;
+  }
+
+  .rate .value {
+    font-size: 14px;
+  }
+
+  .c-result-row {
+    padding: 0;
+  }
+
+  .col-main {
+    padding: 8px;
+  }
+
+  .contacts-panel {
+    padding: 8px;
+  }
+}
+
+/* ✅ 360px ↓ — Ultra small */
+@media (max-width: 360px) {
+
+  .title {
+    font-size: 16px;
+  }
+
+  .filters-grid {
+    gap: 8px;
+  }
+
+  .adv-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .c-result-row {
+    border-radius: 8px;
+  }
+
+  .cell {
+    font-size: 12px;
+  }
+
+  .rate .value {
+    font-size: 13px;
+  }
+}
+
 </style>

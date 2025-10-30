@@ -140,38 +140,217 @@ function navigate(to: any) { router.push(to) }
 </script>
 
 <style scoped>
-.market-page { padding: 24px; }
-.hero { background: linear-gradient(180deg, #eef5ff, #ffffff); border-radius: 16px; margin-bottom: 20px; }
-.hero-inner { display: flex; gap: 24px; padding: 32px; align-items: center; min-height: 220px; }
-.hero-text h1 { margin: 0 0 8px; font-size: 28px; font-weight: 700; }
-.hero-text p { margin: 0 0 16px; color: #475569; }
-.stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 0; margin: 0; list-style: none; color: #1f2937; }
-.hero-art { flex: 1; min-height: 160px; border-radius: 12px; background: radial-gradient(closest-side, #dbeafe, transparent), repeating-linear-gradient(45deg, #eff6ff 0 10px, #ffffff 10px 20px); }
-
-.search-card { margin-bottom: 24px; }
-.search-grid { display: grid; grid-template-columns: 1fr 1fr 160px 220px; gap: 16px; align-items: end; }
-.field label { display: block; font-size: 12px; color: #64748b; margin-bottom: 6px; }
-.field.small { min-width: 140px; }
-.actions { display: flex; gap: 12px; align-items: center; }
-.distance-result { margin-top: 12px; color: #334155; display: flex; align-items: center; gap: 8px; }
-
-.services { margin: 28px 0; }
-.service-card { cursor: pointer; transition: transform .15s ease; }
-.service-card:hover { transform: translateY(-2px); }
-.service-card .icon { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 8px; margin-bottom: 12px; }
-.service-card .icon.cargo { background: #fef3c7; color: #92400e; }
-.service-card .icon.vehicle { background: #dbeafe; color: #1e3a8a; }
-.service-card .icon.orders { background: #dcfce7; color: #166534; }
-.service-card .icon.check { background: #fee2e2; color: #991b1b; }
-.service-card .title { font-weight: 600; margin-bottom: 4px; }
-.service-card .desc { color: #6b7280; font-size: 13px; }
-
-.cta-card { border-radius: 12px; }
-.cta-inner { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 10px 4px; }
-.cta-actions { display: flex; gap: 10px; }
-
-@media (max-width: 1024px) {
-  .search-grid { grid-template-columns: 1fr 1fr; }
-  .actions { grid-column: 1 / -1; }
+.market-page {
+  padding: 24px;
 }
+
+/* HERO */
+.hero {
+  background: linear-gradient(180deg, #eef5ff, #ffffff);
+  border-radius: 16px;
+  margin-bottom: 20px;
+}
+
+.hero-inner {
+  display: flex;
+  gap: 24px;
+  padding: 32px;
+  align-items: center;
+  min-height: 220px;
+}
+
+.hero-text h1 {
+  margin: 0 0 8px;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.hero-text p {
+  margin: 0 0 16px;
+  color: #475569;
+}
+
+.hero-art {
+  flex: 1;
+  min-height: 160px;
+  border-radius: 12px;
+  background: radial-gradient(closest-side, #dbeafe, transparent),
+  repeating-linear-gradient(45deg, #eff6ff 0 10px, #ffffff 10px 20px);
+}
+
+/* SEARCH */
+.search-card {
+  margin-bottom: 24px;
+}
+
+.search-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 160px 220px;
+  gap: 16px;
+  align-items: end;
+}
+
+.field label {
+  display: block;
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 6px;
+}
+
+.field.small {
+  min-width: 140px;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.distance-result {
+  margin-top: 12px;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* SERVICES */
+.services {
+  margin: 28px 0;
+}
+
+.service-card {
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.service-card:hover {
+  transform: translateY(-2px);
+}
+
+.service-card .icon {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.service-card .icon.cargo {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.service-card .icon.vehicle {
+  background: #dbeafe;
+  color: #1e3a8a;
+}
+
+.service-card .icon.orders {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.service-card .icon.check {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.service-card .title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.service-card .desc {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+/* CTA */
+.cta-card {
+  border-radius: 12px;
+}
+
+.cta-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 4px;
+}
+
+.cta-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* ✅ RESPONSIVE FIXES */
+
+/* TABLET — laptop */
+@media (max-width: 1024px) {
+
+  .hero-inner {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .search-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .actions {
+    grid-column: 1 / -1;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
+
+/* TABLET — small screens */
+@media (max-width: 768px) {
+
+  .hero-inner {
+    padding: 20px;
+  }
+
+  .search-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .actions button {
+    width: 100%;
+  }
+
+  .cta-inner {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+/* MOBILE — small phones */
+@media (max-width: 480px) {
+
+  .market-page {
+    padding: 16px;
+  }
+
+  .hero-inner {
+    padding: 16px;
+  }
+
+  .hero-text h1 {
+    font-size: 22px;
+  }
+
+  .service-card .desc {
+    font-size: 12px;
+  }
+}
+
 </style>

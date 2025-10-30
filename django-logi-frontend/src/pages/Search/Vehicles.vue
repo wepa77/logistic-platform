@@ -275,26 +275,161 @@ function applyFilters() {
 watch(() => route.query, () => { listKey.value += 1 })
 </script>
 <style scoped>
-.search-page{padding:12px}
-.title{display:flex;align-items:center;gap:8px;margin:0}
-.subtitle{color:#64748b;margin:4px 0 12px}
+/* =======================================
+ ✅ RESPONSIVE BREAKPOINTS — VEHICLES SEARCH
+======================================= */
 
-.filters-card{margin-bottom:12px}
-.filters-grid{display:flex;flex-direction:column;gap:10px}
-.row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
-.range{display:flex;align-items:center;gap:6px}
-.dash{color:#94a3b8}
+/* ✅ 1280px ↓ wider tablets */
+@media (max-width: 1280px) {
+  .adv-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
 
-/* Advanced filters grid to mimic ATI expanded panel (like Cargos) */
-.adv-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:8px}
-.section{border:1px solid #e5e7eb;border-radius:8px;padding:10px;background:#fff}
-.sect-title{font-weight:600;color:#111827;margin-bottom:8px}
-.checklist{display:flex;flex-direction:column;gap:6px}
-.dims-grid{display:grid;grid-template-columns:1fr;gap:6px;margin-top:6px}
-.mt6{margin-top:6px}
-.small{font-size:12px}
-.muted{color:#6b7280}
-.row.mini{gap:6px}
+/* ✅ 1024px ↓ tablets */
+@media (max-width: 1024px) {
+  .row {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .filters-grid {
+    gap: 16px;
+  }
+
+  .adv-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ✅ 768px ↓ mobile landscape / small tablets */
+@media (max-width: 768px) {
+
+  .title {
+    font-size: 20px;
+  }
+
+  /* 🔹 form rows become vertical */
+  .row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filters-card {
+    padding: 12px;
+  }
+
+  /* 🔹 advanced filter section → 1 col */
+  .adv-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .section {
+    padding: 10px;
+  }
+
+  .dims-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .search-page {
+    padding: 10px;
+  }
+}
+
+/* ✅ 600px ↓ mobile */
+@media (max-width: 600px) {
+
+  .title {
+    font-size: 18px;
+  }
+
+  .subtitle {
+    font-size: 13px;
+  }
+
+  .row {
+    gap: 8px;
+  }
+
+  .filters-card {
+    padding: 10px;
+  }
+
+  .sect-title {
+    font-size: 14px;
+  }
+
+  .checklist {
+    gap: 4px;
+  }
+
+  .range {
+    gap: 4px;
+  }
+
+  .dash {
+    font-size: 12px;
+  }
+}
+
+/* ✅ 480px ↓ small phones */
+@media (max-width: 480px) {
+
+  .title {
+    font-size: 17px;
+  }
+
+  .filters-card {
+    padding: 8px;
+  }
+
+  .section {
+    padding: 8px;
+  }
+
+  .row {
+    gap: 6px;
+  }
+
+  .adv-grid {
+    gap: 8px;
+  }
+
+  .sect-title {
+    font-size: 13px;
+  }
+}
+
+/* ✅ 360px ↓ ultra small */
+@media (max-width: 360px) {
+
+  .title {
+    font-size: 15px;
+  }
+
+  .subtitle {
+    font-size: 12px;
+  }
+
+  .filters-card {
+    padding: 6px;
+  }
+
+  .section {
+    padding: 6px;
+  }
+
+  .sect-title {
+    font-size: 12px;
+  }
+
+  .range {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
 </style>
 
 
